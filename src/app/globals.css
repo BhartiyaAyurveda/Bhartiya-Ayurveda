@@ -1,0 +1,284 @@
+@import url('https://fonts.googleapis.com/css2?family=Alex+Brush&family=Caveat:wght@600;700&family=Dancing+Script:wght@600;700&family=Montserrat:wght@700;800;900&family=Noto+Sans+Devanagari:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-forest-dark: #071F13;
+  --color-forest: #0E3320;
+  --color-forest-light: #16462C;
+  --color-sand: #FAF8F5;
+  --color-sand-muted: #F2EDE4;
+  --color-gold: #C59B3F;
+  --color-terracotta: #B96647;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16.5px;
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  color: #1a2e22;
+  background-color: #FAF8F5;
+  font-style: normal;
+  overflow-x: clip;
+}
+
+@media (min-width: 640px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  html {
+    font-size: 17px;
+  }
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  font-style: normal;
+  line-height: 1.6;
+  overflow-x: clip;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+  html, body {
+    font-size: 11px !important;
+  }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+/* Prevent unwanted automatic zoom on iOS Safari when tapping inputs */
+@media screen and (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1ede4;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1b5e3a;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0e311e;
+}
+
+/* Hero Section Bold All-Caps Sans Callout (Matches HEAL BALANCE TRANSFORM) */
+.font-hero-caps {
+  font-family: 'Montserrat', 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+/* Special Calligraphy Font */
+.font-calligraphy {
+  font-family: 'Dancing Script', 'Alex Brush', 'Caveat', cursive;
+}
+
+/* Clean standard typography */
+.font-script {
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  font-style: normal;
+  letter-spacing: 0.02em;
+}
+
+.font-serif-title {
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  font-style: normal;
+}
+
+.font-devanagari {
+  font-family: 'Noto Sans Devanagari', sans-serif;
+}
+
+/* Botanical subtle leaf motif overlays */
+.leaf-border-accent {
+  background-image: radial-gradient(#15432a 0.75px, transparent 0.75px);
+  background-size: 20px 20px;
+}
+
+/* Glassmorphism */
+.glass-frosted-dark {
+  background: rgba(14, 49, 30, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.glass-frosted-light {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+/* Image zoom on hover */
+.img-hover-zoom {
+  overflow: hidden;
+}
+
+.img-hover-zoom img {
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.img-hover-zoom:hover img {
+  transform: scale(1.07);
+}
+
+/* Keyframe Animations */
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
+}
+
+@keyframes floatGentle {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(1.2deg);
+  }
+}
+
+@keyframes swaySlow {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(197, 155, 63, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(197, 155, 63, 0);
+  }
+}
+
+@keyframes pulsePingSoft {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmerStreak {
+  0% {
+    transform: translateX(-150%);
+  }
+  100% {
+    transform: translateX(150%);
+  }
+}
+
+@keyframes rotateSlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+/* Animation Helper Classes */
+.animate-float-slow {
+  animation: floatSlow 4.5s ease-in-out infinite;
+}
+
+.animate-float-gentle {
+  animation: floatGentle 5s ease-in-out infinite;
+}
+
+.animate-sway-slow {
+  animation: swaySlow 6s ease-in-out infinite;
+  transform-origin: top left;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2.5s infinite;
+}
+
+.animate-ping-soft {
+  animation: pulsePingSoft 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.animate-rotate-slow {
+  animation: rotateSlow 24s linear infinite;
+}
+
+.animate-breathe {
+  animation: breathe 3.5s ease-in-out infinite;
+}
+
+/* Card Hover Elevation Effects */
+.card-hover-lift {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+}
+
+.card-hover-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 32px -8px rgba(14, 51, 32, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* Shimmer Button Effect */
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+  transform: translateX(-150%);
+  pointer-events: none;
+}
+
+.btn-shimmer:hover::after {
+  animation: shimmerStreak 1s ease-in-out;
+}
