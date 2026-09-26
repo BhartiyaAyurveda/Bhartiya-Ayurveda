@@ -488,7 +488,7 @@ export default function ContactPage() {
                   rel="noopener noreferrer"
                   className="text-[#B96647] hover:underline"
                 >
-                  Get Directions →
+                  Get Directions
                 </a>
               </div>
             </div>

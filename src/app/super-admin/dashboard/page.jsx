@@ -585,7 +585,7 @@ export default function SuperAdminDashboardPage() {
                       onClick={() => setActiveTab("certificates")}
                       className="text-xs font-bold text-[#8C671D] hover:text-[#0E3320] underline transition-colors"
                     >
-                      View Full Registry →
+                      View Full Registry
                     </button>
                   </div>
                 </div>

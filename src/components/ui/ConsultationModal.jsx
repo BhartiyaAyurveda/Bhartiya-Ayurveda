@@ -189,7 +189,7 @@ export default function ConsultationModal({ isOpen, onClose }) {
                   className="w-full py-3.5 bg-gradient-to-r from-forest-800 to-forest-700 hover:from-forest-900 hover:to-forest-800 text-white font-semibold rounded-xl text-sm transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
                 >
                   <Sparkles className="w-4 h-4 text-gold-400" />
-                  <span>Confirm Consultation Request →</span>
+                  <span>Confirm Consultation Request</span>
                 </button>
                 <p className="text-[11px] text-center text-forest-700/60 mt-2">
                   🔒 100% confidential. No spam. Guided by licensed Ayurvedic doctors.
