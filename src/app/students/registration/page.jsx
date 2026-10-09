@@ -236,7 +236,7 @@ export default function StudentRegistrationPage() {
           <div className="flex justify-center">
             <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-[#C59B3F]/40 text-[#E4BF64] text-[11px] sm:text-sm font-semibold shadow-sm text-center">
               <span>🌿</span>
-              <span>भारतीय आयुर्वेद • छात्र पंजीकरण सत्र 2026-27</span>
+              <span>भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद् • छात्र पंजीकरण सत्र 2026-27</span>
             </div>
           </div>
 
@@ -251,7 +251,7 @@ export default function StudentRegistrationPage() {
           </div>
 
           <p className="max-w-2xl mx-auto text-xs sm:text-base text-[#CBD8CB] leading-relaxed">
-            Create your official Bhartiya Ayurveda student profile to access exam schedules, download hall tickets, view semester results, and obtain digital marksheets.
+            Create your official Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad student profile to access exam schedules, download hall tickets, view semester results, and obtain digital marksheets.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 pt-2">
@@ -282,7 +282,7 @@ export default function StudentRegistrationPage() {
                 छात्र पंजीकरण पावती • Registration Receipt
               </h2>
               <p className="text-xs sm:text-sm text-[#7A583A] font-medium">
-                भारतीय आयुर्वेद (Bhartiya Ayurveda)
+                भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद् (Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad)
               </p>
               <div className="inline-block bg-[#0E3320] text-[#E4BF64] px-4 py-1.5 rounded-full text-xs font-mono font-bold tracking-widest mt-2">
                 STUDENT ID: {studentId}
@@ -834,7 +834,7 @@ export default function StudentRegistrationPage() {
                         className="mt-1 w-4 h-4 accent-[#0E3320] rounded shrink-0"
                       />
                       <span>
-                        I hereby declare that all details and documents provided above are true and genuine according to my official academic records. I agree to abide by the rules and regulations of Bhartiya Ayurveda.
+                        I hereby declare that all details and documents provided above are true and genuine according to my official academic records. I agree to abide by the rules and regulations of Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad.
                       </span>
                     </label>
                   </div>

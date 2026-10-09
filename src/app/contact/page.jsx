@@ -50,7 +50,7 @@ export default function ContactPage() {
       icon: MapPin,
       titleHi: "हमारा केंद्र / स्थान",
       titleEn: "Center Location (Mumbai)",
-      desc: "Bhartiya Ayurveda Center, Mumbai, Maharashtra - 400050, India",
+      desc: "Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad Center, Mumbai, Maharashtra - 400050, India",
       sub: "Central Ayurvedic consultation center & holistic wellness clinic in Mumbai.",
     },
     {
@@ -87,7 +87,7 @@ export default function ContactPage() {
         <div className="absolute inset-0 z-0">
           <img
             src="/images/cta/cta-landscape.jpg"
-            alt="Bhartiya Ayurveda Mumbai Wellness Center"
+            alt="Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad Mumbai Wellness Center"
             className="w-full h-full object-cover opacity-60"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#071F13] via-[#0E3320]/65 to-[#071F13]/70"></div>
@@ -115,7 +115,7 @@ export default function ContactPage() {
               संपर्क करें
             </h1>
             <div className="font-sans text-xl sm:text-2xl lg:text-3xl text-[#C59B3F] font-bold">
-              Contact Bhartiya Ayurveda
+              Contact Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad
             </div>
           </div>
 
@@ -439,7 +439,7 @@ export default function ContactPage() {
                 मानचित्र पर हमारा केंद्र देखें
               </h2>
               <div className="text-base sm:text-lg font-sans font-bold text-[#15482D] mt-0.5">
-                Find Bhartiya Ayurveda Center, Mumbai
+                Find Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad Center, Mumbai
               </div>
             </div>
 
@@ -457,7 +457,7 @@ export default function ContactPage() {
           <div className="relative rounded-3xl overflow-hidden shadow-xl border-2 border-[#D9CABE] bg-white">
             {/* Map Frame */}
             <iframe
-              title="Bhartiya Ayurveda Mumbai Location"
+              title="Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad Mumbai Location"
               src="https://maps.google.com/maps?q=Mumbai,%20Maharashtra,%20India&t=&z=13&ie=UTF8&iwloc=&output=embed"
               width="100%"
               height="480"
@@ -475,7 +475,7 @@ export default function ContactPage() {
                 <span className="text-xs font-bold text-[#2E7A4A] uppercase tracking-wide">Open for Consultations</span>
               </div>
               <h4 className="font-sans font-bold text-base sm:text-lg text-[#0E3320] leading-tight">
-                Bhartiya Ayurveda Center
+                Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad Center
               </h4>
               <p className="text-xs sm:text-sm text-[#466551] leading-relaxed">
                 Mumbai, Maharashtra - 400050, India

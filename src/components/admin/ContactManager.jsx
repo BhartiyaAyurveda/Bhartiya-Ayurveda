@@ -18,8 +18,8 @@ import {
 
 const DEFAULT_CONTACT = {
   // Center Location
-  mainCenterName: "Bhartiya Ayurveda Central Ashram & Institute",
-  mainCenterNameHi: "भारतीय आयुर्वेद केंद्रीय संस्थान एवं आश्रम",
+  mainCenterName: "Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad Central Ashram & Institute",
+  mainCenterNameHi: "भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद् केंद्रीय संस्थान एवं आश्रम",
   addressLine1: "Near Lakshman Jhula, Tapovan, P.O. Shivananda Nagar",
   city: "Rishikesh",
   state: "Uttarakhand",

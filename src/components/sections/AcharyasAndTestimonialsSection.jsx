@@ -36,7 +36,7 @@ export default function AcharyasAndTestimonialsSection({ onOpenConsultation }) {
     {
       name: "Priya Patel",
       role: "14-Day Ayurveda Retreat Participant",
-      text: "Bhartiya Ayurveda has truly transformed my life. The programs are authentic, well-structured and deeply enriching.",
+      text: "Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad has truly transformed my life. The programs are authentic, well-structured and deeply enriching.",
       img: "/images/testimonials/priya-patel.jpg",
     },
     {

@@ -1,8 +1,8 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "Bhartiya Ayurveda | भारतीय आयुर्वेद संस्थान — Ancient Wisdom for a Better Tomorrow",
-  description: "Experience authentic classical Ayurveda, pure Ashtanga Yoga, and 5-element Naturopathy retreats nestled in Rishikesh, Uttarakhand.",
+  title: "Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad | भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद् — Ancient Wisdom for a Better Tomorrow",
+  description: "Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad (भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद्) — experience authentic classical Ayurveda, pure Ashtanga Yoga, and 5-element Naturopathy retreats nestled in Rishikesh, Uttarakhand.",
   keywords: [
     "Ayurveda",
     "Yoga",
@@ -10,12 +10,23 @@ export const metadata = {
     "Prakritik Chikitsa",
     "Rishikesh Retreat",
     "Panchakarma",
-    "Bhartiya Ayurveda",
+    "Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad",
+    "भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद्",
+    "Bhartiya Ayurveda Trust",
   ],
+  applicationName: "Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad",
+  authors: [{ name: "Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad" }],
   icons: {
-    icon: "/images/favicon.png",
-    shortcut: "/images/favicon.png",
-    apple: "/images/favicon.png",
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
+  openGraph: {
+    title: "Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad | भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद्",
+    description: "Experience authentic classical Ayurveda, pure Ashtanga Yoga, and 5-element Naturopathy retreats nestled in Rishikesh, Uttarakhand.",
+    siteName: "Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad",
+    locale: "hi_IN",
+    type: "website",
   },
 };
 

@@ -96,7 +96,7 @@ export default function StudentLoginPage() {
           <div className="flex justify-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-[#C59B3F]/40 text-[#E4BF64] text-xs sm:text-sm font-semibold shadow-sm">
               <span>🌿</span>
-              <span>भारतीय आयुर्वेद • छात्र पोर्टल</span>
+              <span>भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद् • छात्र पोर्टल</span>
             </div>
           </div>
 
@@ -106,7 +106,7 @@ export default function StudentLoginPage() {
               विद्यार्थी लॉगिन पोर्टल
             </h1>
             <div className="font-sans text-xl sm:text-2xl lg:text-3xl text-[#C59B3F] font-bold">
-              Bhartiya Ayurveda Student Portal Access
+              Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad Student Portal Access
             </div>
           </div>
 
@@ -237,10 +237,10 @@ export default function StudentLoginPage() {
                   Syllabus & Courseware
                 </h3>
                 <p className="text-xs text-[#666] leading-relaxed">
-                  Access official Bhartiya Ayurveda textbooks, Shatkarma guidelines, Herbarium handbook, and Anatomy notes.
+                  Access official Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad textbooks, Shatkarma guidelines, Herbarium handbook, and Anatomy notes.
                 </p>
                 <button
-                  onClick={() => alert("Redirecting to Bhartiya Ayurveda E-Learning portal...")}
+                  onClick={() => alert("Redirecting to Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad E-Learning portal...")}
                   className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[#0E3320] text-[#0E3320] hover:bg-[#0E3320] hover:text-white font-semibold text-xs transition-colors"
                 >
                   <Download className="w-4 h-4" />
@@ -337,7 +337,7 @@ export default function StudentLoginPage() {
                   </label>
                   <button
                     type="button"
-                    onClick={() => alert("Please contact Bhartiya Ayurveda student helpdesk at +91 98765 43210 or email hello@bhartiyaayurveda.in to reset your password.")}
+                    onClick={() => alert("Please contact Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad student helpdesk at +91 98765 43210 or email hello@bhartiyaayurveda.in to reset your password.")}
                     className="text-xs text-[#7A583A] hover:text-[#0E3320] underline"
                   >
                     Forgot Password?
@@ -416,7 +416,7 @@ export default function StudentLoginPage() {
         {/* Support Helpdesk Bar */}
         <div className="max-w-lg mx-auto mt-8 bg-white p-5 rounded-2xl border border-[#EBE2D4] text-center space-y-1 shadow-sm">
           <p className="text-xs font-semibold text-[#0E3320]">
-            Bhartiya Ayurveda Student Helpdesk & Support
+            Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad Student Helpdesk & Support
           </p>
           <p className="text-xs text-[#666]">
             Facing trouble logging in? Call Helpline: <strong className="text-[#0E3320]">+91 98765 43210</strong> or email <strong className="text-[#0E3320]">hello@bhartiyaayurveda.in</strong>

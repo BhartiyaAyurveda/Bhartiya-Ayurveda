@@ -192,7 +192,7 @@ export default function GalleryPage() {
       titleHi: "औषधीय वनस्पति धरोहर",
       titleEn: "Botanical Canopy & Sacred Flora",
       category: "Ayurveda",
-      desc: "Pure biodiversity thriving in the lush gardens of Bhartiya Ayurveda sanctuary.",
+      desc: "Pure biodiversity thriving in the lush gardens of Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad sanctuary.",
     },
   ];
 

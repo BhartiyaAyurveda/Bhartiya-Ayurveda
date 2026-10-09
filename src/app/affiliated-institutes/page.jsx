@@ -42,7 +42,7 @@ export default function AffiliatedInstitutesPage() {
     message: ""
   });
 
-  // The 14 exact affiliated institutions of Bhartiya Ayurveda
+  // The 14 exact affiliated institutions of Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad
   const institutes = [
     {
       id: 1,
@@ -291,7 +291,7 @@ export default function AffiliatedInstitutesPage() {
           <div className="flex justify-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-[#C59B3F]/40 text-[#E4BF64] text-xs sm:text-sm font-semibold shadow-sm">
               <span>🌿</span>
-              <span>भारतीय आयुर्वेद — संबद्ध शिक्षण संस्थान</span>
+              <span>भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद् — संबद्ध शिक्षण संस्थान</span>
             </div>
           </div>
 
@@ -306,7 +306,7 @@ export default function AffiliatedInstitutesPage() {
           </div>
 
           <p className="max-w-2xl mx-auto text-base sm:text-lg text-[#CBD8CB] leading-relaxed pt-1">
-            Recognized paramedical, yoga, and naturopathy colleges officially affiliated with Bhartiya Ayurveda across India.
+            Recognized paramedical, yoga, and naturopathy colleges officially affiliated with Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad across India.
           </p>
 
           {/* Quick stats row */}

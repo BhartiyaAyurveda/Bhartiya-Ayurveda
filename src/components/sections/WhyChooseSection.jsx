@@ -47,10 +47,10 @@ export default function WhyChooseSection({ onOpenVideo }) {
             <Reveal direction="up" delay={100}>
               <div>
                 <h2 className="text-xl sm:text-2xl lg:text-3xl font-devanagari font-bold text-[#0E3320]">
-                  क्यों चुनें भारतीय आयुर्वेद ?
+                  क्यों चुनें भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद् ?
                 </h2>
                 <div className="text-base sm:text-lg font-sans font-bold text-[#16462C] mt-1">
-                  Why Choose Bhartiya Ayurveda ?
+                  Why Choose Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad ?
                 </div>
               </div>
             </Reveal>

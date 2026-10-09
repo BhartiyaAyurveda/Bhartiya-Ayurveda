@@ -109,7 +109,7 @@ export default function AboutPage() {
         <div className="absolute inset-0 z-0">
           <img
             src="/images/hero/hero-meditation.jpg"
-            alt="Bhartiya Ayurveda Sanctuary"
+            alt="Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad Sanctuary"
             className="w-full h-full object-cover opacity-60 object-center"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#071F13] via-[#0E3320]/65 to-[#071F13]/70"></div>
@@ -117,7 +117,7 @@ export default function AboutPage() {
 
         <div className="max-w-7xl mx-auto relative z-10 text-center space-y-5">
           {/* Breadcrumb Row */}
-          <nav aria-label="Breadcrumb" className="flex items-center justify-center gap-2 text-xs sm:text-sm text-[#C59B3F] font-semibold tracking-wider uppercase">
+          <nav aria-label="Breadcrumb" className="flex items-center justify-center gap-2 text-sm sm:text-base text-[#C59B3F] font-semibold tracking-wider uppercase">
             <Link href="/" className="hover:underline hover:text-white transition-colors">Home</Link>
             <span className="text-[#8C671D]">/</span>
             <span className="text-white">About Us</span>
@@ -125,7 +125,7 @@ export default function AboutPage() {
 
           {/* Vedic Tag Pill Row (Distinct separate line) */}
           <div className="flex justify-center">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-[#C59B3F]/40 text-[#E4BF64] text-xs sm:text-sm font-semibold shadow-sm">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-[#C59B3F]/40 text-[#E4BF64] text-sm sm:text-base font-semibold shadow-sm">
               <span>🌿</span>
               <span>सनातन परंपरा • प्रकृति का सानिध्य • समग्र स्वास्थ्य</span>
             </div>
@@ -133,15 +133,15 @@ export default function AboutPage() {
 
           {/* Main Title Row */}
           <div className="space-y-2 pt-1">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-devanagari font-bold text-white leading-tight">
+            <h1 className="text-3xl sm:text-4xl lg:text-4xl font-devanagari font-bold text-white leading-tight">
               हमारे बारे में
             </h1>
-            <div className="font-sans text-xl sm:text-2xl lg:text-3xl text-[#C59B3F] font-bold">
-              About Bhartiya Ayurveda
+            <div className="font-sans text-2xl sm:text-3xl lg:text-4xl text-[#C59B3F] font-bold">
+              About Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad
             </div>
           </div>
 
-          <p className="max-w-2xl mx-auto text-base sm:text-lg text-[#CBD8CB] leading-relaxed pt-1">
+          <p className="max-w-2xl mx-auto text-lg sm:text-xl text-[#CBD8CB] leading-relaxed pt-1">
             Restoring the timeless harmony of Body, Mind, and Spirit through classical Vedic Ayurveda, authentic Himalayan Yoga, and 5-Element Naturopathy.
           </p>
         </div>
@@ -154,21 +154,21 @@ export default function AboutPage() {
             
             {/* Left Story Text */}
             <div className="lg:col-span-7 space-y-5">
-              <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-[#8C671D] uppercase tracking-wider">
+              <div className="inline-flex items-center gap-2 text-sm sm:text-base font-bold text-[#8C671D] uppercase tracking-wider">
                 <Flower2 className="w-4 h-4 text-[#2E7A4A]" />
                 <span>Our Heritage & Origin</span>
               </div>
 
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-devanagari font-bold text-[#0E3320] leading-tight">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-devanagari font-bold text-[#0E3320] leading-tight">
                 भारतीय संस्कृति और प्राचीन चिकित्सा का पावन संगम
               </h2>
 
-              <p className="font-devanagari text-sm sm:text-base text-[#2E543C] leading-relaxed">
-                भारतीय आयुर्वेद संस्थान की स्थापना ऋषिकेश में पावन गंगा के तट पर इस संकल्प के साथ की गई कि प्राचीन काल से चली आ रही महर्षि चरक, सुश्रुत और वाग्भट्ट की चिकित्सा परंपरा को उसके विशुद्ध और प्रामाणिक स्वरूप में जन-जन तक पहुँचाया जा सके।
+              <p className="font-devanagari text-base sm:text-lg text-[#2E543C] leading-relaxed">
+                भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद् संस्थान की स्थापना ऋषिकेश में पावन गंगा के तट पर इस संकल्प के साथ की गई कि प्राचीन काल से चली आ रही महर्षि चरक, सुश्रुत और वाग्भट्ट की चिकित्सा परंपरा को उसके विशुद्ध और प्रामाणिक स्वरूप में जन-जन तक पहुँचाया जा सके।
               </p>
 
-              <p className="font-sans text-sm sm:text-base text-[#466551] leading-relaxed">
-                In an era dominated by symptomatic treatments and synthetic lifestyle stress, Bhartiya Ayurveda provides a refuge of authentic natural healing. We don't just treat illnesses; we identify the root imbalance in your bodily doshas and restore your inherent vitality through natural therapies, sattvic nutrition, and inner balance.
+              <p className="font-sans text-base sm:text-lg text-[#466551] leading-relaxed">
+                In an era dominated by symptomatic treatments and synthetic lifestyle stress, Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad provides a refuge of authentic natural healing. We don't just treat illnesses; we identify the root imbalance in your bodily doshas and restore your inherent vitality through natural therapies, sattvic nutrition, and inner balance.
               </p>
 
               {/* Highlight bullet points */}
@@ -179,7 +179,7 @@ export default function AboutPage() {
                   "Pure cold-pressed Ayurvedic herbal formulations",
                   "Lifelong holistic lifestyle guidance & community"
                 ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-2.5 text-sm sm:text-base text-[#0E3320] font-semibold">
+                  <div key={i} className="flex items-center gap-2.5 text-base sm:text-lg text-[#0E3320] font-semibold">
                     <CheckCircle2 className="w-5 h-5 text-[#2E7A4A] shrink-0" />
                     <span>{item}</span>
                   </div>
@@ -189,7 +189,7 @@ export default function AboutPage() {
               <div className="pt-3">
                 <button
                   onClick={() => setIsConsultationOpen(true)}
-                  className="px-7 py-3.5 rounded-full bg-[#0E3320] hover:bg-[#071F13] text-white text-sm sm:text-base font-semibold shadow-md flex items-center gap-2.5 transition-all group"
+                  className="px-7 py-3.5 rounded-full bg-[#0E3320] hover:bg-[#071F13] text-white text-base sm:text-lg font-semibold shadow-md flex items-center gap-2.5 transition-all group"
                 >
                   <span>Schedule Consultation with Our Vaidyas</span>
                 </button>
@@ -210,10 +210,10 @@ export default function AboutPage() {
                   </div>
 
                   <div className="space-y-2 border-t border-[#E5DAC9] pt-4">
-                    <blockquote className="font-devanagari font-bold text-base sm:text-lg text-[#0E3320] leading-snug">
+                    <blockquote className="font-devanagari font-bold text-lg sm:text-xl text-[#0E3320] leading-snug">
                       "स्वस्थस्य स्वास्थ्य रक्षणं, आतुरस्य विकार प्रशमनं च।"
                     </blockquote>
-                    <p className="font-sans text-xs sm:text-sm text-[#8C671D] font-semibold">
+                    <p className="font-sans text-sm sm:text-base text-[#8C671D] font-semibold">
                       — To protect the health of the healthy and alleviate disease in the ailing. (Charaka Samhita)
                     </p>
                   </div>
@@ -223,14 +223,77 @@ export default function AboutPage() {
                 <div className="absolute -bottom-5 right-2 sm:-bottom-6 sm:right-6 bg-[#0E3320] text-white px-4 sm:px-5 py-2.5 sm:py-3.5 rounded-2xl shadow-xl border border-[#C59B3F]/40 flex items-center gap-2.5 sm:gap-3">
                   <Award className="w-6 h-6 sm:w-8 sm:h-8 text-[#C59B3F] shrink-0" />
                   <div>
-                    <div className="text-lg sm:text-2xl font-extrabold text-white leading-none">25+ Years</div>
-                    <div className="text-[11px] sm:text-xs text-[#CBD8CB] font-medium mt-0.5">Vedic Tradition</div>
+                    <div className="text-xl sm:text-3xl font-extrabold text-white leading-none">25+ Years</div>
+                    <div className="text-[11px] sm:text-sm text-[#CBD8CB] font-medium mt-0.5">Vedic Tradition</div>
                   </div>
                 </div>
               </div>
             </div>
 
           </div>
+        </div>
+      </section>
+
+      {/* 3b. Trust Objectives (न्यास के उद्देश्य) */}
+      <section className="py-16 md:py-20 px-4 md:px-8 bg-[#F5F0E8] border-b border-[#E6DDCE]">
+        <div className="max-w-7xl mx-auto space-y-12">
+
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-devanagari font-bold text-[#0E3320]">
+              न्यास के उद्देश्य
+            </h2>
+            <div className="text-xl sm:text-2xl font-sans font-bold text-[#15482D]">
+              Our Trust's Objectives
+            </div>
+            <p className="text-base sm:text-lg text-[#466551]">
+              As registered in our founding Trust Deed, guiding every institute, retreat and outreach we build.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                hi: "इस न्यास/ट्रस्ट का मुख्य उद्देश्य छात्र-छात्राओं व शिक्षित बेरोजगार व्यक्तियों को आयुर्वेद, योग एवं प्राकृतिक चिकित्सा से सम्बन्धित क्षेत्रो में प्रशिक्षण देना है।",
+                en: "The primary objective of this Trust is to provide training to students and educated unemployed individuals in fields related to Ayurveda, Yoga & Naturopathy.",
+              },
+              {
+                hi: "आयुर्वेद, योग, यूनानी एवं प्राकृतिक चिकित्सा इत्यादि कोर्सेस के संचालन हेतु कालेज/शैक्षिक संस्थानो को देश-विदेश/राज्य/तहसील/ब्लाक/जिला स्तर पर प्रारम्भ एवं संचालन करना।",
+                en: "Establishing and operating colleges & educational institutions at the national, international, state, tehsil, block and district level to run courses in Ayurveda, Yoga, Unani and Naturopathy.",
+              },
+              {
+                hi: "न्यास (ट्रस्ट) के आयुर्वेद, योग, प्राकृतिक चिकित्सा तथा अन्य चिकित्सीय कोर्सेस को पूर्ण करने के पश्चात प्रशिक्षित युवक/युवतियों को डिप्लोमा/सर्टीफिकेट/डिग्री (आवश्यक सम्बद्धता उपरान्त) प्रदान करना।",
+                en: "Awarding recognized Diplomas, Certificates and Degrees (after obtaining necessary affiliation) to trained youth upon completion of the Trust's Ayurveda, Yoga, Naturopathy and other medical courses.",
+              },
+              {
+                hi: "आयुर्वेद, योग, प्राकृतिक चिकित्सा का प्रचार प्रसार भारत के हर जिले, कस्बो, तहसील, राज्यो व विदेशों में करना।",
+                en: "Promoting and spreading Ayurveda, Yoga & Naturopathy in every district, town, tehsil and state of India, and abroad.",
+              },
+              {
+                hi: "सम्पूर्ण भारत के ग्रामीण इलाको में आयुर्वेद, योग, प्राकृतिक चिकित्सा के माध्यम से बीमार लोगो का ईलाज करवाना एवं योग विद्या का प्रचार व प्रसार करना।",
+                en: "Providing treatment to the sick through Ayurveda, Yoga & Naturopathy in rural areas across India, and promoting the science of Yoga.",
+              },
+              {
+                hi: "भारत के समस्त राज्यो, जिलो, तहसीलो, कस्बो में प्रेक्टिस कर रहे डाक्टरो, नर्सिंग प्रेक्टीशनरो, पैरामेडिकल प्रेक्टीशनरो को आयुर्वेद, योग, यूनानी, जड़ी-बूटियों से इलाज तथा प्राकृतिक चिकित्सा में इनरोल करके डिप्लोमा, प्रमाण पत्र, डिग्री (आवश्यक सम्बद्धता लेकर) प्रदान करना।",
+                en: "Enrolling doctors, nursing practitioners and paramedical practitioners practicing across all states, districts, tehsils and towns of India into Ayurveda, Yoga, Unani, herbal & Naturopathy programs, and awarding them Diplomas, Certificates and Degrees (after necessary affiliation).",
+              },
+              {
+                hi: "योग केन्द्रो की स्थापना/संचालन भारत के समस्त राज्यों, शहरो, तहसीलो, जिलो, कस्बो एवं विदेशों में करना।",
+                en: "Establishing and operating Yoga Kendras across all states, cities, tehsils, districts and towns of India, and abroad.",
+              },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-3xl p-6 border border-[#E8DFCFA] shadow-sm hover:shadow-xl hover:-translate-y-1.5 hover:border-[#C59B3F]/50 transition-all duration-300 flex flex-col gap-3"
+              >
+                <span className="w-10 h-10 rounded-full bg-[#EAE2D3] text-[#0E3320] text-lg font-bold flex items-center justify-center shrink-0">
+                  {i + 1}
+                </span>
+                <p className="font-devanagari text-lg sm:text-xl text-[#0E3320] font-semibold leading-relaxed">{item.hi}</p>
+                <p className="text-base sm:text-lg text-[#52725D] leading-relaxed">{item.en}</p>
+              </div>
+            ))}
+          </div>
+
         </div>
       </section>
 
@@ -246,14 +309,14 @@ export default function AboutPage() {
               key={idx}
               className="p-4 sm:p-6 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/10 hover:border-[#C59B3F]/50 shadow-sm transition-all duration-300 hover:-translate-y-1"
             >
-              <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-white font-sans">
+              <div className="text-4xl sm:text-5xl lg:text-6xl font-black text-white font-sans">
                 {m.num}
               </div>
               <div className="w-8 h-0.5 bg-[#C59B3F] mx-auto my-2 rounded-full"></div>
-              <div className="font-devanagari font-bold text-xs sm:text-base text-[#E4BF64] mt-1">
+              <div className="font-devanagari font-bold text-sm sm:text-lg text-[#E4BF64] mt-1">
                 {m.labelHi}
               </div>
-              <div className="text-[11px] sm:text-sm text-[#B3CEBA] font-semibold mt-0.5">
+              <div className="text-[11px] sm:text-base text-[#B3CEBA] font-semibold mt-0.5">
                 {m.labelEn}
               </div>
             </div>
@@ -266,13 +329,13 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto space-y-12">
           
           <div className="text-center max-w-2xl mx-auto space-y-3">
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-devanagari font-bold text-[#0E3320]">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-devanagari font-bold text-[#0E3320]">
               दृष्टि एवं उद्देश्य
             </h2>
-            <div className="text-lg sm:text-xl font-sans font-bold text-[#15482D]">
+            <div className="text-xl sm:text-2xl font-sans font-bold text-[#15482D]">
               Our Vision & Mission
             </div>
-            <p className="text-sm sm:text-base text-[#466551]">
+            <p className="text-base sm:text-lg text-[#466551]">
               Guided by the timeless ethics of the Vedas, committed to global well-being.
             </p>
           </div>
@@ -285,16 +348,16 @@ export default function AboutPage() {
                   <Sun className="w-7 h-7 stroke-[1.75] text-[#C59B3F]" />
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-[#8C671D] uppercase tracking-wider">Vision</span>
-                  <h3 className="text-lg sm:text-xl font-devanagari font-bold text-[#0E3320] mt-1">
+                  <span className="text-sm font-bold text-[#8C671D] uppercase tracking-wider">Vision</span>
+                  <h3 className="text-xl sm:text-2xl font-devanagari font-bold text-[#0E3320] mt-1">
                     हमारी दृष्टि (Our Vision)
                   </h3>
                 </div>
-                <p className="font-devanagari text-sm sm:text-base text-[#2E543C] leading-relaxed">
-                  विश्व को प्राचीन भारतीय चिकित्सा पद्धति से पुनः जोड़कर हर व्यक्ति को रोगमुक्त, ऊर्जावान और शांत जीवन प्रदान करना। हम चाहते हैं कि हर घर में आयुर्वेद और योग एक स्वाभाविक जीवन शैली बने।
+                <p className="font-devanagari text-base sm:text-lg text-[#2E543C] leading-relaxed">
+                  विश्व को प्राचीन भारतीय चिकित्सा पद्धति से पुनः जोड़कर हर व्यक्ति को रोगमुक्त, ऊर्जावान और शांत जीवन प्रदान करना। हम चाहते हैं कि हर घर में आयुर्वेद और योग एक स्वाभाविक जीवन शैली बने। हमारा लक्ष्य है कि भारत के हर राज्य, जिले, तहसील एवं कस्बे तथा विदेशों में भी योग केंद्र एवं शैक्षणिक संस्थान स्थापित हों।
                 </p>
-                <p className="font-sans text-sm sm:text-base text-[#466551] leading-relaxed">
-                  To be an internationally revered sanctuary of authentic healing, inspiring millions to rediscover harmony with nature, balance their elemental doshas, and achieve enduring longevity.
+                <p className="font-sans text-base sm:text-lg text-[#466551] leading-relaxed">
+                  To be an internationally revered sanctuary of authentic healing, inspiring millions to rediscover harmony with nature, balance their elemental doshas, and achieve enduring longevity. We envision Yoga Kendras and educational institutes established across every state, district, tehsil and town of India — and abroad.
                 </p>
               </div>
             </div>
@@ -306,16 +369,16 @@ export default function AboutPage() {
                   <Leaf className="w-7 h-7 stroke-[1.75]" />
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-[#C59B3F] uppercase tracking-wider">Mission</span>
-                  <h3 className="text-lg sm:text-xl font-devanagari font-bold text-white mt-1">
+                  <span className="text-sm font-bold text-[#C59B3F] uppercase tracking-wider">Mission</span>
+                  <h3 className="text-xl sm:text-2xl font-devanagari font-bold text-white mt-1">
                     हमारा उद्देश्य (Our Mission)
                   </h3>
                 </div>
-                <p className="font-devanagari text-sm sm:text-base text-[#D4E2D4] leading-relaxed">
-                  शुद्ध, प्रामाणिक और वैज्ञानिक रूप से समर्थित आयुर्वेदिक उपचार, शास्त्रीय योग और प्राकृतिक चिकित्सा को पारदर्शी एवं सुलभ बनाना। प्रत्येक साधक को व्यक्तिगत मार्गदर्शन देना।
+                <p className="font-devanagari text-base sm:text-lg text-[#D4E2D4] leading-relaxed">
+                  शुद्ध, प्रामाणिक और वैज्ञानिक रूप से समर्थित आयुर्वेदिक उपचार, शास्त्रीय योग और प्राकृतिक चिकित्सा को पारदर्शी एवं सुलभ बनाना। प्रत्येक साधक को व्यक्तिगत मार्गदर्शन देना। हम बेरोजगार युवाओं को प्रशिक्षित करने, डाक्टरों/नर्सों/पैरामेडिकल कर्मियों को प्रमाणित करने एवं ग्रामीण भारत तक सुलभ चिकित्सा पहुँचाने हेतु प्रतिबद्ध हैं।
                 </p>
-                <p className="font-sans text-sm sm:text-base text-[#CBD8CB] leading-relaxed">
-                  To provide compassionate, personalized care using pure Himalayan botanical medicines, Panchakarma detoxification, and mindful practices, guided by authentic masters.
+                <p className="font-sans text-base sm:text-lg text-[#CBD8CB] leading-relaxed">
+                  To provide compassionate, personalized care using pure Himalayan botanical medicines, Panchakarma detoxification, and mindful practices, guided by authentic masters. We are committed to training unemployed youth, certifying doctors, nurses & paramedics, and serving India's rural communities with accessible healing.
                 </p>
               </div>
             </div>
@@ -329,10 +392,10 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto space-y-12">
           
           <div className="text-center max-w-2xl mx-auto space-y-3">
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-devanagari font-bold text-[#0E3320]">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-devanagari font-bold text-[#0E3320]">
               हमारे तीन पावन आधार
             </h2>
-            <div className="text-lg sm:text-xl font-sans font-bold text-[#15482D]">
+            <div className="text-xl sm:text-2xl font-sans font-bold text-[#15482D]">
               The Three Pillars of Our Healing Philosophy
             </div>
           </div>
@@ -377,21 +440,21 @@ export default function AboutPage() {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                    <div className="absolute top-4 left-4 text-4xl sm:text-5xl font-black text-white/90 drop-shadow-lg font-sans">
+                    <div className="absolute top-4 left-4 text-4xl sm:text-6xl font-black text-white/90 drop-shadow-lg font-sans">
                       {pillar.num}
                     </div>
                   </div>
                   <div className="p-6 space-y-2.5">
-                    <h3 className="text-lg sm:text-xl font-devanagari font-bold text-[#0E3320] group-hover:text-[#1E603D] transition-colors">
+                    <h3 className="text-xl sm:text-2xl font-devanagari font-bold text-[#0E3320] group-hover:text-[#1E603D] transition-colors">
                       {pillar.hi}
                     </h3>
-                    <p className="text-sm sm:text-base text-[#466551] leading-relaxed font-sans">
+                    <p className="text-base sm:text-lg text-[#466551] leading-relaxed font-sans">
                       {pillar.desc}
                     </p>
                   </div>
                 </div>
                 <div className="p-6 pt-0">
-                  <Link href={pillar.href} className="text-sm font-bold text-[#B96647] hover:underline flex items-center gap-1 group/link">
+                  <Link href={pillar.href} className="text-base font-bold text-[#B96647] hover:underline flex items-center gap-1 group/link">
                     <span>Learn more</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
                   </Link>
@@ -408,10 +471,10 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto space-y-12">
           
           <div className="text-center max-w-2xl mx-auto space-y-3">
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-devanagari font-bold text-[#0E3320]">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-devanagari font-bold text-[#0E3320]">
               हमारे मूल सिद्धांत
             </h2>
-            <div className="text-lg sm:text-xl font-sans font-bold text-[#15482D]">
+            <div className="text-xl sm:text-2xl font-sans font-bold text-[#15482D]">
               Our Guiding Values & Principles
             </div>
           </div>
@@ -429,14 +492,14 @@ export default function AboutPage() {
                       <Icon className="w-6 h-6 stroke-[1.75]" />
                     </div>
                     <div>
-                      <h4 className="text-base sm:text-lg font-devanagari font-bold text-[#0E3320]">
+                      <h4 className="text-lg sm:text-xl font-devanagari font-bold text-[#0E3320]">
                         {val.hi}
                       </h4>
-                      <div className="text-sm font-sans font-bold text-[#8C671D]">
+                      <div className="text-base font-sans font-bold text-[#8C671D]">
                         {val.en}
                       </div>
                     </div>
-                    <p className="text-xs sm:text-sm text-[#466551] leading-relaxed">
+                    <p className="text-sm sm:text-base text-[#466551] leading-relaxed">
                       {val.desc}
                     </p>
                   </div>
@@ -454,17 +517,17 @@ export default function AboutPage() {
           
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-devanagari font-bold text-[#0E3320]">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-devanagari font-bold text-[#0E3320]">
                 हमारे पूज्य आचार्य एवं वैद्य
               </h2>
-              <div className="text-lg sm:text-xl font-sans font-bold text-[#15482D] mt-1">
+              <div className="text-xl sm:text-2xl font-sans font-bold text-[#15482D] mt-1">
                 Meet Our Experienced Teachers & Physicians
               </div>
             </div>
 
             <button
               onClick={() => setIsConsultationOpen(true)}
-              className="px-6 py-2.5 rounded-full bg-[#0E3320] hover:bg-[#071F13] text-white text-sm font-semibold shadow-sm transition-colors self-start sm:self-auto"
+              className="px-6 py-2.5 rounded-full bg-[#0E3320] hover:bg-[#071F13] text-white text-base font-semibold shadow-sm transition-colors self-start sm:self-auto"
             >
               Book an Appointment
             </button>
@@ -486,16 +549,16 @@ export default function AboutPage() {
                   </div>
 
                   <div className="text-center space-y-1">
-                    <h3 className="font-sans font-bold text-lg text-[#0E3320] group-hover:text-[#1E603D] transition-colors">
+                    <h3 className="font-sans font-bold text-xl text-[#0E3320] group-hover:text-[#1E603D] transition-colors">
                       {a.name}
                     </h3>
-                    <p className="text-xs text-[#8C671D] font-bold">
+                    <p className="text-sm text-[#8C671D] font-bold">
                       {a.role}
                     </p>
                     <span className="inline-block mt-1 px-3 py-0.5 rounded-full bg-[#FAF8F5] border border-[#E0D5C3] text-[11px] text-[#466551] font-semibold">
                       {a.exp}
                     </span>
-                    <p className="text-xs sm:text-[13px] text-[#52725D] pt-3 leading-relaxed text-left">
+                    <p className="text-sm sm:text-[13px] text-[#52725D] pt-3 leading-relaxed text-left">
                       {a.desc}
                     </p>
                   </div>
@@ -519,24 +582,24 @@ export default function AboutPage() {
         </div>
 
         <div className="max-w-5xl mx-auto relative z-10 text-center space-y-6">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-devanagari font-bold text-white leading-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-devanagari font-bold text-white leading-tight">
             आरोग्य और आत्म-शांति की ओर एक कदम बढ़ाएं
           </h2>
-          <p className="text-base sm:text-lg text-[#E4BF64] font-medium max-w-2xl mx-auto">
+          <p className="text-lg sm:text-xl text-[#E4BF64] font-medium max-w-2xl mx-auto">
             Experience authentic Ayurveda consultations and rejuvenating retreats nestled in the serene foothills of Rishikesh.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
             <button
               onClick={() => setIsConsultationOpen(true)}
-              className="px-8 py-3.5 rounded-full bg-[#FAF8F5] hover:bg-white text-[#0E3320] text-sm sm:text-base font-bold shadow-lg flex items-center gap-2 transition-all group"
+              className="px-8 py-3.5 rounded-full bg-[#FAF8F5] hover:bg-white text-[#0E3320] text-base sm:text-lg font-bold shadow-lg flex items-center gap-2 transition-all group"
             >
               <span>Book Your Consultation</span>
             </button>
 
             <Link
               href="/contact"
-              className="px-7 py-3.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-sm sm:text-base font-semibold border border-white/40 backdrop-blur transition-all"
+              className="px-7 py-3.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-base sm:text-lg font-semibold border border-white/40 backdrop-blur transition-all"
             >
               Contact Our Ashram
             </Link>

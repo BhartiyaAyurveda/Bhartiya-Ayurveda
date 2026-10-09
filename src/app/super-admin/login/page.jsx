@@ -132,8 +132,8 @@ export default function SuperAdminLoginPage() {
       {/* Top Banner Bar */}
       <header className="relative z-10 w-full px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between border-b border-white/10 bg-[#0B2618]/70 backdrop-blur-md">
         <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group">
-          <div className="relative w-28 h-9 sm:w-32 sm:h-10 shrink-0 bg-white/95 rounded-lg px-1.5 py-1">
-            <Image src="/logo.png" alt="Bhartiya Ayurveda" fill sizes="128px" className="object-contain" />
+          <div className="relative w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-full overflow-hidden">
+            <Image src="/logo.png" alt="Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad" fill sizes="56px" className="object-cover" />
           </div>
           <span className="hidden sm:block text-[10px] sm:text-[11px] font-medium tracking-wider text-[#C59B3F] uppercase">
             Central Institutional Portal
@@ -177,7 +177,7 @@ export default function SuperAdminLoginPage() {
               {/* Title & Description */}
               <div className="space-y-2">
                 <h1 className="text-xl sm:text-2xl md:text-3xl font-serif font-bold text-white leading-tight">
-                  भारतीय आयुर्वेद <br />
+                  भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद् <br />
                   <span className="text-[#C59B3F]">Command Console</span>
                 </h1>
                 <p className="text-xs sm:text-sm text-[#DDD1BE] leading-relaxed">
@@ -475,7 +475,7 @@ export default function SuperAdminLoginPage() {
 
       {/* Global Bottom Footer Note */}
       <footer className="relative z-10 w-full py-3 px-6 text-center text-[11px] text-white/50 border-t border-white/5 bg-[#071F13]">
-        © {new Date().getFullYear()} Bhartiya Ayurveda Sansthan (भारतीय आयुर्वेद संस्थान). All Rights Reserved. Restricted to authorized administrators.
+        © {new Date().getFullYear()} Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad Sansthan (भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद् संस्थान). All Rights Reserved. Restricted to authorized administrators.
       </footer>
     </main>
   );

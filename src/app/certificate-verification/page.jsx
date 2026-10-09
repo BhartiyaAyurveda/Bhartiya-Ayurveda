@@ -183,7 +183,7 @@ export default function CertificateVerificationPage() {
           <div className="flex justify-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-[#C59B3F]/40 text-[#E4BF64] text-xs sm:text-sm font-semibold shadow-sm">
               <span>🌿</span>
-              <span>भारतीय आयुर्वेद • आधिकारिक प्रमाण पत्र सत्यापन</span>
+              <span>भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद् • आधिकारिक प्रमाण पत्र सत्यापन</span>
             </div>
           </div>
 
@@ -198,7 +198,7 @@ export default function CertificateVerificationPage() {
           </div>
 
           <p className="max-w-2xl mx-auto text-sm sm:text-base text-[#CBD8CB] leading-relaxed">
-            Verify the authenticity of diplomas, degrees, and practitioner registration certificates issued by Bhartiya Ayurveda.
+            Verify the authenticity of diplomas, degrees, and practitioner registration certificates issued by Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
@@ -323,8 +323,8 @@ export default function CertificateVerificationPage() {
 
               {/* Council Header */}
               <div className="text-center space-y-1 relative z-10">
-                <div className="relative w-40 h-14 sm:w-48 sm:h-16 mx-auto mb-1">
-                  <Image src="/logo.png" alt="Bhartiya Ayurveda" fill sizes="192px" className="object-contain" />
+                <div className="relative w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-1 rounded-full overflow-hidden shadow-sm">
+                  <Image src="/logo.png" alt="Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad" fill sizes="96px" className="object-cover" />
                 </div>
                 <h2 className="text-xl sm:text-2xl font-devanagari font-bold text-[#0E3320]">
                   भारतीय आयुर्वेद
@@ -402,7 +402,7 @@ export default function CertificateVerificationPage() {
                 <div className="text-center sm:text-right text-xs">
                   <div className="w-32 h-0.5 bg-[#0E3320] mx-auto sm:ml-auto mb-1"></div>
                   <p className="font-bold text-[#0E3320]">Registrar / Controller</p>
-                  <p className="text-[#666]">Bhartiya Ayurveda Academic Board</p>
+                  <p className="text-[#666]">Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad Academic Board</p>
                 </div>
               </div>
             </div>
@@ -461,7 +461,7 @@ export default function CertificateVerificationPage() {
         {/* Verification Helpline Card */}
         <div className="mt-8 bg-white p-5 rounded-2xl border border-[#EBE2D4] text-center space-y-1 shadow-sm print:hidden">
           <p className="text-xs font-semibold text-[#0E3320]">
-            Bhartiya Ayurveda Verification Helpdesk
+            Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad Verification Helpdesk
           </p>
           <p className="text-xs text-[#666]">
             For physical certificate verification or apostille attestation, contact Helpline: <strong className="text-[#0E3320]">+91 98765 43210</strong> or email <strong className="text-[#0E3320]">hello@bhartiyaayurveda.in</strong>

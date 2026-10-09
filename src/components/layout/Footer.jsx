@@ -18,8 +18,18 @@ export default function Footer() {
           
           {/* Brand Info (Full on mobile, 2 cols on tablet/desktop) */}
           <div className="col-span-1 sm:col-span-2 space-y-4">
-            <div className="relative w-40 h-14 bg-white/95 rounded-lg px-2 py-1.5">
-              <Image src="/logo.png" alt="Bhartiya Ayurveda" fill sizes="160px" className="object-contain" style={{ padding: "0.375rem" }} />
+            <div className="flex items-center gap-3">
+              <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-white/95 shadow-md shrink-0">
+                <Image src="/logo.png" alt="Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad" fill sizes="96px" className="object-cover" />
+              </div>
+              <div className="min-w-0">
+                <span className="block font-devanagari text-base sm:text-lg font-bold text-white tracking-tight leading-tight">
+                  भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद्
+                </span>
+                <span className="block text-xs sm:text-sm text-[#C59B3F] font-semibold tracking-wide mt-0.5">
+                  Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad
+                </span>
+              </div>
             </div>
 
             <div className="p-4 bg-[#0E3320]/70 rounded-2xl border border-[#143B27] max-w-sm">
@@ -129,7 +139,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#7A9983] font-normal text-center sm:text-left">
           <div>
-            © 2026 Bhartiya Ayurveda. All rights reserved.
+            © 2026 Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad. All rights reserved.
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">

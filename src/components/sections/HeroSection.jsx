@@ -34,7 +34,7 @@ export default function HeroSection({ onOpenConsultation, onOpenVideo }) {
           <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(250,248,245,0.92)_0%,rgba(250,248,245,0.75)_22%,rgba(250,248,245,0.4)_38%,rgba(250,248,245,0)_58%)] pointer-events-none" />
 
           {/* Foreground content wrapper */}
-          <div className="relative z-10 flex flex-col justify-between h-full pt-4 xs:pt-5 pb-3 xs:pb-4 px-4 xs:px-5">
+          <div className="relative z-10 flex flex-col justify-between h-full pt-4 xs:pt-5 pb-3 xs:pb-4 px-3.5 xs:px-4 sm:px-6 md:px-8">
             {/* Top Text & CTAs Block */}
             <div>
               {/* Green Pill Badge */}

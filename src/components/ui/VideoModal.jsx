@@ -13,7 +13,7 @@ export default function VideoModal({ isOpen, onClose }) {
           <div className="flex items-center gap-2 min-w-0">
             <Sparkles className="w-4 h-4 text-gold-400 shrink-0" />
             <span className="font-serif font-semibold text-sand-100 text-xs sm:text-sm truncate">
-              Bhartiya Ayurveda • Sacred Journey Film
+              Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad • Sacred Journey Film
             </span>
           </div>
           <button

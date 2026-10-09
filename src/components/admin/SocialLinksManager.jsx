@@ -41,7 +41,7 @@ const DEFAULT_SOCIALS = [
   {
     id: "youtube",
     name: "YouTube Channel",
-    handle: "Bhartiya Ayurveda Official",
+    handle: "Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad Official",
     url: "https://youtube.com/@bhartiyaayurveda",
     enabled: true,
     followers: "145K Subscribers",
@@ -68,7 +68,7 @@ const DEFAULT_SOCIALS = [
   {
     id: "whatsapp",
     name: "WhatsApp Official Channel",
-    handle: "Bhartiya Ayurveda Community",
+    handle: "Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad Community",
     url: "https://whatsapp.com/channel/bhartiya-ayurveda",
     enabled: true,
     followers: "35K Members",

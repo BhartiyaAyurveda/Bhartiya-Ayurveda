@@ -71,7 +71,7 @@ export default function Home() {
       {/* 9. The Three Doshas (3 Pastel Cards + Charaka Samhita Quote) */}
       <DoshasSection />
 
-      {/* 10. Why Choose Bhartiya Ayurveda (5 Circles + Leaves Video Card) */}
+      {/* 10. Why Choose Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad (5 Circles + Leaves Video Card) */}
       <WhyChooseSection onOpenVideo={openVideo} />
 
       {/* 11. Side-by-Side: Meet Our Acharyas (4 cards) & What People Say (Priya Patel review) */}

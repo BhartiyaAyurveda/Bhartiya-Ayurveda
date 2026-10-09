@@ -184,7 +184,7 @@ export default function StudentResultsPage() {
           <div className="flex justify-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-[#C59B3F]/40 text-[#E4BF64] text-xs sm:text-sm font-semibold shadow-sm">
               <span>🌿</span>
-              <span>भारतीय आयुर्वेद • वार्षिक एवं सत्रीय परीक्षा परिणाम</span>
+              <span>भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद् • वार्षिक एवं सत्रीय परीक्षा परिणाम</span>
             </div>
           </div>
 
@@ -199,7 +199,7 @@ export default function StudentResultsPage() {
           </div>
 
           <p className="max-w-2xl mx-auto text-sm sm:text-base text-[#CBD8CB] leading-relaxed">
-            Enter your Roll Number to instantly search, view, and print your verified Bhartiya Ayurveda Marksheet.
+            Enter your Roll Number to instantly search, view, and print your verified Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad Marksheet.
           </p>
         </div>
       </section>
@@ -314,8 +314,8 @@ export default function StudentResultsPage() {
             {/* Marksheet Official Header */}
             <div className="border-b-2 sm:border-b-4 border-[#C59B3F] pb-4 sm:pb-6 text-center space-y-1.5 sm:space-y-2 print:pb-2 print:space-y-0.5">
               <div className="flex items-center justify-center gap-4 mb-2">
-                <div className="relative w-40 h-14 sm:w-48 sm:h-16">
-                  <Image src="/logo.png" alt="Bhartiya Ayurveda" fill sizes="192px" className="object-contain" priority />
+                <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden shadow-sm">
+                  <Image src="/logo.png" alt="Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad" fill sizes="96px" className="object-cover" priority />
                 </div>
               </div>
               <h2 className="text-lg sm:text-2xl lg:text-3xl font-devanagari font-bold text-[#0E3320] tracking-wide">
@@ -434,7 +434,7 @@ export default function StudentResultsPage() {
               <div className="text-center sm:text-right">
                 <div className="w-28 sm:w-32 h-0.5 bg-[#0E3320] mx-auto sm:ml-auto mb-1"></div>
                 <p className="font-bold text-[#0E3320]">Controller of Examinations</p>
-                <p>Bhartiya Ayurveda</p>
+                <p>Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad</p>
               </div>
             </div>
 

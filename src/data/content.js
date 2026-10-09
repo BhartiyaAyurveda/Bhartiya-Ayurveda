@@ -275,7 +275,7 @@ export const siteContent = {
   },
 
   whyChoose: {
-    badge: "Why Choose Bhartiya Ayurveda",
+    badge: "Why Choose Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad",
     badgeHi: "हमारी विशेषताएं",
     title: "Authentic Vedic Tradition Meets Modern Care",
     points: [
@@ -357,7 +357,7 @@ export const siteContent = {
       name: "Rajesh Verma",
       city: "Bengaluru, Karnataka",
       rating: 5,
-      review: "As a busy tech executive, my stress and insomnia were out of control. Bhartiya Ayurveda's Panchakarma and Shirodhara gave me the deepest sleep I've had in 10 years.",
+      review: "As a busy tech executive, my stress and insomnia were out of control. Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad's Panchakarma and Shirodhara gave me the deepest sleep I've had in 10 years.",
       reviewHi: "अनिद्रा और तनाव से मुझे पूर्ण राहत मिली। शिरोधारा और प्राकृतिक वातावरण का अनुभव अद्वितीय था।",
       program: "21-Day Naturopathy Detox",
       image: "/images/acharyas/yogi-rahul.jpg",
@@ -446,12 +446,12 @@ export const siteContent = {
   },
 
   footer: {
-    about: "Bhartiya Ayurveda is dedicated to reviving the sacred, authentic wisdom of ancient India. We synthesize classical Ayurveda, pure Ashtanga Yoga, and 5-element Naturopathy for complete harmony of body, mind, and soul.",
+    about: "Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad is dedicated to reviving the sacred, authentic wisdom of ancient India. We synthesize classical Ayurveda, pure Ashtanga Yoga, and 5-element Naturopathy for complete harmony of body, mind, and soul.",
     sloganHi: "स्वस्थ शरीर • शांत मन • संतुलित समाज • समृद्ध भारत",
     address: "Tapovan, Rishikesh, Uttarakhand 249192, India",
     phone: "+91 (0135) 244-8899 / +91 98765 43210",
     email: "healing@bhartiyaayurveda.org",
     timing: "Mon - Sat: 7:00 AM - 8:00 PM (IST)",
-    copyright: "© 2026 Bhartiya Ayurveda Sansthan. All rights reserved. Grounded in tradition, created for humanity.",
+    copyright: "© 2026 Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad Sansthan. All rights reserved. Grounded in tradition, created for humanity.",
   },
 };

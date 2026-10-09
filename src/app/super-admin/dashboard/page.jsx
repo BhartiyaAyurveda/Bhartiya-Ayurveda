@@ -230,8 +230,8 @@ export default function SuperAdminDashboardPage() {
             </button>
 
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="relative w-28 h-10 shrink-0 bg-white/95 rounded-lg px-1.5 py-1 transition-transform group-hover:scale-105">
-                <Image src="/logo.png" alt="Bhartiya Ayurveda" fill sizes="128px" className="object-contain" />
+              <div className="relative w-12 h-12 shrink-0 rounded-full overflow-hidden transition-transform group-hover:scale-105">
+                <Image src="/logo.png" alt="Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad" fill sizes="48px" className="object-cover" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
@@ -790,7 +790,7 @@ export default function SuperAdminDashboardPage() {
 
       {/* Global Dashboard Footer */}
       <footer className="py-4 px-6 text-center text-xs text-[#5C8261] border-t border-[#DDD1BE] bg-white mt-12">
-        Bhartiya Ayurveda Central Directorate • Super Admin Governance Console v2.4 • Confidential &amp; Protected
+        Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad Central Directorate • Super Admin Governance Console v2.4 • Confidential &amp; Protected
       </footer>
     </div>
   );

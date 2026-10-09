@@ -46,7 +46,7 @@ export default function CoursesPage() {
   });
   const [callbackSubmitted, setCallbackSubmitted] = useState(false);
 
-  // All Academic Programs of Bhartiya Ayurveda
+  // All Academic Programs of Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad
   const courses = [
     {
       id: "dnys",
@@ -520,7 +520,7 @@ export default function CoursesPage() {
           <div className="flex justify-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-[#C59B3F]/40 text-[#E4BF64] text-xs sm:text-sm font-semibold shadow-sm">
               <span>🌿</span>
-              <span>भारतीय आयुर्वेद • मान्यता प्राप्त शैक्षणिक पाठ्यक्रम 2026-27</span>
+              <span>भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद् • मान्यता प्राप्त शैक्षणिक पाठ्यक्रम 2026-27</span>
             </div>
           </div>
 
@@ -751,7 +751,7 @@ export default function CoursesPage() {
         )}
       </section>
 
-      {/* 5. Why Study With Bhartiya Ayurveda & Council */}
+      {/* 5. Why Study With Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad & Council */}
       <section className="bg-[#0E3320] text-white py-16 px-4 md:px-8">
         <div className="max-w-7xl mx-auto space-y-12">
           <div className="text-center max-w-3xl mx-auto space-y-3">

@@ -257,7 +257,7 @@ export default function AdmissionRegistrationFormPage() {
                   आपका प्रवेश पंजीकरण सफलतापूर्वक प्राप्त हो गया है!
                 </h2>
                 <p className="text-sm sm:text-base text-[#466551]">
-                  Your application has been registered with Bhartiya Ayurveda.
+                  Your application has been registered with Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad.
                 </p>
               </div>
 

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Search, ArrowRight, Menu, X, ChevronDown } from "lucide-react";
+import { ArrowRight, Menu, X, ChevronDown } from "lucide-react";
 
 export default function Navbar({ onOpenConsultation }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -39,20 +39,20 @@ export default function Navbar({ onOpenConsultation }) {
     <header
       className={`sticky top-0 z-50 transition-all duration-300 bg-white print:hidden ${
         isScrolled
-          ? "shadow-md border-b border-[#DFD3C0] py-2.5 sm:py-3"
-          : "border-b border-[#EBE2D4] py-3.5"
+          ? "shadow-md border-b border-[#DFD3C0] py-0 sm:py-0"
+          : "border-b border-[#EBE2D4] py-0.5 sm:py-0.5"
       } px-4 md:px-8`}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Brand Logo */}
-        <Link href="/" className="flex items-center group min-w-0 shrink-0">
-          <div className="relative w-36 h-12 sm:w-44 sm:h-14 shrink-0">
-            <Image src="/logo.png" alt="Bhartiya Ayurveda" fill sizes="176px" className="object-contain object-left" priority />
+        <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group min-w-0 shrink-0 lg:ml-6 xl:ml-10">
+          <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-full overflow-hidden">
+            <Image src="/logo.png" alt="Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad" fill sizes="80px" className="object-cover" priority />
           </div>
         </Link>
 
         {/* Desktop Nav Links */}
-        <nav className="hidden lg:flex items-center gap-6 xl:gap-7 text-[16px] font-semibold">
+        <nav className="hidden lg:flex items-center gap-3.5 xl:gap-6 text-[15px] xl:text-[16px] font-semibold shrink min-w-0">
           {/* Home */}
           <Link
             href="/"
@@ -228,23 +228,8 @@ export default function Navbar({ onOpenConsultation }) {
           </Link>
         </nav>
 
-        {/* Right CTA & Search */}
-        <div className="flex items-center gap-1.5 sm:gap-4 shrink-0">
-          <button
-            className="hidden sm:flex p-2 sm:p-2.5 text-[#1A452E] hover:text-[#B96647] transition-colors rounded-full hover:bg-black/5"
-            aria-label="Search"
-          >
-            <Search className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
-          </button>
-
-          <button
-            onClick={onOpenConsultation}
-            className="btn-shimmer hidden sm:inline-flex items-center gap-2 px-5 lg:px-6 py-2.5 lg:py-3 rounded-full bg-[#0E3320] hover:bg-[#071F13] text-white text-xs lg:text-[14px] font-semibold shadow hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer"
-          >
-            <span className="w-2 h-2 rounded-full bg-[#E4BF64] animate-ping-soft"></span>
-            <span>Book a Consultation</span>
-          </button>
-
+        {/* Mobile Menu Toggle */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 lg:gap-4 shrink-0">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="lg:hidden w-10 h-10 rounded-full bg-[#FAF7F2] hover:bg-[#F0EAE1] border border-[#E5DDD1] flex items-center justify-center text-[#0E3320] shadow-xs active:scale-95 transition-all cursor-pointer"
