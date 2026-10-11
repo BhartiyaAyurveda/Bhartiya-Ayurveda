@@ -140,7 +140,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#5C6B60] font-normal text-center sm:text-left">
           <div>
-            © 2026 Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad. All rights reserved.
+            © 2023 Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad. All rights reserved.
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
