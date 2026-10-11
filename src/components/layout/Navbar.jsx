@@ -37,17 +37,25 @@ export default function Navbar({ onOpenConsultation }) {
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-300 bg-white print:hidden ${
+      className={`sticky top-0 lg:top-9 z-50 transition-all duration-300 bg-white print:hidden ${
         isScrolled
           ? "shadow-md border-b border-[#DFD3C0] py-0 sm:py-0"
           : "border-b border-[#EBE2D4] py-0.5 sm:py-0.5"
       } px-4 md:px-8`}
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <div className="max-w-7xl mx-auto flex items-center justify-start lg:justify-between">
         {/* Brand Logo */}
-        <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group min-w-0 shrink-0 lg:ml-6 xl:ml-10">
-          <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-full overflow-hidden">
+        <Link href="/" className="flex items-center gap-1.5 sm:gap-3 group min-w-0 flex-1 lg:flex-initial lg:shrink-0 lg:ml-6 xl:ml-10 mr-1.5">
+          <div className="relative w-9 h-9 xs:w-11 xs:h-11 sm:w-20 sm:h-20 shrink-0 rounded-full overflow-hidden">
             <Image src="/logo.png" alt="Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad" fill sizes="80px" className="object-cover" priority />
+          </div>
+          <div className="lg:hidden min-w-0 flex-1">
+            <span className="block font-devanagari text-[11px] xs:text-[13px] font-bold text-[#0E3320] leading-tight">
+              भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद्
+            </span>
+            <span className="block font-sans text-[9px] xs:text-[11px] font-semibold text-[#8C671D] leading-tight">
+              Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad
+            </span>
           </div>
         </Link>
 

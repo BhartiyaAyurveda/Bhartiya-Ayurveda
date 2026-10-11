@@ -326,11 +326,11 @@ export default function CertificateVerificationPage() {
                 <div className="relative w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-1 rounded-full overflow-hidden shadow-sm">
                   <Image src="/logo.png" alt="Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad" fill sizes="96px" className="object-cover" />
                 </div>
-                <h2 className="text-xl sm:text-2xl font-devanagari font-bold text-[#0E3320]">
-                  भारतीय आयुर्वेद
+                <h2 className="text-base sm:text-xl font-devanagari font-bold text-[#0E3320]">
+                  भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद्
                 </h2>
-                <h3 className="text-xs sm:text-sm font-serif font-bold text-[#7A583A] tracking-wider uppercase">
-                  BHARTIYA AYURVEDA
+                <h3 className="text-[10px] sm:text-xs font-serif font-bold text-[#7A583A] tracking-wider uppercase">
+                  Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad
                 </h3>
                 <p className="text-[11px] text-[#666]">
                   Premier National Institution for Ayurveda, Yoga & Naturopathy Education

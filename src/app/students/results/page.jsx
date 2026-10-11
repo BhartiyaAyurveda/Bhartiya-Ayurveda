@@ -318,11 +318,11 @@ export default function StudentResultsPage() {
                   <Image src="/logo.png" alt="Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad" fill sizes="96px" className="object-cover" priority />
                 </div>
               </div>
-              <h2 className="text-lg sm:text-2xl lg:text-3xl font-devanagari font-bold text-[#0E3320] tracking-wide">
-                भारतीय आयुर्वेद
+              <h2 className="text-base sm:text-xl lg:text-2xl font-devanagari font-bold text-[#0E3320] tracking-wide">
+                भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद्
               </h2>
-              <p className="text-xs sm:text-base font-serif font-bold text-[#7A583A] tracking-wider uppercase">
-                BHARTIYA AYURVEDA
+              <p className="text-[11px] sm:text-sm font-serif font-bold text-[#7A583A] tracking-wider uppercase">
+                Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad
               </p>
               <p className="text-[11px] sm:text-xs text-[#666]">
                 Premier Institution for Authentic Ayurveda, Yoga & Naturopathy Education
