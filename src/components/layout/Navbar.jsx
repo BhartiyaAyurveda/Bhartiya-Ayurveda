@@ -39,8 +39,8 @@ export default function Navbar({ onOpenConsultation }) {
     <header
       className={`sticky top-0 lg:top-9 z-50 transition-all duration-300 bg-white print:hidden ${
         isScrolled
-          ? "shadow-md border-b border-[#DFD3C0] py-0 sm:py-0"
-          : "border-b border-[#EBE2D4] py-0.5 sm:py-0.5"
+          ? "shadow-md border-b border-[#DFD3C0] py-2 sm:py-2"
+          : "border-b border-[#EBE2D4] py-3 sm:py-3"
       } px-4 md:px-8`}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-start lg:justify-between">
