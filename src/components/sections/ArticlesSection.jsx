@@ -1,7 +1,7 @@
 "use client";
 
 import { siteContent } from "@/data/content";
-import { BookOpen, Clock, Calendar, ArrowRight } from "lucide-react";
+import { BookOpen, Clock, Calendar } from "lucide-react";
 
 export default function ArticlesSection() {
   const { articles } = siteContent;
@@ -27,8 +27,7 @@ export default function ArticlesSection() {
             className="inline-flex items-center gap-2 text-xs font-semibold text-forest-800 hover:text-gold-600 transition-colors"
           >
             <span>Have Questions? Read FAQs</span>
-            <ArrowRight className="w-4 h-4" />
-          </a>
+                      </a>
         </div>
 
         {/* 3 Articles Grid */}
@@ -81,8 +80,7 @@ export default function ArticlesSection() {
               <div className="p-6 pt-0">
                 <div className="pt-4 border-t border-sand-100 flex items-center justify-between text-xs font-semibold text-forest-800 group-hover:text-gold-600 transition-colors">
                   <span>Read Full Article</span>
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                </div>
+                                  </div>
               </div>
             </article>
           ))}

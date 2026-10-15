@@ -1,9 +1,11 @@
 "use client";
 
-import { Activity, Wind, Eye, Flame, ArrowRight, Sparkles } from "lucide-react";
+import { Activity, Wind, Eye, Flame, Sparkles } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 
 export default function YogaSection({ onOpenConsultation }) {
+  const { homepage } = useSiteSettings();
   const yogaCards = [
     {
       icon: Activity,
@@ -51,7 +53,7 @@ export default function YogaSection({ onOpenConsultation }) {
       {/* Background Panorama Image */}
       <div className="absolute inset-0 z-0">
         <img
-          src="/images/yoga/yoga-banner.png"
+          src={homepage?.backgrounds?.yogaBg || "/images/yoga/yoga-banner.png"}
           alt="Yoga banner in nature"
           className="w-full h-full object-cover object-center opacity-18 transition-transform duration-1000 select-none pointer-events-none"
         />
@@ -112,8 +114,7 @@ export default function YogaSection({ onOpenConsultation }) {
                   className="btn-shimmer w-full xs:w-auto px-7 xs:px-8 py-3.5 xs:py-4 rounded-full bg-[#FAF8F5] hover:bg-white text-[#0E3320] text-[14.5px] xs:text-base font-extrabold shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:scale-95 flex items-center justify-center gap-2.5 transition-all group font-sans cursor-pointer"
                 >
                   <span>Explore Yoga</span>
-                  <ArrowRight className="w-4.5 h-4.5 text-[#B87D24] group-hover:translate-x-1 transition-transform" />
-                </button>
+                                  </button>
               </div>
             </Reveal>
           </div>

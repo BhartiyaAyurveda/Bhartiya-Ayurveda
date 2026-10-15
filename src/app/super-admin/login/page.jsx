@@ -1,482 +1,266 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import {
-  ShieldCheck,
-  Lock,
-  Mail,
-  Eye,
-  EyeOff,
-  ArrowRight,
-  CheckCircle2,
-  AlertCircle,
-  KeyRound,
-  ExternalLink,
-  Sparkles,
-  HelpCircle,
-  X
-} from "lucide-react";
+import { Lock, User, Eye, EyeOff, CheckCircle2, AlertCircle, RefreshCw, ShieldCheck } from "lucide-react";
 
 export default function SuperAdminLoginPage() {
   const router = useRouter();
 
-  // Form states
-  const [email, setEmail] = useState("");
+  // Step 1: credentials
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(true);
-  const [capsLockActive, setCapsLockActive] = useState(false);
 
-  // Interaction & validation states
+  // Step 2: OTP
+  const [step, setStep] = useState("credentials"); // "credentials" | "otp"
+  const [maskedEmail, setMaskedEmail] = useState("");
+  const [pendingEmail, setPendingEmail] = useState("");
+  const [digits, setDigits] = useState(["", "", "", "", "", ""]);
+  const digitRefs = useRef([]);
+  const otp = digits.join("");
+  const [resendCooldown, setResendCooldown] = useState(0);
+
   const [isLoading, setIsLoading] = useState(false);
-  const [statusMessage, setStatusMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
-  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  // Monitor Caps Lock key
-  const handleKeyDown = (e) => {
-    if (e.getModifierState && e.getModifierState("CapsLock")) {
-      setCapsLockActive(true);
-    } else {
-      setCapsLockActive(false);
-    }
-  };
-
-  const handleKeyUp = (e) => {
-    if (e.getModifierState && e.getModifierState("CapsLock")) {
-      setCapsLockActive(true);
-    } else {
-      setCapsLockActive(false);
-    }
-  };
-
-  // Quick fill demo credentials
-  const handleQuickFill = () => {
-    setEmail("superadmin@bhartiyaayurveda.org");
-    setPassword("Ayurveda@Admin2026");
-    setErrorMessage("");
-  };
-
-  // Form submission handler
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMessage("");
-
-    // Basic validation
-    if (!email.trim()) {
-      setErrorMessage("Please enter your Super Admin email address.");
-      return;
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.trim())) {
-      setErrorMessage("Please enter a valid official email address format.");
-      return;
-    }
-    if (!password) {
-      setErrorMessage("Please enter your master security password.");
-      return;
-    }
-    if (password.length < 6) {
-      setErrorMessage("Password must be at least 6 characters.");
-      return;
-    }
-
-    // Authentication handshake simulation
+    if (!username.trim() || !password) { setErrorMessage("Username and password are required."); return; }
     setIsLoading(true);
-    setStatusMessage("Verifying institutional credentials...");
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: username.trim(), password }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setErrorMessage(data.error || "Invalid credentials."); setIsLoading(false); return; }
 
-    setTimeout(() => {
-      setStatusMessage("Authorizing Super Admin cryptographic handshake...");
-    }, 600);
-
-    setTimeout(() => {
-      setIsLoading(false);
-      setIsSuccess(true);
-      setStatusMessage("Authentication successful! Loading console...");
-
-      // Save session in localStorage/sessionStorage
-      const authSession = {
-        email: email.trim(),
-        role: "Super Administrator",
-        authenticatedAt: new Date().toISOString(),
-        terminalId: "SEC-TER-9824",
-      };
-
-      if (typeof window !== "undefined") {
-        if (rememberMe) {
-          localStorage.setItem("bhartiya_admin_session", JSON.stringify(authSession));
-        } else {
-          sessionStorage.setItem("bhartiya_admin_session", JSON.stringify(authSession));
-        }
+      if (data.requireOtp) {
+        setMaskedEmail(data.maskedEmail);
+        setPendingEmail(data.email);
+        setStep("otp");
+        setDigits(["", "", "", "", "", ""]);
+        startResendCooldown();
+        setTimeout(() => digitRefs.current[0]?.focus(), 100);
+      } else {
+        setIsSuccess(true);
+        setTimeout(() => router.push("/super-admin/dashboard"), 800);
       }
+    } catch {
+      setErrorMessage("Network error. Please try again.");
+    }
+    setIsLoading(false);
+  };
 
-      // Navigate to dashboard
-      setTimeout(() => {
-        router.push("/super-admin/dashboard");
-      }, 1000);
-    }, 1500);
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    setErrorMessage("");
+    if (!otp.trim()) { setErrorMessage("Please enter the OTP."); return; }
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/admin/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: pendingEmail, otp: otp.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setErrorMessage(data.error || "Invalid OTP."); setIsLoading(false); return; }
+      setIsSuccess(true);
+      setTimeout(() => router.push("/super-admin/dashboard"), 800);
+    } catch {
+      setErrorMessage("Network error. Please try again.");
+    }
+    setIsLoading(false);
+  };
+
+  const handleResendOtp = async () => {
+    if (resendCooldown > 0) return;
+    setErrorMessage("");
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: username.trim(), password }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setErrorMessage(data.error || "Failed to resend OTP."); return; }
+      if (data.requireOtp) startResendCooldown();
+    } catch {
+      setErrorMessage("Network error.");
+    }
+  };
+
+  const startResendCooldown = () => {
+    setResendCooldown(60);
+    const t = setInterval(() => {
+      setResendCooldown(c => { if (c <= 1) { clearInterval(t); return 0; } return c - 1; });
+    }, 1000);
   };
 
   return (
-    <main className="min-h-screen bg-[#071F13] flex flex-col justify-between text-[#FAF8F5] relative overflow-hidden selection:bg-[#C59B3F] selection:text-white">
-      {/* Background Ambience & Vedic Foliage Elements */}
-      <div className="absolute inset-0 pointer-events-none opacity-20">
-        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#C59B3F] blur-[120px]" />
-        <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-[#15482D] blur-[140px]" />
-      </div>
-
-      {/* Top Banner Bar */}
-      <header className="relative z-10 w-full px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between border-b border-white/10 bg-[#0B2618]/70 backdrop-blur-md">
-        <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group">
-          <div className="relative w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-full overflow-hidden">
-            <Image src="/logo.png" alt="Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad" fill sizes="56px" className="object-cover" />
+    <main className="min-h-screen bg-[#F2EDE4] flex items-center justify-center px-4">
+      <div className="w-full max-w-sm">
+        {/* Logo */}
+        <div className="flex flex-col items-center mb-8 gap-3">
+          <div className="relative w-24 h-24 rounded-full overflow-hidden ring-4 ring-[#C59B3F]/40 shadow-lg">
+            <Image src="/logo.png" alt="Bhartiya Ayurveda" fill className="object-cover" />
           </div>
-          <span className="hidden sm:block text-[10px] sm:text-[11px] font-medium tracking-wider text-[#C59B3F] uppercase">
-            Central Institutional Portal
-          </span>
-        </Link>
+          <div className="text-center space-y-0.5">
+            <p className="text-sm font-bold text-[#C59B3F] tracking-wide">
+              भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद्
+            </p>
+            <p className="text-xs text-[#5C8261]">Super Admin Portal</p>
+          </div>
+        </div>
 
-        <Link
-          href="/"
-          className="flex items-center gap-1.5 sm:gap-2 text-xs font-semibold text-sand-300 hover:text-white transition-colors bg-white/5 hover:bg-white/10 px-3 sm:px-3.5 py-1.5 rounded-full border border-white/10 shrink-0"
-        >
-          <span className="hidden xs:inline">Public Website</span>
-          <span className="xs:hidden">Site</span>
-          <ExternalLink className="w-3.5 h-3.5 text-[#C59B3F]" />
-        </Link>
-      </header>
-
-      {/* Main Login Workspace (Responsive Split Layout) */}
-      <div className="relative z-10 flex-1 flex items-center justify-center px-3 sm:px-4 py-6 md:py-12">
-        <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border border-[#C59B3F]/25 bg-[#0E3320]/90 backdrop-blur-xl">
-          
-          {/* Left Panel: Institutional Showcase & Security Badges (5 cols on lg) */}
-          <div className="lg:col-span-5 p-5 sm:p-8 lg:p-10 flex flex-col justify-between relative bg-gradient-to-br from-[#0B2618] via-[#071F13] to-[#0E3320] border-b lg:border-b-0 lg:border-r border-white/10">
-            {/* Subtle background image overlay */}
-            <div className="absolute inset-0 opacity-15 mix-blend-overlay pointer-events-none">
-              <Image
-                src="/images/decor/leaves-dark.jpg"
-                alt="Ayurvedic Botanical Motif"
-                fill
-                className="object-cover"
-                priority
-              />
+        <div className="bg-white rounded-2xl p-7 shadow-lg border border-[#DDD1BE] space-y-5">
+          {errorMessage && (
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs">
+              <AlertCircle className="w-4 h-4 shrink-0" /><span>{errorMessage}</span>
             </div>
+          )}
+          {isSuccess && (
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs">
+              <CheckCircle2 className="w-4 h-4 shrink-0" /><span>Login successful! Redirecting...</span>
+            </div>
+          )}
 
-            <div className="relative z-10 space-y-4 sm:space-y-6">
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C59B3F]/15 border border-[#C59B3F]/40 text-[#F3D68B] text-xs font-semibold tracking-wide">
-                <ShieldCheck className="w-4 h-4 text-[#C59B3F]" />
-                <span>Super Admin Tier Access</span>
+          {/* ── STEP 1: Credentials ── */}
+          {step === "credentials" && (
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#0E3320] mb-1.5">Username</label>
+                <div className="relative">
+                  <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#5C8261]" />
+                  <input type="text" value={username} onChange={e => setUsername(e.target.value)}
+                    placeholder="superadmin" autoComplete="username" disabled={isLoading || isSuccess}
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-[#DDD1BE] bg-[#FAF8F5] text-sm text-[#0E3320] placeholder-[#C8B79E] focus:outline-none focus:ring-2 focus:ring-[#C59B3F] disabled:opacity-50"
+                  />
+                </div>
               </div>
 
-              {/* Title & Description */}
-              <div className="space-y-2">
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-serif font-bold text-white leading-tight">
-                  भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद् <br />
-                  <span className="text-[#C59B3F]">Command Console</span>
-                </h1>
-                <p className="text-xs sm:text-sm text-[#DDD1BE] leading-relaxed">
-                  Centralized administrative dashboard for governing academic curriculums, student certifications, affiliated institutes, and institutional compliance.
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#0E3320] mb-1.5">Password</label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#5C8261]" />
+                  <input type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)}
+                    placeholder="Enter password" autoComplete="current-password" disabled={isLoading || isSuccess}
+                    className="w-full pl-10 pr-11 py-3 rounded-xl border border-[#DDD1BE] bg-[#FAF8F5] text-sm text-[#0E3320] placeholder-[#C8B79E] focus:outline-none focus:ring-2 focus:ring-[#C59B3F] disabled:opacity-50"
+                  />
+                  <button type="button" tabIndex={-1} onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5C8261] hover:text-[#0E3320]">
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <button type="submit" disabled={isLoading || isSuccess}
+                className="w-full py-3 rounded-xl bg-[#0E3320] hover:bg-[#15482D] text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-70 cursor-pointer">
+                {isLoading ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /><span>Verifying...</span></> : <span>Sign In</span>}
+              </button>
+
+              <div className="text-center pt-1">
+                <Link href="/super-admin/forgot-password" className="text-xs text-[#5C8261] hover:text-[#C59B3F] transition-colors">
+                  Forgot password?
+                </Link>
+              </div>
+            </form>
+          )}
+
+          {/* ── STEP 2: OTP ── */}
+          {step === "otp" && (
+            <form onSubmit={handleVerifyOtp} className="space-y-5">
+              <div className="text-center space-y-1.5">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0E3320] to-[#15482D] flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <ShieldCheck className="w-7 h-7 text-[#C59B3F]" />
+                </div>
+                <p className="text-base font-bold text-[#0E3320]">Two-Factor Verification</p>
+                <p className="text-xs text-[#5C8261] leading-relaxed">
+                  A 6-digit OTP has been sent to<br />
+                  <strong className="text-[#0E3320]">{maskedEmail}</strong>
                 </p>
               </div>
 
-              {/* Security Feature Highlights */}
-              <div className="space-y-2.5 sm:space-y-3 pt-1 sm:pt-2">
-                <div className="flex items-start gap-3 p-2.5 sm:p-3 rounded-xl bg-white/5 border border-white/10 text-xs">
-                  <div className="p-1.5 rounded-lg bg-[#C59B3F]/20 text-[#F3D68B] shrink-0">
-                    <Lock className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h2 className="font-bold text-white text-xs">256-Bit SSL Encryption</h2>
-                    <p className="text-[#C8B79E] text-[11px] mt-0.5">
-                      All administrative communications and database queries are cryptographically encrypted.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-2.5 sm:p-3 rounded-xl bg-white/5 border border-white/10 text-xs">
-                  <div className="p-1.5 rounded-lg bg-[#2A7A50]/30 text-emerald-300 shrink-0">
-                    <KeyRound className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h2 className="font-bold text-white text-xs">Role-Based Access Control (RBAC)</h2>
-                    <p className="text-[#C8B79E] text-[11px] mt-0.5">
-                      Enforces privileged verification for student registries and certificate issuance.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-2.5 sm:p-3 rounded-xl bg-white/5 border border-white/10 text-xs">
-                  <div className="p-1.5 rounded-lg bg-blue-500/20 text-blue-300 shrink-0">
-                    <Sparkles className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h2 className="font-bold text-white text-xs">Instant Certificate Validation</h2>
-                    <p className="text-[#C8B79E] text-[11px] mt-0.5">
-                      Real-time ledger access for nationwide Ayurvedic diploma authentications.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Terminal Notice */}
-            <div className="relative z-10 pt-4 sm:pt-6 mt-4 sm:mt-6 border-t border-white/10 flex items-center justify-between text-[11px] text-[#DDD1BE]/70">
-              <span>Terminal Node: IND-DEL-01</span>
-              <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                Network Secure
-              </span>
-            </div>
-          </div>
-
-          {/* Right Panel: Authentication Form (7 cols on lg) */}
-          <div className="lg:col-span-7 p-5 sm:p-8 lg:p-12 bg-[#FAF8F5] text-[#0E3320] flex flex-col justify-between">
-            <div>
-              {/* Form Heading */}
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-2xl font-bold font-serif text-[#0E3320] tracking-tight">
-                    Super Admin Sign In
-                  </h2>
-                  <p className="text-xs text-[#5C8261] mt-1">
-                    Enter your authorized administrative email and password.
-                  </p>
-                </div>
-                <div className="w-12 h-12 rounded-2xl bg-[#0E3320] text-[#C59B3F] flex items-center justify-center shadow-md">
-                  <Lock className="w-6 h-6 stroke-[1.8]" />
+              {/* 6-digit boxes */}
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-[#5C8261] mb-3 text-center">Enter OTP</label>
+                <div className="flex justify-center gap-1.5 sm:gap-2.5 w-full">
+                  {digits.map((d, i) => (
+                    <input
+                      key={i}
+                      ref={el => digitRefs.current[i] = el}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={d}
+                      disabled={isLoading || isSuccess}
+                      autoComplete="one-time-code"
+                      onChange={e => {
+                        const val = e.target.value.replace(/\D/g, "").slice(-1);
+                        const next = [...digits];
+                        next[i] = val;
+                        setDigits(next);
+                        if (val && i < 5) digitRefs.current[i + 1]?.focus();
+                      }}
+                      onKeyDown={e => {
+                        if (e.key === "Backspace" && !digits[i] && i > 0) {
+                          digitRefs.current[i - 1]?.focus();
+                        }
+                        if (e.key === "ArrowLeft" && i > 0) digitRefs.current[i - 1]?.focus();
+                        if (e.key === "ArrowRight" && i < 5) digitRefs.current[i + 1]?.focus();
+                      }}
+                      onPaste={e => {
+                        const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+                        if (pasted.length > 0) {
+                          const next = [...digits];
+                          for (let j = 0; j < 6; j++) next[j] = pasted[j] || "";
+                          setDigits(next);
+                          const focusIdx = Math.min(pasted.length, 5);
+                          digitRefs.current[focusIdx]?.focus();
+                        }
+                        e.preventDefault();
+                      }}
+                      className={`flex-1 min-w-0 max-w-[52px] aspect-square text-center text-lg sm:text-xl font-bold rounded-xl border-2 bg-[#FAF8F5] text-[#0E3320] font-mono transition-all focus:outline-none disabled:opacity-50
+                        ${d ? "border-[#0E3320] bg-[#F0F7F2] shadow-sm" : "border-[#DDD1BE] focus:border-[#C59B3F] focus:ring-2 focus:ring-[#C59B3F]/20 focus:bg-white"}`}
+                    />
+                  ))}
                 </div>
               </div>
 
-              {/* Quick Demo Fill Helper Banner */}
-              <div className="mb-6 p-3.5 rounded-xl bg-[#E6EFE9] border border-[#2A7A50]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-[#1E603D] shrink-0" />
-                  <span className="text-xs font-semibold text-[#15482D]">
-                    Testing login? Use pre-configured Super Admin credentials:
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleQuickFill}
-                  className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0E3320] hover:bg-[#15482D] text-white text-xs font-medium transition-all shadow-sm shrink-0"
-                >
-                  <span>Auto-Fill Demo</span>
+              <button type="submit" disabled={isLoading || isSuccess || otp.length < 6}
+                className="w-full py-3 rounded-xl bg-[#0E3320] hover:bg-[#15482D] text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50 cursor-pointer shadow-md">
+                {isLoading
+                  ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /><span>Verifying...</span></>
+                  : <span>Verify OTP</span>}
+              </button>
+
+              <div className="flex items-center justify-between text-xs pt-1">
+                <button type="button" onClick={() => { setStep("credentials"); setDigits(["","","","","",""]); setErrorMessage(""); }}
+                  className="text-[#5C8261] hover:text-[#0E3320] font-medium transition-colors">
+                  Back
+                </button>
+                <button type="button" onClick={handleResendOtp} disabled={resendCooldown > 0}
+                  className="flex items-center gap-1.5 text-[#5C8261] hover:text-[#C59B3F] disabled:opacity-40 transition-colors font-medium">
+                  <RefreshCw className="w-3 h-3" />
+                  {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend OTP"}
                 </button>
               </div>
+            </form>
+          )}
+        </div>
 
-              {/* Error Message Banner */}
-              {errorMessage && (
-                <div className="mb-6 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2.5 animate-fadeIn">
-                  <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
-                  <span className="font-medium">{errorMessage}</span>
-                </div>
-              )}
-
-              {/* Success Message Banner */}
-              {isSuccess && (
-                <div className="mb-6 p-3.5 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs flex items-center gap-2.5 animate-fadeIn">
-                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
-                  <span className="font-medium">{statusMessage}</span>
-                </div>
-              )}
-
-              {/* Login Form */}
-              <form onSubmit={handleLogin} className="space-y-5" noValidate>
-                {/* Email Field */}
-                <div>
-                  <label
-                    htmlFor="admin-email"
-                    className="block text-xs font-bold uppercase tracking-wider text-[#0E3320] mb-1.5"
-                  >
-                    Institutional Email Address <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#5C8261]">
-                      <Mail className="w-4 h-4" />
-                    </div>
-                    <input
-                      id="admin-email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="superadmin@bhartiyaayurveda.org"
-                      disabled={isLoading || isSuccess}
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-[#DDD1BE] bg-white text-sm text-[#0E3320] placeholder-[#C8B79E] focus:outline-none focus:ring-2 focus:ring-[#C59B3F] focus:border-transparent transition-all disabled:opacity-50"
-                    />
-                  </div>
-                </div>
-
-                {/* Password Field */}
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label
-                      htmlFor="admin-password"
-                      className="block text-xs font-bold uppercase tracking-wider text-[#0E3320]"
-                    >
-                      Master Password <span className="text-red-500">*</span>
-                    </label>
-                    {capsLockActive && (
-                      <span className="text-[11px] font-semibold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-md">
-                        Caps Lock is ON
-                      </span>
-                    )}
-                  </div>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#5C8261]">
-                      <Lock className="w-4 h-4" />
-                    </div>
-                    <input
-                      id="admin-password"
-                      type={showPassword ? "text" : "password"}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      onKeyDown={handleKeyDown}
-                      onKeyUp={handleKeyUp}
-                      placeholder="Enter master password"
-                      disabled={isLoading || isSuccess}
-                      className="w-full pl-10 pr-11 py-3 rounded-xl border border-[#DDD1BE] bg-white text-sm text-[#0E3320] placeholder-[#C8B79E] focus:outline-none focus:ring-2 focus:ring-[#C59B3F] focus:border-transparent transition-all disabled:opacity-50"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      tabIndex={-1}
-                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#5C8261] hover:text-[#0E3320] transition-colors"
-                      title={showPassword ? "Hide password" : "Show password"}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
-                        <Eye className="w-4 h-4" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Remember Me & Forgot Password */}
-                <div className="flex items-center justify-between text-xs pt-1">
-                  <label className="flex items-center gap-2 cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                      className="w-4 h-4 rounded border-[#DDD1BE] text-[#1E603D] focus:ring-[#C59B3F] accent-[#1E603D]"
-                    />
-                    <span className="text-[#15482D] font-medium">
-                      Keep this session authenticated
-                    </span>
-                  </label>
-
-                  <button
-                    type="button"
-                    onClick={() => setShowForgotModal(true)}
-                    className="font-semibold text-[#8C671D] hover:text-[#0E3320] underline transition-colors"
-                  >
-                    Forgot Password?
-                  </button>
-                </div>
-
-                {/* Submit Action Button */}
-                <button
-                  type="submit"
-                  disabled={isLoading || isSuccess}
-                  className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#0E3320] to-[#15482D] hover:from-[#15482D] hover:to-[#1E603D] text-[#FAF8F5] font-semibold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group disabled:opacity-75 disabled:cursor-not-allowed"
-                >
-                  {isLoading ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>{statusMessage || "Authenticating..."}</span>
-                    </>
-                  ) : isSuccess ? (
-                    <>
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                      <span>Redirecting to Super Admin Console...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Sign In to Super Admin Console</span>
-                      <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 text-[#C59B3F]" />
-                    </>
-                  )}
-                </button>
-              </form>
-            </div>
-
-            {/* Footer Trust Note */}
-            <div className="mt-8 pt-4 border-t border-[#DDD1BE]/60 flex items-center justify-between text-[11px] text-[#5C8261]">
-              <span className="flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#C59B3F]" />
-                Security Gateway v2.4 (Encrypted)
-              </span>
-              <span className="text-[#8C671D]">
-                IP Logged &amp; Verified
-              </span>
-            </div>
-          </div>
-
+        <div className="mt-4 text-center">
+          <Link href="/" className="text-xs text-[#5C8261] hover:text-[#0E3320] transition-colors">
+            Back to Website
+          </Link>
         </div>
       </div>
-
-      {/* Forgot Password Modal Dialog */}
-      {showForgotModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-[#FAF8F5] text-[#0E3320] max-w-md w-full rounded-2xl p-6 shadow-2xl border border-[#DDD1BE] relative">
-            <button
-              onClick={() => setShowForgotModal(false)}
-              className="absolute top-4 right-4 text-neutral-400 hover:text-neutral-700 transition-colors p-1 rounded-full hover:bg-neutral-100"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="w-12 h-12 rounded-full bg-[#E6EFE9] text-[#1E603D] flex items-center justify-center mb-4">
-              <HelpCircle className="w-6 h-6" />
-            </div>
-
-            <h3 className="text-lg font-bold font-serif text-[#0E3320] mb-2">
-              Super Admin Credential Recovery
-            </h3>
-            <p className="text-xs text-[#5C8261] mb-4 leading-relaxed">
-              For supreme institutional security, master credentials cannot be reset via automated emails without clearance from the Central Directorate.
-            </p>
-
-            <div className="bg-[#EBE2D4]/60 p-3.5 rounded-xl border border-[#DDD1BE] text-xs space-y-1.5 mb-5">
-              <p className="font-semibold text-[#0E3320]">Emergency IT Helpdesk:</p>
-              <p className="text-[#5C8261]">Email: <span className="font-mono font-medium text-[#0E3320]">security@bhartiyaayurveda.org</span></p>
-              <p className="text-[#5C8261]">Emergency Master Hotline: <span className="font-medium text-[#0E3320]">+91 98765 43210</span></p>
-            </div>
-
-            <div className="flex items-center justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowForgotModal(false);
-                  handleQuickFill();
-                }}
-                className="px-4 py-2 rounded-lg bg-[#C59B3F] hover:bg-[#AC822D] text-white text-xs font-semibold shadow-sm transition-all"
-              >
-                Use Demo Login
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowForgotModal(false)}
-                className="px-4 py-2 rounded-lg bg-[#E6EFE9] hover:bg-[#DDD1BE] text-[#0E3320] text-xs font-medium transition-all"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Global Bottom Footer Note */}
-      <footer className="relative z-10 w-full py-3 px-6 text-center text-[11px] text-white/50 border-t border-white/5 bg-[#071F13]">
-        © {new Date().getFullYear()} Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad Sansthan (भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद् संस्थान). All Rights Reserved. Restricted to authorized administrators.
-      </footer>
     </main>
   );
 }

@@ -3,51 +3,36 @@
 import { useState } from "react";
 import { Clock, ArrowUpRight, ChevronRight, Leaf } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
+
+const FALLBACK_ARTICLES = [
+  { hi: "आयुर्वेदिक दिनचर्या के 5 सरल नियम", en: "5 Simple Rules for an Ayurvedic Lifestyle", readTime: "5 min", img: "/images/articles/article-1.jpg", link: "#" },
+  { hi: "योग से मानसिक शांति कैसे पाएं",     en: "How Yoga Brings Mental Peace",               readTime: "6 min", img: "/images/articles/article-2.jpg", link: "#" },
+  { hi: "सात्विक आहार का महत्व",              en: "The Power of Sattvic Food",                  readTime: "4 min", img: "/images/articles/article-3.jpg", link: "#" },
+];
+
+const FALLBACK_FAQS = [
+  { q: "आयुर्वेद क्या है और यह कैसे काम करता है ?", a: "आयुर्वेद त्रिदोष (वात, पित्त, कफ) के संतुलन द्वारा शरीर की प्राकृतिक रोग प्रतिरोधक क्षमता को जागृत करता है।" },
+  { q: "योग और आयुर्वेद में क्या अंतर है ?",        a: "आयुर्वेद शारीरिक और मानसिक स्वास्थ्य का विज्ञान है, जबकि योग मन और चेतना की साधना है। दोनों एक-दूसरे के पूरक हैं।" },
+  { q: "क्या ऑनलाइन परामर्श उपलब्ध है ?",          a: "हाँ, हमारे अनुभवी वैद्य वीडियो कॉल के माध्यम से ऑनलाइन परामर्श प्रदान करते हैं।" },
+  { q: "प्राकृतिक चिकित्सा में कौन-सी विधियाँ शामिल हैं ?", a: "इसमें जल चिकित्सा, मिट्टी लेप, सूर्य स्नान, उपवास चिकित्सा और मालिश जैसे प्राकृतिक उपचार शामिल हैं।" },
+  { q: "क्या कोई व्यक्तिगत परामर्श करवा सकता है ?", a: "हाँ, आप व्यक्तिगत 1-on-1 परामर्श के लिए अपॉइंटमेंट बुक कर सकते हैं।" },
+];
 
 export default function ArticlesAndFaqSection({ onOpenConsultation }) {
-  const articles = [
-    {
-      hi: "आयुर्वेदिक दिनचर्या के 5 सरल नियम",
-      en: "5 Simple Rules for an Ayurvedic Lifestyle",
-      readTime: "5 min read",
-      img: "/images/articles/article-1.jpg",
-    },
-    {
-      hi: "योग से मानसिक शांति कैसे पाएं",
-      en: "How Yoga Brings Mental Peace",
-      readTime: "6 min read",
-      img: "/images/articles/article-2.jpg",
-    },
-    {
-      hi: "सात्विक आहार का महत्व",
-      en: "The Power of Sattvic Food",
-      readTime: "4 min read",
-      img: "/images/articles/article-3.jpg",
-    },
-  ];
+  const { homepage } = useSiteSettings();
 
-  const faqs = [
-    {
-      q: "आयुर्वेद क्या है और यह कैसे काम करता है ?",
-      a: "आयुर्वेद त्रिदोष (वात, पित्त, कफ) के संतुलन द्वारा शरीर की प्राकृतिक रोग प्रतिरोधक क्षमता को जागृत करता है।",
-    },
-    {
-      q: "योग और आयुर्वेद में क्या अंतर है ?",
-      a: "आयुर्वेद शारीरिक और मानसिक स्वास्थ्य का विज्ञान है, जबकि योग मन और चेतना की साधना है। दोनों एक-दूसरे के पूरक हैं।",
-    },
-    {
-      q: "क्या ऑनलाइन परामर्श उपलब्ध है ?",
-      a: "हाँ, हमारे अनुभवी वैद्य वीडियो कॉल के माध्यम से नाड़ी, लक्षण एवं जीवनशैली पर आधारित ऑनलाइन परामर्श प्रदान करते हैं।",
-    },
-    {
-      q: "प्राकृतिक चिकित्सा में कौन-सी विधियाँ शामिल हैं ?",
-      a: "इसमें जल चिकित्सा, मिट्टी लेप, सूर्य स्नान, उपवास चिकित्सा और मालिश जैसे प्राकृतिक उपचार शामिल हैं।",
-    },
-    {
-      q: "क्या कोई व्यक्तिगत परामर्श करवा सकता है ?",
-      a: "हाँ, आप अपनी सुविधा के अनुसार व्यक्तिगत 1-on-1 परामर्श के लिए अपॉइंटमेंट बुक कर सकते हैं।",
-    },
-  ];
+  const rawArticles = homepage?.articles?.length ? homepage.articles : FALLBACK_ARTICLES;
+  const articles = rawArticles.map(a => ({
+    hi:       a.titleHi  || a.hi  || "",
+    en:       a.titleEn  || a.en  || "",
+    readTime: a.readTime || "",
+    img:      a.image    || a.img || "",
+    link:     a.link     || "#",
+  }));
+
+  const rawFaqs = homepage?.faq?.length ? homepage.faq : FALLBACK_FAQS;
+  const faqs = rawFaqs.map(f => ({ q: f.q || "", a: f.a || "" }));
 
   const [openFaq, setOpenFaq] = useState(0);
 

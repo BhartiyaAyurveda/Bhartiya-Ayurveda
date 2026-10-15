@@ -4,75 +4,26 @@ import { useState } from "react";
 import { Check, ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
 import ProgramDetailsModal from "@/components/ui/ProgramDetailsModal";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
+
+const FALLBACK_PROGRAMS = [
+  { hi: "7 दिन आयुर्वेद रिट्रीट", en: "7 Days Ayurveda Retreat", image: "/images/programs/retreat-7days.jpg", price: "₹ 24,999", duration: "7 Days", description: "A gentle introduction to Ayurvedic living.", features: ["Detox & Rejuvenation","Beginner-friendly","Sattvic Food","Nature Walks"] },
+  { hi: "14 दिन योग ध्यान बंधन", en: "14 Days Yoga & Meditation", image: "/images/programs/yoga-14days.jpg", price: "₹ 42,999", duration: "14 Days", description: "Deepen your practice with two weeks of daily Asana, Pranayama and guided meditation.", features: ["Inner Peace & Balance","Pranayama & Mindfulness","Sattvic Lifestyle","Personal Guidance"] },
+  { hi: "21 दिन प्राकृतिक चिकित्सा", en: "21 Days Naturopathy Program", image: "/images/programs/naturopathy-21days.jpg", price: "₹ 64,999", duration: "21 Days", description: "A comprehensive naturopathy journey.", features: ["Deep Cleansing","Natural Therapies","Diet & Lifestyle Guidance","Expert Support"] },
+  { hi: "30 दिन समग्र स्वास्थ्य", en: "30 Days Holistic Wellness", image: "/images/programs/wellness-30days.jpg", price: "₹ 84,999", duration: "30 Days", description: "Our most complete transformation program.", features: ["Complete Mind-Body Reset","Yoga, Ayurveda & Nature","Personalized Plan","Lifetime Guidance"] },
+];
 
 export default function ProgramsSection({ onOpenConsultation }) {
   const [selectedProgram, setSelectedProgram] = useState(null);
-
-  const programs = [
-    {
-      hi: "7 दिन आयुर्वेद रिट्रीट",
-      en: "7 Days Ayurveda Retreat",
-      image: "/images/programs/retreat-7days.jpg",
-      price: "₹ 24,999",
-      duration: "7 Days",
-      description: "A gentle introduction to Ayurvedic living — daily detox rituals, sattvic meals, and guided nature walks designed to reset your body and calm your mind in a week.",
-      features: [
-        "Detox & Rejuvenation",
-        "Beginner-friendly",
-        "Sattvic Food",
-        "Nature Walks",
-      ],
-    },
-    {
-      hi: "14 दिन योग ध्यान बंधन",
-      en: "14 Days Yoga & Meditation",
-      image: "/images/programs/yoga-14days.jpg",
-      price: "₹ 42,999",
-      duration: "14 Days",
-      description: "Deepen your practice with two weeks of daily Asana, Pranayama and guided meditation, paired with a sattvic lifestyle and one-on-one guidance from our resident yogacharyas.",
-      features: [
-        "Inner Peace & Balance",
-        "Pranayama & Mindfulness",
-        "Sattvic Lifestyle",
-        "Personal Guidance",
-      ],
-    },
-    {
-      hi: "21 दिन प्राकृतिक चिकित्सा",
-      en: "21 Days Naturopathy Program",
-      image: "/images/programs/naturopathy-21days.jpg",
-      price: "₹ 64,999",
-      duration: "21 Days",
-      description: "A comprehensive naturopathy journey combining deep cleansing therapies, personalized diet and lifestyle guidance, and continuous support from our expert naturopaths.",
-      features: [
-        "Deep Cleansing",
-        "Natural Therapies",
-        "Diet & Lifestyle Guidance",
-        "Expert Support",
-      ],
-    },
-    {
-      hi: "30 दिन समग्र स्वास्थ्य",
-      en: "30 Days Holistic Wellness",
-      image: "/images/programs/wellness-30days.jpg",
-      price: "₹ 84,999",
-      duration: "30 Days",
-      description: "Our most complete transformation program — a full month resetting body and mind through Yoga, Ayurveda and nature therapy, with a personalized plan and lifetime guidance beyond your stay.",
-      features: [
-        "Complete Mind-Body Reset",
-        "Yoga, Ayurveda & Nature",
-        "Personalized Plan",
-        "Lifetime Guidance",
-      ],
-    },
-  ];
+  const { homepage } = useSiteSettings();
+  const programs = (homepage?.programs?.length ? homepage.programs : FALLBACK_PROGRAMS);
 
   return (
     <section id="programs" className="py-16 px-4 md:px-8 text-white relative font-sans overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img
-          src="/images/programs/programsbg.png"
+          src={homepage?.backgrounds?.programsBg || "/images/programs/programsbg.png"}
           alt="Programs background"
           className="w-full h-full object-cover"
         />

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 import Link from "next/link";
 import { 
   Building2, 
@@ -11,7 +12,6 @@ import {
   GraduationCap, 
   BookOpen, 
   CheckCircle2, 
-  ArrowRight, 
   Send, 
   Award, 
   ShieldCheck, 
@@ -26,12 +26,16 @@ import Footer from "@/components/layout/Footer";
 import ConsultationModal from "@/components/ui/ConsultationModal";
 import VideoModal from "@/components/ui/VideoModal";
 
+
 export default function AffiliatedInstitutesPage() {
+  const { contact } = useSiteSettings();
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRegion, setSelectedRegion] = useState("All");
+  const [institutes, setInstitutes] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [callBackForm, setCallBackForm] = useState({
     name: "",
@@ -42,173 +46,22 @@ export default function AffiliatedInstitutesPage() {
     message: ""
   });
 
-  // The 14 exact affiliated institutions of Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad
-  const institutes = [
-    {
-      id: 1,
-      name: "S.P College of Paramedical Sciences",
-      nameHi: "एस.पी. कॉलेज ऑफ पैरामेडिकल साइंसेज",
-      address: "TIYARI ARA, Jaunpur, Uttar Pradesh - 222001",
-      city: "Jaunpur",
-      state: "Uttar Pradesh",
-      type: "Paramedical & Yoga Sciences",
-      code: "BA-AFF-01",
-      status: "Active & Verified",
-    },
-    {
-      id: 2,
-      name: "Sushail Institute of Paramedical Science",
-      nameHi: "सुशैल इंस्टीट्यूट ऑफ पैरामेडिकल साइंस",
-      address: "THARA RUDAULI, Ayodhya, Uttar Pradesh - 224001",
-      city: "Ayodhya",
-      state: "Uttar Pradesh",
-      type: "Paramedical & Naturopathy",
-      code: "BA-AFF-02",
-      status: "Active & Verified",
-    },
-    {
-      id: 3,
-      name: "R.S College of Paramedical Science",
-      nameHi: "आर.एस. कॉलेज ऑफ पैरामेडिकल साइंस",
-      address: "Munderwa Lalganj Road, Mahadeva Bankati, Basti, Uttar Pradesh - 272123",
-      city: "Basti",
-      state: "Uttar Pradesh",
-      type: "Paramedical & Integrative Medicine",
-      code: "BA-AFF-03",
-      status: "Active & Verified",
-    },
-    {
-      id: 4,
-      name: "Gyan Prabhat Institute of Paramedical Science",
-      nameHi: "ज्ञान प्रभात इंस्टीट्यूट ऑफ पैरामेडिकल साइंस",
-      address: "Van Vihar Road, Bhupatpatti, Jaunpur, Uttar Pradesh - 222002",
-      city: "Jaunpur",
-      state: "Uttar Pradesh",
-      type: "Paramedical & Yoga Sciences",
-      code: "BA-AFF-04",
-      status: "Active & Verified",
-    },
-    {
-      id: 5,
-      name: "MHD Paramedical College",
-      nameHi: "एम.एच.डी. पैरामेडिकल कॉलेज",
-      address: "Ganga Nagar, Basharatpur, Near Shahpur Thana, Gorakhpur, Uttar Pradesh - 273004",
-      city: "Gorakhpur",
-      state: "Uttar Pradesh",
-      type: "Paramedical & Clinical Training",
-      code: "BA-AFF-05",
-      status: "Active & Verified",
-    },
-    {
-      id: 6,
-      name: "Sreenidhi Marabashettar Medical Institute",
-      nameHi: "श्रीनिधि मारबशेट्टार मेडिकल इंस्टीट्यूट",
-      address: "Hubli, Karnataka - 580030",
-      city: "Hubli",
-      state: "Karnataka",
-      type: "Medical & Holistic Sciences",
-      code: "BA-AFF-06",
-      status: "Active & Verified",
-    },
-    {
-      id: 7,
-      name: "Aarvi Paramedical Institute",
-      nameHi: "आरवी पैरामेडिकल इंस्टीट्यूट",
-      address: "Tilokpur Nahar, Aurai, Bhadohi, Uttar Pradesh - 220011",
-      city: "Bhadohi",
-      state: "Uttar Pradesh",
-      type: "Paramedical & Naturopathy Care",
-      code: "BA-AFF-07",
-      status: "Active & Verified",
-    },
-    {
-      id: 8,
-      name: "S.S. Nursing and Paramedical College",
-      nameHi: "एस.एस. नर्सिंग एंड पैरामेडिकल कॉलेज",
-      address: "Kalyanpur, Gorakhpur, Uttar Pradesh - 273412",
-      city: "Gorakhpur",
-      state: "Uttar Pradesh",
-      type: "Nursing & Paramedical Education",
-      code: "BA-AFF-08",
-      status: "Active & Verified",
-    },
-    {
-      id: 9,
-      name: "Anjana Nursing Home & Paramedical College",
-      nameHi: "अंजना नर्सिंग होम एवं पैरामेडिकल कॉलेज",
-      address: "Ramnagar, Ambedkar Nagar, Uttar Pradesh - 224149",
-      city: "Ambedkar Nagar",
-      state: "Uttar Pradesh",
-      type: "Clinical Hospital & Education",
-      code: "BA-AFF-09",
-      status: "Active & Verified",
-    },
-    {
-      id: 10,
-      name: "Ram Avatar Memorial Paramedical College",
-      nameHi: "राम अवतार मेमोरियल पैरामेडिकल कॉलेज",
-      address: "Village Udarauli, Post Ahirauli, Salempur, Deoria, Uttar Pradesh - 274505",
-      city: "Deoria",
-      state: "Uttar Pradesh",
-      type: "Paramedical & Rural Healthcare",
-      code: "BA-AFF-10",
-      status: "Active & Verified",
-    },
-    {
-      id: 11,
-      name: "Maa Saraswati Paramedical College",
-      nameHi: "माँ सरस्वती पैरामेडिकल कॉलेज",
-      address: "Kuwaripur, Jaunpur, Uttar Pradesh - 222202",
-      city: "Jaunpur",
-      state: "Uttar Pradesh",
-      type: "Paramedical & Yoga Education",
-      code: "BA-AFF-11",
-      status: "Active & Verified",
-    },
-    {
-      id: 12,
-      name: "J.P. Institute of Paramedical Science",
-      nameHi: "जे.पी. इंस्टीट्यूट ऑफ पैरामेडिकल साइंस",
-      address: "Kaboolpur, Zafrabad, Jaunpur, Uttar Pradesh - 222180",
-      city: "Jaunpur",
-      state: "Uttar Pradesh",
-      type: "Paramedical & Health Sciences",
-      code: "BA-AFF-12",
-      status: "Active & Verified",
-    },
-    {
-      id: 13,
-      name: "Institute of Naturopathy and Yogic Sciences",
-      nameHi: "इंस्टीट्यूट ऑफ नेचुरोपैथी एंड योगिक साइंसेज",
-      address: "Patrakar Puram, Gomti Nagar, Lucknow, Uttar Pradesh - 226010",
-      city: "Lucknow",
-      state: "Uttar Pradesh",
-      type: "Naturopathy & Yoga Research",
-      code: "BA-AFF-13",
-      status: "Active & Verified",
-    },
-    {
-      id: 14,
-      name: "Ayurveda and Yoga Training Center",
-      nameHi: "आयुर्वेद एंड योग ट्रेनिंग सेंटर",
-      address: "Okhla, New Delhi - 110025",
-      city: "New Delhi",
-      state: "Delhi",
-      type: "Ayurveda, Yoga & Training",
-      code: "BA-AFF-14",
-      status: "Active & Verified",
-    },
-  ];
+  useEffect(() => {
+    fetch("/api/public/affiliated-institutes")
+      .then(r => r.json())
+      .then(d => { if (d.ok) setInstitutes((d.data || []).map(i => ({ ...i, nameHi: i.name_hindi, status: "Active & Verified" }))); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
-  // Filtered institutes based on search and selected region
   const filteredInstitutes = useMemo(() => {
     return institutes.filter((inst) => {
       const matchesSearch =
         inst.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        inst.nameHi.includes(searchQuery) ||
-        inst.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        inst.state.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        inst.address.toLowerCase().includes(searchQuery.toLowerCase());
+        (inst.nameHi || "").includes(searchQuery) ||
+        (inst.city || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (inst.state || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (inst.address || "").toLowerCase().includes(searchQuery.toLowerCase());
 
       const matchesRegion =
         selectedRegion === "All" ||
@@ -217,7 +70,7 @@ export default function AffiliatedInstitutesPage() {
 
       return matchesSearch && matchesRegion;
     });
-  }, [searchQuery, selectedRegion]);
+  }, [institutes, searchQuery, selectedRegion]);
 
   const handleCallBackSubmit = (e) => {
     e.preventDefault();
@@ -480,8 +333,7 @@ export default function AffiliatedInstitutesPage() {
                       className="px-4 py-2 rounded-xl bg-[#0E3320] hover:bg-[#071F13] text-white text-xs sm:text-sm font-semibold transition-colors flex items-center gap-1.5 shadow-sm"
                     >
                       <span>Inquire / संपर्क करें</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
+                                          </button>
                   </div>
 
                 </div>
@@ -563,7 +415,7 @@ export default function AffiliatedInstitutesPage() {
 
       {/* 6. Call Back Request Form (कॉल बैक का अनुरोध करें) */}
       <section id="call-back-section" className="py-16 md:py-20 px-4 md:px-8 border-b border-[#EBE2D4] bg-[#FAF8F5]">
-        <div className="max-w-4xl mx-auto bg-white rounded-3xl p-8 sm:p-12 border border-[#E4D9C7] shadow-xl space-y-6">
+        <div className="max-w-2xl mx-auto bg-white rounded-3xl p-8 sm:p-12 border border-[#E4D9C7] shadow-xl space-y-6">
           
           <div className="text-center space-y-2 max-w-xl mx-auto">
             <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-[#8C671D] uppercase tracking-wider">
@@ -733,7 +585,7 @@ export default function AffiliatedInstitutesPage() {
               href="/contact"
               className="px-7 py-3.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-sm sm:text-base font-semibold border border-white/40 backdrop-blur transition-all"
             >
-              Helpline: +91 98765 43210
+              Helpline: {contact.primaryPhone}
             </Link>
           </div>
         </div>

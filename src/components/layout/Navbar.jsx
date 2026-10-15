@@ -4,13 +4,11 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { ArrowRight, Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 
 export default function Navbar({ onOpenConsultation }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [admissionsDropdown, setAdmissionsDropdown] = useState(false);
   const [studentsDropdown, setStudentsDropdown] = useState(false);
-  const [mobileAdmissionsOpen, setMobileAdmissionsOpen] = useState(false);
   const [mobileStudentsOpen, setMobileStudentsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -25,12 +23,13 @@ export default function Navbar({ onOpenConsultation }) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const isAdmissionsActive = pathname?.startsWith("/admissions");
   const isStudentsActive = pathname?.startsWith("/students");
   const isCoursesActive = pathname === "/courses" || pathname === "/academics";
   const isInstitutesActive = pathname === "/affiliated-institutes";
   const isCertActive = pathname === "/certificate-verification";
   const isGalleryActive = pathname === "/gallery";
+  const isAnnouncementsActive = pathname?.startsWith("/announcements");
+
   const isAboutActive = pathname === "/about";
   const isContactActive = pathname === "/contact";
   const isHomeActive = pathname === "/";
@@ -39,8 +38,8 @@ export default function Navbar({ onOpenConsultation }) {
     <header
       className={`sticky top-0 lg:top-9 z-50 transition-all duration-300 bg-white print:hidden ${
         isScrolled
-          ? "shadow-md border-b border-[#DFD3C0] py-2 sm:py-2"
-          : "border-b border-[#EBE2D4] py-3 sm:py-3"
+          ? "shadow-md border-b border-[#DFD3C0] py-1.5 sm:py-1.5 lg:py-1"
+          : "border-b border-[#EBE2D4] py-2 sm:py-2 lg:py-1.5"
       } px-4 md:px-8`}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-start lg:justify-between">
@@ -73,44 +72,6 @@ export default function Navbar({ onOpenConsultation }) {
             Home
           </Link>
 
-          {/* Admissions Dropdown */}
-          <div
-            className="relative"
-            onMouseEnter={() => setAdmissionsDropdown(true)}
-            onMouseLeave={() => setAdmissionsDropdown(false)}
-          >
-            <button
-              onClick={() => setAdmissionsDropdown(!admissionsDropdown)}
-              className={`flex items-center gap-1.5 py-1 font-semibold transition-all relative ${
-                isAdmissionsActive
-                  ? "text-[#1A5C38] border-b-2 border-[#1A5C38]"
-                  : "text-[#882424] hover:text-[#1A5C38]"
-              }`}
-            >
-              <span>Admissions</span>
-              <ChevronDown
-                className={`w-4 h-4 transition-transform duration-200 ${
-                  admissionsDropdown ? "rotate-180" : ""
-                } ${isAdmissionsActive ? "text-[#1A5C38]" : "text-[#7A9983]"}`}
-              />
-            </button>
-
-            {/* Dropdown Menu Box */}
-            {admissionsDropdown && (
-              <div className="absolute top-full left-0 pt-2 z-50 animate-in fade-in-50 slide-in-from-top-1">
-                <div className="w-56 bg-white rounded-md shadow-xl border border-[#EBE2D4] py-3 px-1">
-                  <Link
-                    href="/admissions/registration-form"
-                    onClick={() => setAdmissionsDropdown(false)}
-                    className="block px-5 py-2 text-[15px] font-semibold text-[#882424] hover:text-[#1A5C38] hover:bg-[#FAF8F5] transition-colors rounded"
-                  >
-                    Registration Form
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
-
           {/* Students Dropdown */}
           <div
             className="relative"
@@ -138,18 +99,11 @@ export default function Navbar({ onOpenConsultation }) {
               <div className="absolute top-full left-0 pt-2 z-50 animate-in fade-in-50 slide-in-from-top-1">
                 <div className="w-56 bg-white rounded-md shadow-xl border border-[#EBE2D4] py-3 px-1 space-y-1">
                   <Link
-                    href="/students/registration"
+                    href="/students/admit-card"
                     onClick={() => setStudentsDropdown(false)}
                     className="block px-5 py-2 text-[15px] font-semibold text-[#882424] hover:text-[#1A5C38] hover:bg-[#FAF8F5] transition-colors rounded"
                   >
-                    Registration
-                  </Link>
-                  <Link
-                    href="/students/login"
-                    onClick={() => setStudentsDropdown(false)}
-                    className="block px-5 py-2 text-[15px] font-semibold text-[#882424] hover:text-[#1A5C38] hover:bg-[#FAF8F5] transition-colors rounded"
-                  >
-                    Login
+                    Admit Card
                   </Link>
                   <Link
                     href="/students/results"
@@ -184,7 +138,7 @@ export default function Navbar({ onOpenConsultation }) {
                 : "text-[#882424] hover:text-[#1A5C38]"
             }`}
           >
-            Institutes
+            Affiliated Institutes
           </Link>
 
           {/* Certificate Verification */}
@@ -209,6 +163,18 @@ export default function Navbar({ onOpenConsultation }) {
             }`}
           >
             Gallery
+          </Link>
+
+          {/* Notices */}
+          <Link
+            href="/announcements"
+            className={`py-1 transition-colors relative ${
+              isAnnouncementsActive
+                ? "text-[#1A5C38] border-b-2 border-[#1A5C38]"
+                : "text-[#882424] hover:text-[#1A5C38]"
+            }`}
+          >
+            Notices
           </Link>
 
           {/* About */}
@@ -286,32 +252,6 @@ export default function Navbar({ onOpenConsultation }) {
             Home
           </Link>
 
-          {/* Mobile Admissions Accordion */}
-          <div>
-            <button
-              onClick={() => setMobileAdmissionsOpen(!mobileAdmissionsOpen)}
-              className="w-full flex items-center justify-between px-4 py-3 text-base text-[#882424] font-semibold hover:bg-[#EBE2D4]/50 rounded-lg"
-            >
-              <span>Admissions</span>
-              <ChevronDown
-                className={`w-4 h-4 transition-transform duration-200 ${
-                  mobileAdmissionsOpen ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-            {mobileAdmissionsOpen && (
-              <div className="pl-6 pr-2 py-1 space-y-1 bg-white/70 rounded-xl mx-3 my-1 border border-[#EBE2D4]">
-                <Link
-                  href="/admissions/registration-form"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-2.5 text-sm text-[#882424] hover:text-[#0E3320] font-semibold"
-                >
-                  Registration Form
-                </Link>
-              </div>
-            )}
-          </div>
-
           {/* Mobile Students Accordion */}
           <div>
             <button
@@ -328,18 +268,11 @@ export default function Navbar({ onOpenConsultation }) {
             {mobileStudentsOpen && (
               <div className="pl-6 pr-2 py-1 space-y-1 bg-white/70 rounded-xl mx-3 my-1 border border-[#EBE2D4]">
                 <Link
-                  href="/students/registration"
+                  href="/students/admit-card"
                   onClick={() => setMobileMenuOpen(false)}
                   className="block px-3 py-2.5 text-sm text-[#882424] hover:text-[#0E3320] font-semibold"
                 >
-                  Student Registration
-                </Link>
-                <Link
-                  href="/students/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-2.5 text-sm text-[#882424] hover:text-[#0E3320] font-semibold"
-                >
-                  Student Login
+                  Admit Card
                 </Link>
                 <Link
                   href="/students/results"
@@ -401,6 +334,18 @@ export default function Navbar({ onOpenConsultation }) {
           </Link>
 
           <Link
+            href="/announcements"
+            onClick={() => setMobileMenuOpen(false)}
+            className={`block px-4 py-3 text-base font-semibold rounded-lg transition-colors ${
+              isAnnouncementsActive
+                ? "bg-[#1A5C38]/10 text-[#1A5C38]"
+                : "text-[#882424] hover:bg-[#EBE2D4]/50"
+            }`}
+          >
+            Notices &amp; Announcements
+          </Link>
+
+          <Link
             href="/about"
             onClick={() => setMobileMenuOpen(false)}
             className={`block px-4 py-3 text-base font-semibold rounded-lg transition-colors ${
@@ -428,7 +373,7 @@ export default function Navbar({ onOpenConsultation }) {
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
-                onOpenConsultation();
+                onOpenConsultation?.();
               }}
               className="w-full py-3.5 rounded-full bg-[#0E3320] text-white text-sm font-semibold shadow-md cursor-pointer hover:bg-[#071F13] transition-colors"
             >

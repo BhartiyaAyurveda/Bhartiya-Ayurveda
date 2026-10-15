@@ -1,47 +1,33 @@
 "use client";
 
 import Reveal from "@/components/ui/Reveal";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
+
+const FALLBACK_CIRCLES = [
+  { hi: "शुद्ध वायु",      en: "Clean Air",    img: "/images/naturopathy/air-waterfall.jpg" },
+  { hi: "सूर्य चिकित्सा", en: "Sun Therapy",  img: "/images/naturopathy/sun-therapy.jpg" },
+  { hi: "जल चिकित्सा",    en: "Water Therapy",img: "/images/naturopathy/water-therapy.jpg" },
+  { hi: "सात्विक आहार",   en: "Pure Food",    img: "/images/naturopathy/pure-food.jpg" },
+  { hi: "औषधीय पौधे",     en: "Herbal Care",  img: "/images/naturopathy/herbal-care.jpg" },
+  { hi: "मिट्टी चिकित्सा",en: "Mud Therapy",  img: "/images/naturopathy/mud-therapy.jpg" },
+];
 
 export default function NaturopathySection() {
-  const circles = [
-    {
-      hi: "शुद्ध वायु",
-      en: "Clean Air",
-      img: "/images/naturopathy/air-waterfall.jpg",
-    },
-    {
-      hi: "सूर्य चिकित्सा",
-      en: "Sun Therapy",
-      img: "/images/naturopathy/sun-therapy.jpg",
-    },
-    {
-      hi: "जल चिकित्सा",
-      en: "Water Therapy",
-      img: "/images/naturopathy/water-therapy.jpg",
-    },
-    {
-      hi: "सात्विक आहार",
-      en: "Pure Food",
-      img: "/images/naturopathy/pure-food.jpg",
-    },
-    {
-      hi: "औषधीय पौधे",
-      en: "Herbal Care",
-      img: "/images/naturopathy/herbal-care.jpg",
-    },
-    {
-      hi: "मिट्टी चिकित्सा",
-      en: "Mud Therapy",
-      img: "/images/naturopathy/mud-therapy.jpg",
-    },
-  ];
+  const { homepage } = useSiteSettings();
+  const rawCircles = homepage?.naturopathy?.length ? homepage.naturopathy : FALLBACK_CIRCLES;
+  // Normalize DB shape (titleHi/titleEn/image) to local shape (hi/en/img)
+  const circles = rawCircles.map(c => ({
+    hi:  c.titleHi || c.hi  || "",
+    en:  c.titleEn || c.en  || "",
+    img: c.image   || c.img || "",
+  }));
 
   return (
     <section id="naturopathy" className="relative py-16 px-4 md:px-8 border-b border-[#EBE2D4] font-sans overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img
-          src="/images/naturopathy/Naturopathybg.png"
+          src={homepage?.backgrounds?.naturopathyBg || "/images/naturopathy/Naturopathybg.png"}
           alt="Naturopathy background"
           className="w-full h-full object-cover"
         />

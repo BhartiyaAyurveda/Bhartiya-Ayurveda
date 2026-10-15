@@ -2,8 +2,10 @@
 
 import { Wind, Sun, Leaf } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 
 export default function DoshasSection() {
+  const { homepage } = useSiteSettings();
   const doshas = [
     {
       icon: Wind,
@@ -36,7 +38,7 @@ export default function DoshasSection() {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img
-          src="/images/ThreeDoshasbg.png"
+          src={homepage?.backgrounds?.threesDoshasBg || "/images/ThreeDoshasbg.png"}
           alt="Three Doshas background"
           className="w-full h-full object-cover"
         />

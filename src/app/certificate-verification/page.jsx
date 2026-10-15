@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -17,7 +18,6 @@ import {
   Calendar,
   FileCheck,
   QrCode,
-  ArrowRight,
   Phone,
   Mail,
   HelpCircle
@@ -27,7 +27,9 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ConsultationModal from "@/components/ui/ConsultationModal";
 
+
 export default function CertificateVerificationPage() {
+  const { contact } = useSiteSettings();
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
   const [enrollmentNumber, setEnrollmentNumber] = useState("");
   const [searched, setSearched] = useState(false);
@@ -277,8 +279,7 @@ export default function CertificateVerificationPage() {
                 ) : (
                   <>
                     <span>Verify Certificate</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </>
+                                      </>
                 )}
               </button>
             </div>
@@ -464,7 +465,7 @@ export default function CertificateVerificationPage() {
             Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad Verification Helpdesk
           </p>
           <p className="text-xs text-[#666]">
-            For physical certificate verification or apostille attestation, contact Helpline: <strong className="text-[#0E3320]">+91 98765 43210</strong> or email <strong className="text-[#0E3320]">hello@bhartiyaayurveda.in</strong>
+            For physical certificate verification or apostille attestation, contact Helpline: <strong className="text-[#0E3320]">{contact.primaryPhone}</strong> or email <strong className="text-[#0E3320]">{contact.verificationEmail || contact.primaryEmail}</strong>
           </p>
         </div>
       </section>

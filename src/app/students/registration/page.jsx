@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 import Link from "next/link";
 import {
   GraduationCap,
@@ -8,8 +9,6 @@ import {
   Phone,
   CheckCircle2,
   Printer,
-  ArrowRight,
-  ArrowLeft,
   Sparkles,
   ShieldCheck,
   Eye,
@@ -67,6 +66,7 @@ const requiredFieldsByStep = {
 };
 
 export default function StudentRegistrationPage() {
+  const { contact } = useSiteSettings();
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -342,8 +342,7 @@ export default function StudentRegistrationPage() {
                   className="w-full sm:w-auto text-center inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#1A5C38] text-white hover:bg-[#0E3320] font-semibold text-sm transition-colors shadow"
                 >
                   <span>Go to Student Login</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
+                                  </Link>
                 <button
                   onClick={resetForm}
                   className="w-full sm:w-auto px-5 py-3 rounded-full border border-[#7A583A]/30 text-[#7A583A] hover:bg-[#FAF8F5] text-sm font-semibold transition-colors text-center"
@@ -372,8 +371,7 @@ export default function StudentRegistrationPage() {
                 className="text-xs sm:text-sm font-semibold text-[#E4BF64] hover:text-white underline inline-flex items-center gap-1 shrink-0"
               >
                 <span>Already registered? Student Login</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+                              </Link>
             </div>
 
             {/* Step Indicator */}
@@ -849,8 +847,7 @@ export default function StudentRegistrationPage() {
                     onClick={goBack}
                     className="w-full sm:w-auto px-6 py-3 rounded-full bg-white text-[#0E3320] border border-[#D5C7B7] text-sm font-semibold hover:border-[#0E3320] transition-colors flex items-center justify-center gap-2"
                   >
-                    <ArrowLeft className="w-4 h-4" />
-                    <span>Back</span>
+                                        <span>Back</span>
                   </button>
                 ) : (
                   <span />
@@ -863,23 +860,21 @@ export default function StudentRegistrationPage() {
                     className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#0E3320] hover:bg-[#071F13] text-white text-sm sm:text-base font-semibold shadow-md transition-all flex items-center justify-center gap-2 group"
                   >
                     <span>Next Step</span>
-                    <ArrowRight className="w-4 h-4 text-[#E4BF64] group-hover:translate-x-1 transition-transform" />
-                  </button>
+                                      </button>
                 ) : (
                   <button
                     type="submit"
                     className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-[#0E3320] hover:bg-[#071F13] text-white font-semibold text-sm sm:text-base shadow-lg transition-all duration-200 group"
                   >
                     <span>Complete Student Registration</span>
-                    <ArrowRight className="w-5 h-5 text-[#E4BF64] group-hover:translate-x-1 transition-transform" />
-                  </button>
+                                      </button>
                 )}
               </div>
 
               {currentStep === steps.length && (
                 <p className="text-xs text-[#7A583A] text-center sm:text-right">
                   Having trouble? Contact Student Support: <br />
-                  <span className="font-semibold text-[#0E3320]">+91 98765 43210 • hello@bhartiyaayurveda.in</span>
+                  <span className="font-semibold text-[#0E3320]">{contact.primaryPhone} • {contact.primaryEmail}</span>
                 </p>
               )}
             </form>

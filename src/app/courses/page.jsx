@@ -1,1086 +1,561 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo, Fragment } from "react";
 import Link from "next/link";
 import {
-  GraduationCap,
-  Calendar,
-  Clock,
-  BookOpen,
-  Award,
-  CheckCircle2,
-  Search,
-  Filter,
-  ArrowRight,
-  ShieldCheck,
-  Building2,
-  FileText,
-  UserCheck,
-  Sparkles,
-  Phone,
-  Mail,
-  X,
-  Stethoscope,
-  HeartPulse,
-  Leaf
+  GraduationCap, Clock, BookOpen, Search,
+  Leaf, RefreshCw, FlaskConical, Flower2,
+  Stethoscope, Crosshair, ChevronLeft, ChevronRight as ChevronRightIcon,
+  SlidersHorizontal, X, LayoutGrid, List, Briefcase
 } from "lucide-react";
 import TopBar from "@/components/layout/TopBar";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ConsultationModal from "@/components/ui/ConsultationModal";
 
+const DURATION_ORDER = ["3 Months","6 Months","1 Year","2 Years","3 Years","3.5 Years","4 Years","5 Years"];
+
+const CATEGORIES = [
+  { key: "all",              label: "All Courses",       labelHi: "सभी पाठ्यक्रम",             icon: GraduationCap, accent: "#0E3320", light: "#EEF6EF", badge: "bg-[#0E3320] text-[#E4BF64]" },
+  { key: "ayurveda",        label: "Ayurveda",           labelHi: "आयुर्वेद",                   icon: Leaf,          accent: "#166534", light: "#dcfce7", badge: "bg-emerald-700 text-white" },
+  { key: "yoga_naturopathy",label: "Yoga & Naturopathy", labelHi: "योग एवं प्राकृतिक चिकित्सा", icon: Flower2,       accent: "#0f766e", light: "#ccfbf1", badge: "bg-teal-700 text-white" },
+  { key: "unani",           label: "Unani",              labelHi: "यूनानी",                      icon: FlaskConical,  accent: "#92400e", light: "#fef3c7", badge: "bg-amber-700 text-white" },
+  { key: "acupuncture",     label: "Acupuncture",        labelHi: "एक्यूपंक्चर",                 icon: Crosshair,     accent: "#9f1239", light: "#ffe4e6", badge: "bg-rose-700 text-white" },
+  { key: "allied_health",   label: "Allied Health",      labelHi: "पैरामेडिकल",                  icon: Stethoscope,   accent: "#1e40af", light: "#dbeafe", badge: "bg-blue-700 text-white" },
+];
+
+const ITEMS_PER_PAGE = 20;
+
+function getCourseType(name) {
+  const n = name.toUpperCase();
+  if (n.startsWith("ADVANCED DIPLOMA") || n.startsWith("POST GRADUATE DIPLOMA") || n.startsWith("POST DIPLOMA")) return "Adv. Diploma";
+  if (n.startsWith("DIPLOMA")) return "Diploma";
+  if (n.startsWith("CERTIFICATE")) return "Certificate";
+  if (n.startsWith("MASTER")) return "Master";
+  return "Program";
+}
+
+function getDurColor(dur) {
+  const map = {
+    "3 Months":  ["#fef2f2","#b91c1c"],
+    "6 Months":  ["#fff7ed","#c2410c"],
+    "1 Year":    ["#f0fdf4","#166534"],
+    "2 Years":   ["#f0fdf4","#0E3320"],
+    "3 Years":   ["#f0fdfa","#0f766e"],
+    "3.5 Years": ["#f0fdfa","#0f766e"],
+    "4 Years":   ["#eff6ff","#1e40af"],
+    "5 Years":   ["#faf5ff","#7e22ce"],
+  };
+  return map[dur] || ["#f5f0e8","#5c4033"];
+}
+
+
 export default function CoursesPage() {
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [courses, setCourses]       = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [apiError, setApiError]     = useState(null);
+  const [searchQuery, setSearchQuery]     = useState("");
   const [selectedDuration, setSelectedDuration] = useState("All");
-  const [selectedCourseModal, setSelectedCourseModal] = useState(null);
+  const [activeCategory, setActiveCategory]     = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [viewMode, setViewMode]       = useState("grid"); // "grid" | "table"
+  const [expandedRow, setExpandedRow] = useState(null);
 
-  // Call Back Form State
-  const [callbackData, setCallbackData] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    course: "D.N.Y.S. (Diploma in Naturopathy & Yoga Sciences)",
-    message: "",
-  });
-  const [callbackSubmitted, setCallbackSubmitted] = useState(false);
+  useEffect(() => {
+    fetch(`/api/public/courses?t=${Date.now()}`, { cache: "no-store" })
+      .then(r => r.json())
+      .then(d => {
+        if (d.ok) setCourses(d.data || []);
+        else setApiError(d.error || "Failed to load courses");
+      })
+      .catch(e => setApiError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
 
-  // All Academic Programs of Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad
-  const courses = [
-    {
-      id: "dnys",
-      code: "DNYS-03",
-      level: "Diploma",
-      titleHi: "डिप्लोमा इन प्राकृतिक चिकित्सा एवं योग विज्ञान (D.N.Y.S.)",
-      titleEn: "Diploma in Naturopathy & Yoga Sciences (D.N.Y.S.)",
-      duration: "3 Years",
-      durationYears: 3,
-      eligibility: "10+2 (Any Stream / Science Preferred)",
-      image: "/images/naturopathy/mud-therapy.jpg",
-      tagline: "A 3-year premier government-recognized professional program in Naturopathy and Yoga science.",
-      description: "D.N.Y.S. is the flagship diploma program certified by the Council. It equips students with deep clinical knowledge of the Five Elements (Panchamahabhuta) therapy, Hydrotherapy, Mud therapy, Fasting therapy, Chromotherapy, and classical Yoga asanas, enabling independent clinical practice and health consultancy.",
-      highlights: [
-        "Government Recognized Council Enrolment",
-        "Clinical Hospital Internship Included",
-        "Hydrotherapy & Mud Bath Practical Labs",
-        "Authorized Independent Naturopathic Practice"
-      ],
-      syllabus: [
-        {
-          period: "1st Year",
-          papers: [
-            "Paper I: Sharir Rachna & Kriya Vigyan (Human Anatomy & Physiology)",
-            "Paper II: Prakritik Chikitsa Darshan (Philosophy & Principles of Naturopathy)",
-            "Paper III: Swasthavritta & Yoga Vigyan (Personal Hygiene & Yogic Kriyas)",
-            "Practical: Shatkarma, Asanas & Pranayama Demonstrations"
-          ]
-        },
-        {
-          period: "2nd Year",
-          papers: [
-            "Paper IV: Jal Chikitsa & Mitti Chikitsa (Hydrotherapy & Mud Therapy)",
-            "Paper V: Aahar & Upvaas Chikitsa (Dietetics, Nutrition & Fasting Therapy)",
-            "Paper VI: Surya Kiran & Vayu Chikitsa (Chromotherapy & Heliotherapy)",
-            "Practical: Clinical Naturopathy Treatments & Case Records"
-          ]
-        },
-        {
-          period: "3rd Year",
-          papers: [
-            "Paper VII: Rog Nidan & Dravyaguna (Diagnostic Methods & Herbology)",
-            "Paper VIII: Chikitshak Dharam & Parikshan (Medical Ethics & Patient Examination)",
-            "Paper IX: Massage & Manipulative Therapies (Mridu Chikitsa)",
-            "Practical: 6 Months Mandatory Hospital Clinical Internship"
-          ]
-        }
-      ],
-      careerOpportunities: [
-        "Registered Naturopathy Practitioner",
-        "Wellness & Panchakarma Clinic Director",
-        "Hospital Naturopath & Yoga Consultant",
-        "Ayush Health & Wellness Centre Officer"
-      ]
-    },
-    {
-      id: "bnys",
-      code: "BNYS-05",
-      level: "Undergraduate Degree",
-      titleHi: "बैचलर ऑफ नेचुरोपैथी एंड योगिक साइंसेज (B.N.Y.S.)",
-      titleEn: "Bachelor of Naturopathy & Yoga Sciences (B.N.Y.S.)",
-      duration: "5 Years",
-      durationYears: 5,
-      eligibility: "10+2 with Physics, Chemistry & Biology (PCB) Min. 50%",
-      image: "/images/hero/hero-meditation.jpg",
-      tagline: "A 5-year full medical bachelor's degree program focused on Naturopathy and Yoga Science.",
-      description: "B.N.Y.S. is an extensive 5-year full-time medical graduation degree course (4.5 years academic + 6 months compulsory rotatory clinical internship). It bridges cutting-edge modern clinical diagnostics with drugless naturopathic healing, acupuncture, and therapeutic yogic medicine.",
-      highlights: [
-        "Comprehensive Medical Graduation Degree",
-        "6 Months Rotatory Hospital Internship",
-        "Clinical Diagnosis, Pathology & Biochemistry",
-        "Acupuncture & Modern Physical Therapy"
-      ],
-      syllabus: [
-        {
-          period: "Phase 1 (Years 1-2)",
-          papers: [
-            "Human Anatomy, Embryology & Histology",
-            "Human Physiology & Biochemistry",
-            "Philosophy & Practice of Naturopathy",
-            "Classical Yoga Philosophy & Patanjali Sutras"
-          ]
-        },
-        {
-          period: "Phase 2 (Years 3-4)",
-          papers: [
-            "Pathology, Microbiology & Forensic Medicine",
-            "Hydrotherapy, Mud Therapy & Heliotherapy",
-            "Acupuncture, Acupressure & Reflexology",
-            "Clinical Nutrition, Herbology & Dietetics"
-          ]
-        },
-        {
-          period: "Phase 3 (Year 5)",
-          papers: [
-            "Obstetrics, Gynecology & Pediatrics in Naturopathy",
-            "Hospital Management & Modern Diagnostics",
-            "Emergency Medicine & First Aid",
-            "Compulsory 6-Month Rotatory Hospital Internship"
-          ]
-        }
-      ],
-      careerOpportunities: [
-        "Class-A Registered Naturopathic Medical Officer",
-        "Chief Medical Officer at Nature Cure Sanatoriums",
-        "Clinical Researcher & AYUSH Faculty",
-        "International Holistic Health Director"
-      ]
-    },
-    {
-      id: "yoga-therapist",
-      code: "PGD-YT",
-      level: "Doctor Specialization",
-      titleHi: "योग थेरेपिस्ट (चिकित्सकों हेतु)",
-      titleEn: "Yoga Therapist (For Medical Doctors)",
-      duration: "1 Year",
-      durationYears: 1,
-      eligibility: "MBBS / BAMS / BHMS / BDS / BUMS or Medical Graduation",
-      image: "/images/programs/yoga-14days.jpg",
-      tagline: "A comprehensive program in Yoga therapy designed specifically for medical professionals.",
-      description: "Designed specifically for practicing modern and AYUSH doctors who want to integrate evidence-based yogic therapy into their clinical practice for chronic lifestyle diseases such as hypertension, diabetes, arthritis, and psychosomatic disorders.",
-      highlights: [
-        "Tailored for Medical Practitioners",
-        "Evidence-Based Yogic Endocrinology",
-        "Clinical Protocols for Lifestyle Diseases",
-        "Certified Council Post-Graduate Diploma"
-      ],
-      syllabus: [
-        {
-          period: "Semester 1",
-          papers: [
-            "Neuro-Endocrine Foundations of Yoga Therapy",
-            "Cardiovascular & Respiratory Yogic Rehabilitation",
-            "Psychosomatic Disorders & Stress Biology"
-          ]
-        },
-        {
-          period: "Semester 2",
-          papers: [
-            "Musculoskeletal & Spine Therapy (Asanas & Bandhas)",
-            "Pranayama & Autonomic Nervous System Regulation",
-            "Clinical Case Documentation & Medical Dissertations"
-          ]
-        }
-      ],
-      careerOpportunities: [
-        "Hospital Integrative Medicine Consultant",
-        "Clinical Yoga Therapy Specialist",
-        "Corporate Preventive Health Advisor"
-      ]
-    },
-    {
-      id: "yoga-teacher",
-      code: "YTTC-01",
-      level: "Diploma",
-      titleHi: "योग शिक्षक प्रशिक्षण (शिक्षकों हेतु)",
-      titleEn: "Yoga Teacher Training (For Teachers & Instructors)",
-      duration: "1 Year",
-      durationYears: 1,
-      eligibility: "10+2 in any stream from recognized board",
-      image: "/images/yoga/yoga-banner.png",
-      tagline: "This program trains Yoga instructors with a focus on education and teaching methodology.",
-      description: "A prestigious 1-year professional course preparing confident yoga instructors capable of teaching in schools, universities, fitness institutes, and international yoga centers with mastery over asanas, pranayama, and Vedic pedagogical methods.",
-      highlights: [
-        "Mastery of Classical Asanas & Adjustments",
-        "Teaching Methodology & Curriculum Planning",
-        "Shatkarma (Six Cleansing Kriyas) Training",
-        "Global Yoga Council Teacher Certification"
-      ],
-      syllabus: [
-        {
-          period: "Semester 1",
-          papers: [
-            "History of Yoga, Vedic Lineages & Philosophy",
-            "Hatha Yoga Pradipika & Gheranda Samhita",
-            "Asana Biomechanics & Injury Prevention"
-          ]
-        },
-        {
-          period: "Semester 2",
-          papers: [
-            "Teaching Methodology, Voice Modulation & Sequencing",
-            "Pranayama, Mudras, Bandhas & Meditation",
-            "Practical Teaching Internship & Viva Voce"
-          ]
-        }
-      ],
-      careerOpportunities: [
-        "Certified School & College Yoga Instructor",
-        "Independent Studio & Ashram Teacher",
-        "International Retreat Trainer"
-      ]
-    },
-    {
-      id: "panchkarma",
-      code: "PAN-01",
-      level: "Certification",
-      titleHi: "पंचकर्म तकनीशियन एवं विशेषज्ञ",
-      titleEn: "Panchakarma Therapy & Technician",
-      duration: "1 Year",
-      durationYears: 1,
-      eligibility: "10th Pass or 10+2 from recognized board",
-      image: "/images/ayurveda/herbs-mortar.jpg",
-      tagline: "One-year program focused on traditional Ayurvedic detoxification therapies.",
-      description: "An intensive practical training course in traditional Ayurvedic detox and rejuvenation therapies. Students gain hands-on experience in classical Abhyanga massage, Shirodhara, Vamana, Virechana, Nasya, and Basti preparation under expert Vaidyas.",
-      highlights: [
-        "Hands-On Clinical Oil Preparation",
-        "Classical Shirodhara & Potli Massage Training",
-        "Authentic 5 Cleansing Kriyas",
-        "High Demand in Ayurvedic Hospitals & Spas"
-      ],
-      syllabus: [
-        {
-          period: "Module 1",
-          papers: [
-            "Fundamentals of Ayurveda: Tridosha, Dhatus & Agni",
-            "Herbal Pharmacognosy & Medicated Oils Preparation",
-            "Purvakarma: Snehana (Oleation) & Swedana (Sudation)"
-          ]
-        },
-        {
-          period: "Module 2",
-          papers: [
-            "Pradhan Karma: Vamana, Virechana, Basti & Nasya",
-            "Paschat Karma: Samsarjana Krama & Diet Management",
-            "Practical Internship in Ayurvedic Hospital Ward"
-          ]
-        }
-      ],
-      careerOpportunities: [
-        "Chief Panchakarma Technician in Hospitals",
-        "Ayurvedic Spa & Wellness Resort Specialist",
-        "Ayush Therapy Assistant"
-      ]
-    },
-    {
-      id: "dims",
-      code: "DIMS-02",
-      level: "Diploma",
-      titleHi: "डिप्लोमा इन इंटीग्रेटेड मेडिकल साइंसेज (D.I.M.S.)",
-      titleEn: "Diploma in Integrated Medical Sciences (D.I.M.S.)",
-      duration: "2 Years",
-      durationYears: 2,
-      eligibility: "10+2 in Science or equivalent diploma",
-      image: "/images/naturopathy/herbal-care.jpg",
-      tagline: "A 2-year program combining conventional and alternative healing methods.",
-      description: "D.I.M.S. provides an integrated approach blending modern fundamental anatomy, medical diagnostics, and emergency first response with time-tested holistic sciences of Ayurveda, Naturopathy, and Botanical Pharmacopeia.",
-      highlights: [
-        "Synthesis of Modern Diagnostics & Naturopathy",
-        "First Aid & Emergency Triage Skills",
-        "Community & Preventive Health Focus",
-        "Hospital Lab & Diagnostic Training"
-      ],
-      syllabus: [
-        {
-          period: "Year 1",
-          papers: [
-            "General Human Biology, Histology & Physiology",
-            "Fundamentals of Complementary & Alternative Medicine",
-            "Basic Pathology & Biochemical Diagnostics"
-          ]
-        },
-        {
-          period: "Year 2",
-          papers: [
-            "Preventive Community Medicine & Public Health",
-            "Integrative Pharmacology & Herbology",
-            "Emergency Care, First Aid & Clinical Hospital Posting"
-          ]
-        }
-      ],
-      careerOpportunities: [
-        "Integrated Healthcare Coordinator",
-        "Community Preventive Medicine Officer",
-        "Wellness Diagnostic Technician"
-      ]
-    },
-    {
-      id: "yoga-science",
-      code: "BSC-YS",
-      level: "Undergraduate Degree",
-      titleHi: "बी.एससी. योग विज्ञान (B.Sc. Yoga Science)",
-      titleEn: "Bachelor of Science in Yoga Science (B.Sc.)",
-      duration: "3 Years",
-      durationYears: 3,
-      eligibility: "10+2 in any stream from a recognized board",
-      image: "/images/programs/wellness-30days.jpg",
-      tagline: "Undergraduate program in Yoga Science with emphasis on holistic health and wellness.",
-      description: "A comprehensive 3-year bachelor's degree program providing deep academic, scientific, and empirical grounding in yogic philosophy, human neurobiology, psychological equilibrium, and research methodologies in yogic healing.",
-      highlights: [
-        "Three-Year Academic University Degree",
-        "Scientific Research & Case Studies",
-        "Ancient Texts & Scriptural Mastery",
-        "Corporate & Educational Career Eligibility"
-      ],
-      syllabus: [
-        {
-          period: "Year 1",
-          papers: [
-            "Foundations of Yoga Philosophy & Vedic Thought",
-            "Human Anatomy & Kinesiology in Yoga",
-            "Practical Asana Foundations & Breathing Techniques"
-          ]
-        },
-        {
-          period: "Year 2",
-          papers: [
-            "Patanjali Yoga Sutras & Hatha Yoga Pradipika",
-            "Yoga Psychology, Mental Health & Stress Relief",
-            "Therapeutic Applications for Chronic Disorders"
-          ]
-        },
-        {
-          period: "Year 3",
-          papers: [
-            "Research Methodology & Bio-statistical Analysis",
-            "Advanced Pranayama, Bandhas, Mudras & Dhyana",
-            "Degree Dissertation & Community Yoga Project"
-          ]
-        }
-      ],
-      careerOpportunities: [
-        "University & College Yoga Lecturer",
-        "Government Sports & AYUSH Department Coach",
-        "Corporate Mindfulness & Ergonomics Trainer",
-        "Higher Studies (M.Sc. / Ph.D. in Yoga)"
-      ]
-    },
-    {
-      id: "naturopathy-degree",
-      code: "NAT-04",
-      level: "Professional Degree",
-      titleHi: "प्राकृतिक चिकित्सा स्नातक पाठ्यक्रम",
-      titleEn: "Professional 4-Year Naturopathy Program",
-      duration: "4 Years",
-      durationYears: 4,
-      eligibility: "10+2 with Science (PCB) or recognized equivalent",
-      image: "/images/naturopathy/air-waterfall.jpg",
-      tagline: "Four-year program in Naturopathy, focusing on natural healing methods.",
-      description: "An intensive 4-year professional curriculum dedicated to natural curative methodologies without synthetic chemical pharmaceuticals. Focuses on cellular detox, hydro-magnetic healing, raw nutrition therapy, and clinical ward rounds.",
-      highlights: [
-        "Deep Immersion in Drugless Natural Medicine",
-        "Raw Nutrition & Cellular Fasting Therapy",
-        "Advanced Heliotherapy & Water Therapy Units",
-        "Sanatorium Clinical Rotations"
-      ],
-      syllabus: [
-        {
-          period: "Year 1 & 2",
-          papers: [
-            "Cellular Biology, Anatomy & Physiology",
-            "Five Elements Theory & Philosophy of Nature Cure",
-            "Therapeutic Nutrition & Fasting Regimen"
-          ]
-        },
-        {
-          period: "Year 3 & 4",
-          papers: [
-            "Advanced Hydrotherapy, Mud & Sun Bath Techniques",
-            "Acupressure, Reflexology & Spine Alignment",
-            "Clinical Diagnosis, Case Taking & Hospital Internship"
-          ]
-        }
-      ],
-      careerOpportunities: [
-        "Chief Medical Superintendent at Nature Cure Centers",
-        "Independent Natural Health Practitioner",
-        "Nutritional Counselor & Detox Specialist"
-      ]
-    },
-    {
-      id: "cya",
-      code: "CYA-06",
-      level: "Certification",
-      titleHi: "योग एवं आयुर्वेद प्रमाण पत्र (C.Y.A.)",
-      titleEn: "Certificate in Yoga & Ayurveda (C.Y.A.)",
-      duration: "6 Months",
-      durationYears: 0.5,
-      eligibility: "10th Pass or Higher Secondary",
-      image: "/images/programs/retreat-7days.jpg",
-      tagline: "Short-term foundation program combining daily Yogic sadhana with Ayurvedic lifestyle wisdom.",
-      description: "An accessible 6-month foundational certificate course designed for beginners, homemakers, and wellness enthusiasts wanting to master daily Dinacharya, Ayurvedic dietary principles, and essential daily yoga asanas.",
-      highlights: [
-        "Quick 6-Month Fast-Track Certification",
-        "Practical Everyday Herbal Remedies",
-        "Tridosha Assessment & Diet Planning",
-        "Daily Breathwork & Asana Routine"
-      ],
-      syllabus: [
-        {
-          period: "Term 1",
-          papers: [
-            "Tridosha (Vata-Pitta-Kapha) Self-Assessment",
-            "Dinacharya (Daily Routine) & Ritucharya (Seasonal Routine)",
-            "Kitchen Herbs & Home Remedies for Common Ailments",
-            "Daily Sun Salutations (Surya Namaskar) & Pranayama"
-          ]
-        }
-      ],
-      careerOpportunities: [
-        "Ayurvedic Lifestyle Coach",
-        "Community Yoga Instructor",
-        "Personal Health & Wellness Advisor"
-      ]
-    }
-  ];
+  const catCounts = useMemo(() => {
+    const m = { all: courses.length };
+    courses.forEach(c => { m[c.category] = (m[c.category] || 0) + 1; });
+    return m;
+  }, [courses]);
 
-  // Categories for filter tabs
-  const categories = [
-    "All",
-    "Diploma",
-    "Undergraduate Degree",
-    "Doctor Specialization",
-    "Certification",
-    "Professional Degree"
-  ];
+  const availableDurations = useMemo(() => {
+    const base = activeCategory === "all" ? courses : courses.filter(c => c.category === activeCategory);
+    const set = new Set(base.map(c => c.duration_label));
+    return ["All", ...DURATION_ORDER.filter(d => set.has(d))];
+  }, [courses, activeCategory]);
 
-  // Durations for dropdown
-  const durations = ["All", "6 Months", "1 Year", "2 Years", "3 Years", "4 Years", "5 Years"];
-
-  // Filtered courses logic
-  const filteredCourses = useMemo(() => {
-    return courses.filter((course) => {
-      const matchesCategory =
-        activeCategory === "All" || course.level === activeCategory;
-      const matchesDuration =
-        selectedDuration === "All" || course.duration === selectedDuration;
-      const matchesSearch =
-        searchQuery === "" ||
-        course.titleEn.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        course.titleHi.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        course.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        course.tagline.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        course.eligibility.toLowerCase().includes(searchQuery.toLowerCase());
-
-      return matchesCategory && matchesDuration && matchesSearch;
+  const filtered = useMemo(() => {
+    return courses.filter(c => {
+      const matchesCat    = activeCategory === "all" || c.category === activeCategory;
+      const matchesDur    = selectedDuration === "All" || c.duration_label === selectedDuration;
+      const matchesSearch = !searchQuery || c.course_name.toLowerCase().includes(searchQuery.toLowerCase()) || (c.course_name_hindi || "").includes(searchQuery);
+      return matchesCat && matchesDur && matchesSearch;
     });
-  }, [activeCategory, selectedDuration, searchQuery]);
+  }, [courses, activeCategory, selectedDuration, searchQuery]);
 
-  const handleCallbackSubmit = (e) => {
-    e.preventDefault();
-    setCallbackSubmitted(true);
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const paginated  = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+  const handleCategoryChange = (key) => {
+    setActiveCategory(key);
+    setSelectedDuration("All");
+    setSearchQuery("");
+    setCurrentPage(1);
   };
 
+  const currentCat = CATEGORIES.find(c => c.key === activeCategory);
+  const hasFilters  = searchQuery || selectedDuration !== "All";
+
+  const pageNumbers = useMemo(() => {
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+      if (i === 1 || i === totalPages || Math.abs(i - currentPage) <= 1) {
+        pages.push({ type: "page", num: i });
+      } else if (Math.abs(i - currentPage) === 2) {
+        const last = pages[pages.length - 1];
+        if (!last || last.type !== "dots") pages.push({ type: "dots", key: `dots-${i}` });
+      }
+    }
+    return pages;
+  }, [totalPages, currentPage]);
+
   return (
-    <main className="min-h-screen bg-[#FAF8F5] text-[#0E3320] font-sans selection:bg-[#C59B3F] selection:text-white">
-      {/* 1. Header Navigation */}
+    <main className="min-h-screen bg-[#F0EDE7] text-[#0E3320]">
       <TopBar />
       <Navbar onOpenConsultation={() => setIsConsultationOpen(true)} />
 
-      {/* 2. Hero Section: Clean 3-Row Layout */}
-      <section className="relative bg-[#071F13] text-white py-16 md:py-24 px-4 md:px-8 overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img
-            src="/images/hero/hero-meditation.jpg"
-            alt="Academic Courses Banner"
-            className="w-full h-full object-cover opacity-60 object-center"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#071F13] via-[#0E3320]/65 to-[#071F13]/70"></div>
+      {/* ══════════════ HERO ══════════════ */}
+      <section className="relative bg-[#071F13] overflow-hidden">
+        {/* BG image */}
+        <div className="absolute inset-0">
+          <img src="/images/hero/hero-meditation.jpg" alt="" className="w-full h-full object-cover opacity-30 object-center" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#071F13]/80 via-[#0E3320]/70 to-[#071F13]" />
         </div>
 
-        <div className="max-w-6xl mx-auto relative z-10 text-center space-y-4">
-          {/* Row 1: Breadcrumbs */}
-          <nav aria-label="Breadcrumb" className="flex items-center justify-center gap-2 text-xs sm:text-sm text-[#C59B3F] font-semibold tracking-wider uppercase">
-            <Link href="/" className="hover:underline hover:text-white transition-colors">Home</Link>
-            <span className="text-[#8C671D]">/</span>
-            <span className="text-white">Academic Courses</span>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 py-14 md:py-20">
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-1.5 text-xs text-[#C59B3F] font-semibold uppercase tracking-wider mb-5">
+            <Link href="/" className="hover:text-white transition-colors">Home</Link>
+            <span className="text-[#C59B3F]/50">/</span>
+            <span className="text-white/70">Courses</span>
           </nav>
 
-          {/* Row 2: Vedic Tag Pill Badge */}
-          <div className="flex justify-center">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-[#C59B3F]/40 text-[#E4BF64] text-xs sm:text-sm font-semibold shadow-sm">
-              <span>🌿</span>
-              <span>भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद् • मान्यता प्राप्त शैक्षणिक पाठ्यक्रम 2026-27</span>
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+            <div className="space-y-4 max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#C59B3F]/15 border border-[#C59B3F]/30 text-[#E4BF64] text-xs font-semibold tracking-wider">
+                <GraduationCap className="w-3.5 h-3.5" />
+                Session 2026–27 · Admissions Open
+              </div>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight">
+                Explore Our<br />
+                <span className="text-[#C59B3F]">Courses & Programs</span>
+              </h1>
+              <p className="text-[#A8C5B0] text-sm sm:text-base leading-relaxed">
+                Authentic Ayurveda, Yoga, Unani, Acupuncture & Allied Health programs — government-recognised, industry-ready qualifications.
+              </p>
+              {/* Stats row */}
+              {!loading && (
+                <div className="flex flex-wrap gap-3 pt-1">
+                  {[
+                    { label: "Total Courses", val: courses.length },
+                    { label: "Disciplines",   val: 5 },
+                    { label: "Min Duration",  val: "3 Mo." },
+                    { label: "Max Duration",  val: "5 Yrs" },
+                  ].map(s => (
+                    <div key={s.label} className="px-4 py-2 rounded-xl bg-white/8 border border-white/10 text-center backdrop-blur-sm">
+                      <div className="text-white font-extrabold text-lg leading-none">{s.val}</div>
+                      <div className="text-[#A8C5B0] text-[10px] font-medium mt-0.5">{s.label}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
 
-          {/* Row 3: Main Title */}
-          <div className="space-y-2 pt-1">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-devanagari font-bold text-white leading-tight">
-              हमारे पाठ्यक्रम
-            </h1>
-            <div className="font-sans text-xl sm:text-2xl lg:text-3xl text-[#C59B3F] font-bold">
-              Our Academic Courses & Degree Programs
-            </div>
-          </div>
-
-          <p className="max-w-2xl mx-auto text-sm sm:text-base text-[#CBD8CB] leading-relaxed">
-            Government-recognized degrees, diplomas, and specialist certifications in Naturopathy, Yoga Science, and Classical Ayurveda across 14 affiliated colleges.
-          </p>
-
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-            <div className="flex items-center gap-2 text-xs text-[#EBE2D4]">
-              <ShieldCheck className="w-4 h-4 text-[#C59B3F]" />
-              <span>Council Recognized Enrolment</span>
-            </div>
-            <div className="w-1.5 h-1.5 rounded-full bg-[#C59B3F]/60"></div>
-            <div className="flex items-center gap-2 text-xs text-[#EBE2D4]">
-              <Building2 className="w-4 h-4 text-[#C59B3F]" />
-              <span>14+ Affiliated Institutions</span>
-            </div>
-            <div className="w-1.5 h-1.5 rounded-full bg-[#C59B3F]/60"></div>
-            <div className="flex items-center gap-2 text-xs text-[#EBE2D4]">
-              <GraduationCap className="w-4 h-4 text-[#C59B3F]" />
-              <span>Practical Clinical Hospital Postings</span>
-            </div>
+            <Link href="/admissions/registration-form"
+              className="self-start lg:self-end inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#C59B3F] hover:bg-[#D4AF37] text-[#071F13] font-extrabold text-sm shadow-lg transition-all hover:scale-105">
+              Apply Now
+            </Link>
           </div>
         </div>
+
+        {/* Fade bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[#F0EDE7] to-transparent" />
       </section>
 
-      {/* 3. Search & Filter Bar */}
-      <section className="max-w-7xl mx-auto px-4 md:px-8 -mt-6 relative z-20">
-        <div className="bg-white rounded-2xl shadow-xl border border-[#EBE2D4] p-4 sm:p-6 space-y-4">
-          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sm:gap-4">
-            {/* Search Input */}
-            <div className="relative w-full md:w-96">
-              <input
-                type="text"
-                placeholder="Search by course name, code, or eligibility..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 rounded-xl border border-[#D5C7B5] bg-[#FAF8F5] text-sm text-[#0E3320] focus:outline-none focus:ring-2 focus:ring-[#C59B3F]"
-              />
-              <Search className="w-4 h-4 text-[#7A583A] absolute left-4 top-3.5" />
-            </div>
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 space-y-6">
 
-            {/* Duration Filter Dropdown */}
-            <div className="flex items-center gap-3 w-full md:w-auto">
-              <span className="text-xs font-bold text-[#1A452E] uppercase tracking-wider shrink-0 flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-[#C59B3F]" />
-                <span>Duration:</span>
-              </span>
-              <select
-                value={selectedDuration}
-                onChange={(e) => setSelectedDuration(e.target.value)}
-                className="w-full md:w-48 px-3.5 py-3 rounded-xl border border-[#D5C7B5] bg-[#FAF8F5] text-sm text-[#0E3320] focus:outline-none focus:ring-2 focus:ring-[#C59B3F]"
-              >
-                {durations.map((dur) => (
-                  <option key={dur} value={dur}>{dur === "All" ? "All Durations" : dur}</option>
+        {/* ══════════════ CATEGORY TABS ══════════════ */}
+        <div className="flex flex-wrap gap-2">
+          {CATEGORIES.map(cat => {
+            const Icon = cat.icon;
+            const isActive = activeCategory === cat.key;
+            const count = catCounts[cat.key] || 0;
+            return (
+              <button key={cat.key} onClick={() => handleCategoryChange(cat.key)}
+                style={isActive ? { backgroundColor: cat.accent, borderColor: cat.accent } : {}}
+                className={`group flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 rounded-2xl border-2 text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
+                  isActive
+                    ? "text-white shadow-lg scale-[1.02]"
+                    : "bg-white border-[#DDD6CB] text-[#3D2B1A] hover:border-[#C59B3F] hover:bg-[#FFFBF5] hover:shadow-sm"
+                }`}>
+                <span className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+                  isActive ? "bg-white/20" : "bg-[#F0EDE7] group-hover:bg-[#FDF8EE]"
+                }`}>
+                  <Icon className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${isActive ? "text-white" : "text-[#C59B3F]"}`} />
+                </span>
+                <span>{cat.label}</span>
+                <span className={`text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 rounded-full font-bold leading-none min-w-[22px] text-center ${
+                  isActive ? "bg-white/25 text-white" : "bg-[#EDE7DE] text-[#5C4033]"
+                }`}>
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* ══════════════ FILTER BAR ══════════════ */}
+        <div className="bg-white rounded-2xl border border-[#E0D6C8] shadow-sm overflow-hidden">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-0 sm:divide-x divide-[#EDE7DE]">
+            {/* Search */}
+            <div className="relative flex-1 min-w-0">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#B8A898]" />
+              <input type="text"
+                placeholder={`Search in ${currentCat?.label || 'courses'}…`}
+                value={searchQuery}
+                onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                className="w-full pl-11 pr-4 py-3.5 text-sm bg-transparent focus:outline-none placeholder:text-[#B8A898] text-[#0E3320]" />
+            </div>
+            {/* Duration */}
+            <div className="flex items-center gap-2.5 px-4 py-3">
+              <SlidersHorizontal className="w-4 h-4 text-[#C59B3F] shrink-0" />
+              <select value={selectedDuration}
+                onChange={e => { setSelectedDuration(e.target.value); setCurrentPage(1); }}
+                className="bg-transparent text-sm font-semibold focus:outline-none text-[#3D2B1A] cursor-pointer pr-2">
+                {availableDurations.map(d => (
+                  <option key={d} value={d}>{d === "All" ? "All Durations" : d}</option>
                 ))}
               </select>
             </div>
-          </div>
-
-          {/* Category Filter Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-2 border-t border-[#EBE2D4] -mx-2 px-2 sm:mx-0 sm:px-0">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`px-3.5 sm:px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
-                  activeCategory === cat
-                    ? "bg-[#0E3320] text-[#E4BF64] shadow-md"
-                    : "bg-[#FAF8F5] text-[#1A452E] hover:bg-[#EBE2D4] border border-[#EBE2D4]"
-                }`}
-              >
-                {cat === "All" ? "All Programs" : cat}
+            {/* Clear */}
+            {hasFilters && (
+              <button onClick={() => { setSearchQuery(""); setSelectedDuration("All"); setCurrentPage(1); }}
+                className="flex items-center gap-1.5 px-4 py-3.5 text-sm font-bold text-[#c05454] hover:bg-red-50 transition-colors cursor-pointer shrink-0">
+                <X className="w-3.5 h-3.5" /> Clear
               </button>
-            ))}
+            )}
           </div>
-        </div>
-      </section>
-
-      {/* 4. Course Cards Grid */}
-      <section className="max-w-7xl mx-auto px-4 md:px-8 py-12 md:py-16">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-lg sm:text-xl font-devanagari font-bold text-[#0E3320]">
-              उपलब्ध पाठ्यक्रम ({filteredCourses.length})
-            </h2>
-            <p className="text-xs sm:text-sm text-[#7A583A] mt-1">
-              Select any program to view full syllabus, subject breakdown, and admission requirements.
-            </p>
-          </div>
-
-          <Link
-            href="/admissions/registration-form"
-            className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#1A5C38] text-white hover:bg-[#0E3320] text-xs font-semibold transition-colors shadow"
-          >
-            <span>Direct Admission Form</span>
-          </Link>
+          {/* Active filter pills */}
+          {hasFilters && (
+            <div className="px-4 pb-3 flex flex-wrap gap-1.5 border-t border-[#F0EDE7] pt-2.5">
+              {searchQuery && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#0E3320]/8 text-[#0E3320]">
+                  "{searchQuery}"
+                  <button onClick={() => { setSearchQuery(""); setCurrentPage(1); }} className="hover:text-red-600 ml-0.5">×</button>
+                </span>
+              )}
+              {selectedDuration !== "All" && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#0E3320]/8 text-[#0E3320]">
+                  <Clock className="w-3 h-3" />{selectedDuration}
+                  <button onClick={() => { setSelectedDuration("All"); setCurrentPage(1); }} className="hover:text-red-600 ml-0.5">×</button>
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
-        {filteredCourses.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {filteredCourses.map((course) => (
-              <div
-                key={course.id}
-                className="bg-white rounded-2xl border border-[#EBE2D4] shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group"
-              >
-                {/* Image Banner */}
-                <div className="relative h-48 sm:h-52 overflow-hidden bg-[#071F13]">
-                  <img
-                    src={course.image}
-                    alt={course.titleEn}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0E3320] via-transparent to-transparent opacity-80"></div>
-
-                  {/* Level Pill */}
-                  <div className="absolute top-3 left-3 bg-[#0E3320]/90 backdrop-blur text-[#E4BF64] border border-[#C59B3F]/40 text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                    {course.level}
-                  </div>
-
-                  {/* Code Badge */}
-                  <div className="absolute top-3 right-3 bg-white/90 backdrop-blur text-[#0E3320] text-xs font-mono font-bold px-2.5 py-1 rounded-md shadow-sm">
-                    {course.code}
-                  </div>
-
-                  {/* Duration Bottom overlay */}
-                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs font-medium">
-                    <span className="flex items-center gap-1.5 bg-[#0E3320]/80 backdrop-blur px-2.5 py-1 rounded-full">
-                      <Clock className="w-3.5 h-3.5 text-[#C59B3F]" />
-                      <span>{course.duration}</span>
-                    </span>
-                    <span className="bg-[#C59B3F] text-[#0E3320] font-bold px-2.5 py-1 rounded-full text-[11px]">
-                      Session 2026-27
-                    </span>
-                  </div>
-                </div>
-
-                {/* Card Content */}
-                <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
-                  <div className="space-y-2">
-                    <div className="space-y-1">
-                      <h3 className="font-devanagari font-bold text-base sm:text-lg text-[#0E3320] leading-snug group-hover:text-[#1A5C38] transition-colors">
-                        {course.titleHi}
-                      </h3>
-                      <h4 className="font-sans font-bold text-xs sm:text-sm text-[#7A583A]">
-                        {course.titleEn}
-                      </h4>
-                    </div>
-
-                    <p className="text-xs text-[#555] line-clamp-2 leading-relaxed">
-                      {course.tagline}
-                    </p>
-
-                    {/* Eligibility Badge */}
-                    <div className="pt-2">
-                      <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-[#EBE2D4] text-xs text-[#0E3320] space-y-1">
-                        <span className="text-[10px] text-[#7A583A] font-bold uppercase tracking-wider block">
-                          Eligibility Criteria:
-                        </span>
-                        <p className="font-semibold text-xs leading-tight">
-                          {course.eligibility}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Highlights */}
-                    <div className="pt-2 space-y-1.5">
-                      {course.highlights.slice(0, 2).map((item, idx) => (
-                        <div key={idx} className="flex items-center gap-2 text-xs text-[#1A452E]">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-[#1A5C38] shrink-0" />
-                          <span className="truncate">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="pt-4 border-t border-[#EBE2D4] flex items-center gap-2">
-                    <button
-                      onClick={() => setSelectedCourseModal(course)}
-                      className="flex-1 py-2.5 px-3 rounded-xl border border-[#0E3320] text-[#0E3320] hover:bg-[#FAF8F5] text-xs font-bold transition-colors cursor-pointer text-center"
-                    >
-                      View Syllabus
-                    </button>
-
-                    <Link
-                      href={`/admissions/registration-form?course=${encodeURIComponent(course.titleEn)}`}
-                      className="flex-1 py-2.5 px-3 rounded-xl bg-[#0E3320] hover:bg-[#071F13] text-[#E4BF64] text-xs font-bold transition-colors text-center inline-flex items-center justify-center gap-1 shadow-sm"
-                    >
-                      <span>Apply Now</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
-                  </div>
-                </div>
+        {/* ══════════════ RESULTS INFO + VIEW TOGGLE ══════════════ */}
+        {!loading && filtered.length > 0 && (
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold text-[#9B8265] px-0.5">
+            <span className="shrink-0">
+              <span className="text-[#0E3320] font-extrabold text-sm">{filtered.length}</span> course{filtered.length !== 1 ? "s" : ""} found
+              {activeCategory !== "all" && <span className="ml-1 hidden sm:inline">in <span className="text-[#C59B3F] font-bold">{currentCat?.label}</span></span>}
+            </span>
+            <div className="flex items-center gap-2 ml-auto">
+              {totalPages > 1 && viewMode === "grid" && (
+                <span className="px-2.5 py-1 rounded-full bg-white border border-[#E0D6C8] text-[#7A6550] font-bold text-[11px] whitespace-nowrap">
+                  Pg {currentPage}/{totalPages}
+                </span>
+              )}
+              {/* View toggle */}
+              <div className="flex items-center bg-white border border-[#E0D6C8] rounded-xl overflow-hidden shadow-sm shrink-0">
+                <button onClick={() => setViewMode("grid")}
+                  className={`flex items-center gap-1 px-2.5 py-2 text-xs font-bold transition-colors cursor-pointer ${viewMode === "grid" ? "bg-[#0E3320] text-[#E4BF64]" : "text-[#9B8265] hover:bg-[#F5F0E8]"}`}>
+                  <LayoutGrid className="w-3.5 h-3.5" /><span className="hidden sm:inline">Cards</span>
+                </button>
+                <button onClick={() => setViewMode("table")}
+                  className={`flex items-center gap-1 px-2.5 py-2 text-xs font-bold transition-colors cursor-pointer border-l border-[#E0D6C8] ${viewMode === "table" ? "bg-[#0E3320] text-[#E4BF64]" : "text-[#9B8265] hover:bg-[#F5F0E8]"}`}>
+                  <List className="w-3.5 h-3.5" /><span className="hidden sm:inline">Table</span>
+                </button>
               </div>
-            ))}
+            </div>
           </div>
-        ) : (
-          <div className="bg-white rounded-2xl p-12 text-center border border-[#EBE2D4] space-y-3">
-            <BookOpen className="w-12 h-12 text-[#C59B3F] mx-auto opacity-75" />
-            <h3 className="font-serif font-bold text-xl text-[#0E3320]">
-              No Courses Match Your Filter
-            </h3>
-            <p className="text-xs sm:text-sm text-[#7A583A]">
-              Try changing the category or clearing the search query to see all programs.
-            </p>
-            <button
-              onClick={() => {
-                setActiveCategory("All");
-                setSelectedDuration("All");
-                setSearchQuery("");
-              }}
-              className="px-6 py-2.5 rounded-full bg-[#0E3320] text-white text-xs font-semibold"
-            >
+        )}
+
+        {/* ══════════════ COURSE GRID / TABLE ══════════════ */}
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-28 gap-4">
+            <RefreshCw className="w-8 h-8 text-[#C59B3F] animate-spin" />
+            <p className="text-sm text-[#9B8265] font-medium">Loading courses…</p>
+          </div>
+        ) : apiError ? (
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center">
+            <p className="text-red-700 font-bold text-sm">API Error: {apiError}</p>
+            <p className="text-red-500 text-xs mt-1">Check the server console for details.</p>
+          </div>
+
+        ) : paginated.length === 0 ? (
+          <div className="bg-white rounded-3xl p-16 text-center border border-[#E0D6C8] space-y-4">
+            <div className="w-16 h-16 rounded-2xl bg-[#F0EDE7] flex items-center justify-center mx-auto">
+              <BookOpen className="w-8 h-8 text-[#C59B3F]" />
+            </div>
+            <div>
+              <h3 className="font-bold text-lg text-[#0E3320]">No Courses Found</h3>
+              <p className="text-sm text-[#9B8265] mt-1">Try a different search term or filter.</p>
+            </div>
+            <button onClick={() => { setSearchQuery(""); setSelectedDuration("All"); setCurrentPage(1); }}
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#0E3320] text-[#E4BF64] text-sm font-bold cursor-pointer hover:bg-[#1A5C38] transition-colors shadow-md">
               Reset Filters
             </button>
           </div>
-        )}
-      </section>
 
-      {/* 5. Why Study With Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad & Council */}
-      <section className="bg-[#0E3320] text-white py-16 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto space-y-12">
-          <div className="text-center max-w-3xl mx-auto space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-[#E4BF64] text-xs font-semibold uppercase tracking-wider">
-              <span>🌿</span>
-              <span>Council Excellence & Standards</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-serif font-bold text-white">
-              Why Study Naturopathy & Yoga With Us?
-            </h2>
-            <p className="text-sm sm:text-base text-[#CBD8CB]">
-              Our academic curriculum combines rigorous clinical medical science with timeless Vedic healing lineages, preparing graduates for lifelong impactful careers.
-            </p>
-          </div>
+        ) : viewMode === "grid" ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {paginated.map((course, idx) => {
+              const dur     = course.duration_label || "";
+              const [durBg, durText] = getDurColor(dur);
+              const type    = getCourseType(course.course_name);
+              const catObj  = CATEGORIES.find(c => c.key === course.category) || CATEGORIES[0];
+              const globalN = (currentPage - 1) * ITEMS_PER_PAGE + idx + 1;
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-[#C59B3F]/20 text-[#E4BF64] flex items-center justify-center">
-                <ShieldCheck className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-base text-white">Council Recognized</h3>
-              <p className="text-xs text-[#CBD8CB] leading-relaxed">
-                Legally approved diplomas and degree certifications empowering you for private clinical practice and registered medical officer positions.
-              </p>
-            </div>
+              return (
+                <div key={course.id}
+                  className="group relative bg-white border border-[#E0D6C8] rounded-2xl overflow-hidden flex flex-col hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200">
+                  {/* Top accent stripe */}
+                  <div className="h-[4px] w-full" style={{ backgroundColor: catObj.accent }} />
 
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-[#C59B3F]/20 text-[#E4BF64] flex items-center justify-center">
-                <Stethoscope className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-base text-white">Clinical Hospital Postings</h3>
-              <p className="text-xs text-[#CBD8CB] leading-relaxed">
-                Mandatory rotations in natural cure hospitals, mud bath departments, hydrotherapy units, and diagnostic laboratories.
-              </p>
-            </div>
-
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-[#C59B3F]/20 text-[#E4BF64] flex items-center justify-center">
-                <Building2 className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-base text-white">14+ Affiliated Centers</h3>
-              <p className="text-xs text-[#CBD8CB] leading-relaxed">
-                Choose from verified campuses in Jaunpur, Ayodhya, Basti, Gorakhpur, Mau, Varanasi, and Prayagraj with full hostel facilities.
-              </p>
-            </div>
-
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-[#C59B3F]/20 text-[#E4BF64] flex items-center justify-center">
-                <UserCheck className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-base text-white">100% Career Assistance</h3>
-              <p className="text-xs text-[#CBD8CB] leading-relaxed">
-                Dedicated placement cells connecting graduates to AYUSH centers, wellness resorts, corporate yoga contracts, and private clinics.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 6. Request a Free Admission Counseling Call */}
-      <section className="max-w-5xl mx-auto px-4 md:px-8 py-16">
-        <div className="bg-white rounded-3xl shadow-xl border border-[#EBE2D4] overflow-hidden grid grid-cols-1 md:grid-cols-5">
-          {/* Left Column: Info */}
-          <div className="md:col-span-2 bg-[#0E3320] text-white p-8 sm:p-10 flex flex-col justify-between space-y-6">
-            <div className="space-y-3">
-              <span className="text-xs text-[#C59B3F] font-bold uppercase tracking-widest">
-                कॉल बैक का अनुरोध करें
-              </span>
-              <h3 className="text-2xl font-serif font-bold text-white">
-                Request an Academic Counseling Call
-              </h3>
-              <p className="text-xs text-[#CBD8CB] leading-relaxed">
-                Unsure which course matches your qualifications? Speak directly with our senior educational advisors for step-by-step guidance.
-              </p>
-            </div>
-
-            <div className="space-y-4 pt-4 border-t border-white/10 text-xs">
-              <div className="flex items-center gap-3">
-                <Phone className="w-4 h-4 text-[#C59B3F]" />
-                <a href="tel:+919876543210" className="hover:underline font-semibold text-white">
-                  +91 98765 43210
-                </a>
-              </div>
-              <div className="flex items-center gap-3">
-                <Mail className="w-4 h-4 text-[#C59B3F]" />
-                <a href="mailto:hello@bhartiyaayurveda.in" className="hover:underline font-semibold text-white">
-                  hello@bhartiyaayurveda.in
-                </a>
-              </div>
-              <div className="flex items-center gap-3">
-                <Clock className="w-4 h-4 text-[#C59B3F]" />
-                <span>Mon - Sat: 9:00 AM - 6:00 PM</span>
-              </div>
-            </div>
-
-            <div className="p-3 bg-white/10 rounded-xl text-[11px] text-[#E4BF64]">
-              ✨ Direct Admissions for Session 2026-27 are currently open.
-            </div>
-          </div>
-
-          {/* Right Column: Counseling Form */}
-          <div className="md:col-span-3 p-8 sm:p-10">
-            {callbackSubmitted ? (
-              <div className="h-full flex flex-col items-center justify-center text-center space-y-3 py-8">
-                <div className="w-14 h-14 rounded-full bg-[#1A5C38]/10 text-[#1A5C38] flex items-center justify-center">
-                  <CheckCircle2 className="w-8 h-8" />
-                </div>
-                <h4 className="font-serif font-bold text-xl text-[#0E3320]">
-                  Counseling Request Received!
-                </h4>
-                <p className="text-xs text-[#666] max-w-sm">
-                  Our academic advisor will call you on <strong>{callbackData.phone}</strong> shortly to answer your questions regarding <strong>{callbackData.course}</strong>.
-                </p>
-                <button
-                  onClick={() => setCallbackSubmitted(false)}
-                  className="px-5 py-2 rounded-full border border-[#0E3320] text-[#0E3320] text-xs font-semibold mt-4"
-                >
-                  Submit Another Inquiry
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleCallbackSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-bold text-[#1A452E] uppercase tracking-wider mb-1.5">
-                    Your Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Ramesh Chandra"
-                    value={callbackData.name}
-                    onChange={(e) => setCallbackData({ ...callbackData, name: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl border border-[#D5C7B5] bg-[#FAF8F5] text-sm text-[#0E3320] focus:outline-none focus:ring-2 focus:ring-[#C59B3F]"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-[#1A452E] uppercase tracking-wider mb-1.5">
-                      Phone Number *
-                    </label>
-                    <input
-                      type="tel"
-                      required
-                      placeholder="+91 98765 43210"
-                      value={callbackData.phone}
-                      onChange={(e) => setCallbackData({ ...callbackData, phone: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-[#D5C7B5] bg-[#FAF8F5] text-sm text-[#0E3320] focus:outline-none focus:ring-2 focus:ring-[#C59B3F]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-[#1A452E] uppercase tracking-wider mb-1.5">
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="student@example.com"
-                      value={callbackData.email}
-                      onChange={(e) => setCallbackData({ ...callbackData, email: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-[#D5C7B5] bg-[#FAF8F5] text-sm text-[#0E3320] focus:outline-none focus:ring-2 focus:ring-[#C59B3F]"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-[#1A452E] uppercase tracking-wider mb-1.5">
-                    Interested Course *
-                  </label>
-                  <select
-                    value={callbackData.course}
-                    onChange={(e) => setCallbackData({ ...callbackData, course: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl border border-[#D5C7B5] bg-[#FAF8F5] text-sm text-[#0E3320] focus:outline-none focus:ring-2 focus:ring-[#C59B3F]"
-                  >
-                    {courses.map((c) => (
-                      <option key={c.id} value={c.titleEn}>{c.titleEn} ({c.duration})</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-[#1A452E] uppercase tracking-wider mb-1.5">
-                    Your Questions / Academic Background (Optional)
-                  </label>
-                  <textarea
-                    rows={2}
-                    placeholder="Tell us about your highest qualification (10th/12th/Graduation)..."
-                    value={callbackData.message}
-                    onChange={(e) => setCallbackData({ ...callbackData, message: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl border border-[#D5C7B5] bg-[#FAF8F5] text-sm text-[#0E3320] focus:outline-none focus:ring-2 focus:ring-[#C59B3F]"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-full bg-[#0E3320] hover:bg-[#071F13] text-[#E4BF64] font-semibold text-sm shadow-md transition-colors group cursor-pointer"
-                >
-                  <span>Request Free Counseling Call</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </button>
-              </form>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* 7. Detailed Course Modal */}
-      {selectedCourseModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-[#EBE2D4] p-4 sm:p-8 space-y-5 sm:space-y-6">
-            {/* Modal Header */}
-            <div className="flex items-start justify-between gap-4 border-b border-[#EBE2D4] pb-4">
-              <div>
-                <div className="inline-flex items-center gap-2 text-xs font-bold text-[#1A5C38] uppercase">
-                  <span>{selectedCourseModal.level}</span>
-                  <span>•</span>
-                  <span>{selectedCourseModal.duration}</span>
-                  <span>•</span>
-                  <span className="font-mono text-[#0E3320]">{selectedCourseModal.code}</span>
-                </div>
-                <h3 className="text-lg sm:text-xl font-devanagari font-bold text-[#0E3320] mt-1">
-                  {selectedCourseModal.titleHi}
-                </h3>
-                <h4 className="text-sm font-sans font-semibold text-[#7A583A]">
-                  {selectedCourseModal.titleEn}
-                </h4>
-              </div>
-              <button
-                onClick={() => setSelectedCourseModal(null)}
-                className="p-2 text-[#7A583A] hover:text-[#0E3320] hover:bg-[#FAF8F5] rounded-full transition-colors"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="space-y-5 text-sm">
-              <div>
-                <h5 className="font-bold text-[#0E3320] text-xs uppercase tracking-wider mb-1">
-                  Course Synopsis
-                </h5>
-                <p className="text-[#555] leading-relaxed text-xs sm:text-sm">
-                  {selectedCourseModal.description}
-                </p>
-              </div>
-
-              {/* Eligibility & Highlights Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-[#FAF8F5] p-4 rounded-xl border border-[#EBE2D4]">
-                  <h6 className="font-bold text-[#0E3320] text-xs uppercase mb-1">Eligibility Criteria</h6>
-                  <p className="text-xs text-[#555] font-semibold">{selectedCourseModal.eligibility}</p>
-                </div>
-                <div className="bg-[#FAF8F5] p-4 rounded-xl border border-[#EBE2D4]">
-                  <h6 className="font-bold text-[#0E3320] text-xs uppercase mb-1">Academic Session</h6>
-                  <p className="text-xs text-[#555] font-semibold">2026-2027 (Annual System)</p>
-                </div>
-              </div>
-
-              {/* Syllabus Breakdown */}
-              <div className="space-y-3">
-                <h5 className="font-bold text-[#0E3320] text-xs uppercase tracking-wider">
-                  Curriculum & Paper Breakdown
-                </h5>
-                <div className="space-y-3">
-                  {selectedCourseModal.syllabus.map((syl, idx) => (
-                    <div key={idx} className="bg-[#FAF8F5] p-4 rounded-xl border border-[#EBE2D4] space-y-2">
-                      <span className="font-bold text-[#0E3320] text-xs block border-b border-[#EBE2D4] pb-1">
-                        {syl.period}
+                  {/* Card header: code + duration */}
+                  <div className="flex items-center justify-between gap-2 px-4 pt-3.5 pb-0">
+                    {course.course_code ? (
+                      <span className="text-[11px] font-extrabold px-2.5 py-1 rounded-lg bg-[#0E3320] text-[#E4BF64] tracking-widest font-mono">
+                        {course.course_code}
                       </span>
-                      <ul className="space-y-1 text-xs text-[#555]">
-                        {syl.papers.map((paper, pIdx) => (
-                          <li key={pIdx} className="flex items-start gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#1A5C38] mt-1.5 shrink-0"></span>
-                            <span>{paper}</span>
-                          </li>
-                        ))}
-                      </ul>
+                    ) : (
+                      <span className="text-[11px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-lg"
+                        style={{ backgroundColor: catObj.light, color: catObj.accent }}>
+                        {type}
+                      </span>
+                    )}
+                    {dur && (
+                      <span className="flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-lg shrink-0"
+                        style={{ backgroundColor: durBg, color: durText }}>
+                        <Clock className="w-3 h-3" />{dur}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="px-4 pt-2.5 pb-4 flex flex-col flex-1 gap-3">
+                    {/* Course names */}
+                    <div className="space-y-1">
+                      <h3 className="text-sm font-bold text-[#0E3320] leading-snug line-clamp-2 group-hover:text-[#1A5C38] transition-colors">
+                        {course.course_name}
+                      </h3>
+                      {course.course_name_hindi && (
+                        <p className="text-xs text-[#9B7A50] leading-snug line-clamp-1"
+                          style={{ fontFamily: "'Noto Sans Devanagari', serif" }}>
+                          {course.course_name_hindi}
+                        </p>
+                      )}
                     </div>
-                  ))}
-                </div>
-              </div>
 
-              {/* Career Opportunities */}
-              <div className="space-y-2">
-                <h5 className="font-bold text-[#0E3320] text-xs uppercase tracking-wider">
-                  Career Scope & Employment Prospects
-                </h5>
-                <div className="flex flex-wrap gap-2">
-                  {selectedCourseModal.careerOpportunities.map((career, cIdx) => (
-                    <span
-                      key={cIdx}
-                      className="px-3 py-1 rounded-full bg-[#1A5C38]/10 text-[#0E3320] text-xs font-medium border border-[#1A5C38]/20"
-                    >
-                      {career}
-                    </span>
-                  ))}
+                    {/* Divider */}
+                    <div className="h-px bg-[#F0EDE7]" />
+
+                    {/* Eligibility */}
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-extrabold text-[#9B8265] uppercase tracking-widest">Eligibility</p>
+                      <p className="text-xs text-[#3D2B1A] leading-snug line-clamp-2">
+                        {course.eligibility || <span className="text-[#C5BDB5]">—</span>}
+                      </p>
+                    </div>
+
+                    {/* Career Scope */}
+                    {course.career_scope && (
+                      <div className="space-y-1">
+                        <p className="text-[10px] font-extrabold text-[#9B8265] uppercase tracking-widest flex items-center gap-1">
+                          <Briefcase className="w-3 h-3 text-[#C59B3F]" /> Work Areas
+                        </p>
+                        <p className="text-xs text-[#3D2B1A] leading-snug line-clamp-2">
+                          {course.career_scope}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Footer */}
+                    <div className="mt-auto pt-2 border-t border-[#F0EDE7] flex items-center justify-between">
+                      <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-full tracking-wider"
+                        style={{ backgroundColor: catObj.light, color: catObj.accent }}>
+                        {catObj.label}
+                      </span>
+                      <span className="text-[10px] font-bold text-[#C59B3F] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
+                        Details
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              );
+            })}
+          </div>
+
+        ) : (
+          /* ══ TABLE VIEW ══ */
+          <div className="bg-white rounded-2xl border border-[#E0D6C8] overflow-hidden shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm border-collapse">
+                <thead>
+                  <tr className="bg-[#0E3320] text-white">
+                    <th className="px-3 py-3 text-left text-[11px] font-extrabold uppercase tracking-wider w-10">#</th>
+                    <th className="px-3 py-3 text-left text-[11px] font-extrabold uppercase tracking-wider w-20">Code</th>
+                    <th className="px-3 py-3 text-left text-[11px] font-extrabold uppercase tracking-wider min-w-[200px]">Course Name</th>
+                    <th className="px-3 py-3 text-left text-[11px] font-extrabold uppercase tracking-wider w-24">Duration</th>
+                    <th className="px-3 py-3 text-left text-[11px] font-extrabold uppercase tracking-wider w-28">Discipline</th>
+                    <th className="px-3 py-3 text-left text-[11px] font-extrabold uppercase tracking-wider min-w-[160px]">Eligibility</th>
+                    <th className="px-3 py-3 text-left text-[11px] font-extrabold uppercase tracking-wider w-8" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((course, idx) => {
+                    const catObj  = CATEGORIES.find(c => c.key === course.category) || CATEGORIES[0];
+                    const dur     = course.duration_label || "";
+                    const [durBg, durText] = getDurColor(dur);
+                    const isExpanded = expandedRow === course.id;
+                    const globalN = idx + 1;
+                    return (
+                      <Fragment key={course.id}>
+                        <tr
+                          onClick={() => setExpandedRow(isExpanded ? null : course.id)}
+                          className={`border-t border-[#F0EDE7] cursor-pointer transition-colors ${isExpanded ? "bg-[#F5F2EE]" : "hover:bg-[#FAFAF8]"}`}>
+                          <td className="px-3 py-3 text-[#9B8265] text-xs font-bold">{globalN}</td>
+                          <td className="px-3 py-3">
+                            {course.course_code
+                              ? <span className="text-[11px] font-extrabold px-2 py-0.5 rounded bg-[#0E3320] text-[#E4BF64] font-mono">{course.course_code}</span>
+                              : <span className="text-[#C5BDB5] text-xs">—</span>}
+                          </td>
+                          <td className="px-3 py-3">
+                            <div className="font-bold text-[#0E3320] text-sm leading-snug">{course.course_name}</div>
+                            {course.course_name_hindi && (
+                              <div className="text-xs text-[#9B7A50] mt-0.5" style={{ fontFamily: "'Noto Sans Devanagari', serif" }}>
+                                {course.course_name_hindi}
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-3 py-3">
+                            {dur && (
+                              <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-lg"
+                                style={{ backgroundColor: durBg, color: durText }}>
+                                <Clock className="w-3 h-3" />{dur}
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-3 py-3">
+                            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full"
+                              style={{ backgroundColor: catObj.light, color: catObj.accent }}>
+                              {catObj.label}
+                            </span>
+                          </td>
+                          <td className="px-3 py-3 text-xs text-[#5C4033]">
+                            {course.eligibility || <span className="text-[#C5BDB5]">—</span>}
+                          </td>
+                          <td className="px-3 py-3 text-center">
+                            <ChevronRightIcon className={`w-4 h-4 text-[#C59B3F] transition-transform ${isExpanded ? "rotate-90" : ""}`} />
+                          </td>
+                        </tr>
+                        {isExpanded && course.career_scope && (
+                          <tr className="bg-[#F5F2EE] border-t border-[#EDE7DE]">
+                            <td colSpan={7} className="px-5 py-3">
+                              <div className="flex items-start gap-2.5">
+                                <Briefcase className="w-4 h-4 text-[#C59B3F] shrink-0 mt-0.5" />
+                                <div>
+                                  <span className="text-[11px] font-extrabold text-[#0E3320] uppercase tracking-wider">Work Areas / Career Scope:</span>
+                                  <p className="text-xs text-[#5C4033] mt-0.5 leading-relaxed">{course.career_scope}</p>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </Fragment>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
-
-            {/* Modal Footer */}
-            <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-[#EBE2D4]">
-              <button
-                onClick={() => setSelectedCourseModal(null)}
-                className="px-5 py-2.5 rounded-full border border-[#D5C7B5] text-[#7A583A] text-xs font-semibold hover:bg-[#FAF8F5] text-center"
-              >
-                Close
-              </button>
-
-              <Link
-                href={`/admissions/registration-form?course=${encodeURIComponent(selectedCourseModal.titleEn)}`}
-                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#0E3320] hover:bg-[#071F13] text-[#E4BF64] font-semibold text-xs transition-colors shadow text-center"
-              >
-                <span>Proceed to Admission Form</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+            <div className="px-4 py-3 bg-[#FAF8F5] border-t border-[#EDE7DE] flex items-center justify-between text-xs text-[#9B8265]">
+              <span>Showing all <strong className="text-[#0E3320]">{filtered.length}</strong> courses · Click a row to see Career Scope</span>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* 8. Footer */}
+        {/* ══════════════ PAGINATION (grid only) ══════════════ */}
+        {viewMode === "grid" && totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 pt-4">
+            <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-[#D5C7B5] bg-white text-sm font-bold text-[#3D2B1A] disabled:opacity-30 hover:border-[#C59B3F] hover:bg-[#FFFBF5] transition-colors cursor-pointer disabled:cursor-default shadow-sm">
+              <ChevronLeft className="w-4 h-4" /> Prev
+            </button>
+
+            <div className="flex items-center gap-1.5">
+              {pageNumbers.map((item, idx) =>
+                item.type === "dots"
+                  ? <span key={item.key} className="w-9 text-center text-[#9B8265] text-sm font-bold">…</span>
+                  : (
+                    <button key={item.num} onClick={() => setCurrentPage(item.num)}
+                      className={`w-10 h-10 rounded-xl text-sm font-bold transition-all cursor-pointer shadow-sm ${
+                        item.num === currentPage
+                          ? "bg-[#0E3320] text-[#E4BF64] shadow-md scale-105"
+                          : "bg-white border border-[#D5C7B5] text-[#3D2B1A] hover:border-[#C59B3F] hover:bg-[#FFFBF5]"
+                      }`}>
+                      {item.num}
+                    </button>
+                  )
+              )}
+            </div>
+
+            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-[#D5C7B5] bg-white text-sm font-bold text-[#3D2B1A] disabled:opacity-30 hover:border-[#C59B3F] hover:bg-[#FFFBF5] transition-colors cursor-pointer disabled:cursor-default shadow-sm">
+              Next <ChevronRightIcon className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        {/* ══════════════ CTA BANNER ══════════════ */}
+        {!loading && filtered.length > 0 && (
+          <div className="mt-4 rounded-3xl overflow-hidden relative bg-[#071F13] text-white">
+            <div className="absolute inset-0 opacity-20 bg-[url('/images/yoga/yoga-banner.jpg')] bg-cover bg-center" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#071F13] via-[#0E3320]/90 to-[#071F13]/70" />
+            <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6 px-6 sm:px-10 py-8">
+              <div>
+                <h3 className="text-xl sm:text-2xl font-extrabold text-white">Ready to Enroll?</h3>
+                <p className="text-[#A8C5B0] text-sm mt-1">Session 2026-27 admissions are open. Apply before seats fill up.</p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 shrink-0">
+                <Link href="/admissions/registration-form"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#C59B3F] hover:bg-[#D4AF37] text-[#071F13] font-extrabold text-sm shadow-lg transition-all hover:scale-105">
+                  Apply Now
+                </Link>
+                <Link href="/contact"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border-2 border-white/30 text-white hover:bg-white/10 font-bold text-sm transition-all">
+                  Contact Us
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
+      </div>
+
       <Footer />
-
-      {/* Consultation Modal */}
-      <ConsultationModal
-        isOpen={isConsultationOpen}
-        onClose={() => setIsConsultationOpen(false)}
-      />
+      <ConsultationModal isOpen={isConsultationOpen} onClose={() => setIsConsultationOpen(false)} />
     </main>
   );
 }

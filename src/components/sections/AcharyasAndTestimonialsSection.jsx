@@ -3,55 +3,40 @@
 import { useState } from "react";
 import { Star, ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
+
+const FALLBACK_ACHARYAS = [
+  { name: "Dr. Anjali Sharma",    role: "Ayurveda Expert",       exp: "15+ years", img: "/images/acharyas/dr-anjali.jpg" },
+  { name: "Yogi Rahul Dev",       role: "Yoga & Meditation",     exp: "12+ years", img: "/images/acharyas/yogi-rahul.jpg" },
+  { name: "Dr. Meera Iyer",       role: "Naturopathy Specialist", exp: "10+ years", img: "/images/acharyas/dr-meera.jpg" },
+  { name: "Acharya Devendra",     role: "Vedic Philosophy",      exp: "20+ years", img: "/images/acharyas/acharya-devendra.jpg" },
+];
+
+const FALLBACK_TESTIMONIALS = [
+  { name: "Priya Patel",  role: "14-Day Retreat Participant",       text: "Bhartiya Ayurveda truly transformed my life. Authentic, well-structured programs.", img: "/images/testimonials/priya-patel.jpg" },
+  { name: "Rajesh Verma", role: "21-Day Naturopathy Participant",   text: "The Panchakarma therapies cured my chronic insomnia. Truly healing.", img: "/images/acharyas/yogi-rahul.jpg" },
+  { name: "Sunita Rao",   role: "7-Day Holistic Retreat Participant", text: "The sattvic diet and daily yoga brought profound joy back into my life.", img: "/images/acharyas/dr-anjali.jpg" },
+];
 
 export default function AcharyasAndTestimonialsSection({ onOpenConsultation }) {
-  const acharyas = [
-    {
-      name: "Dr. Anjali Sharma",
-      role: "Ayurveda Expert",
-      exp: "15+ years",
-      img: "/images/acharyas/dr-anjali.jpg",
-    },
-    {
-      name: "Yogi Rahul Dev",
-      role: "Yoga & Meditation",
-      exp: "12+ years",
-      img: "/images/acharyas/yogi-rahul.jpg",
-    },
-    {
-      name: "Dr. Meera Iyer",
-      role: "Naturopathy Specialist",
-      exp: "10+ years",
-      img: "/images/acharyas/dr-meera.jpg",
-    },
-    {
-      name: "Acharya Devendra",
-      role: "Vedic Philosophy",
-      exp: "20+ years",
-      img: "/images/acharyas/acharya-devendra.jpg",
-    },
-  ];
+  const { homepage } = useSiteSettings();
 
-  const testimonials = [
-    {
-      name: "Priya Patel",
-      role: "14-Day Ayurveda Retreat Participant",
-      text: "Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad has truly transformed my life. The programs are authentic, well-structured and deeply enriching.",
-      img: "/images/testimonials/priya-patel.jpg",
-    },
-    {
-      name: "Rajesh Verma",
-      role: "21-Day Naturopathy Detox Participant",
-      text: "The Panchakarma and herbal therapies cured my chronic insomnia. The serene Himalayan atmosphere was truly healing.",
-      img: "/images/acharyas/yogi-rahul.jpg",
-    },
-    {
-      name: "Sunita Rao",
-      role: "7-Day Holistic Retreat Participant",
-      text: "The doctors take time to understand your unique Prakriti. The sattvic diet and daily yoga brought profound joy back.",
-      img: "/images/acharyas/dr-anjali.jpg",
-    },
-  ];
+  // Normalize DB shape to local shape
+  const rawAcharyas = homepage?.acharyas?.length ? homepage.acharyas : FALLBACK_ACHARYAS;
+  const acharyas = rawAcharyas.map(a => ({
+    name: a.name || "",
+    role: a.specialty || a.role || "",
+    exp:  a.bio      || a.exp  || "",
+    img:  a.photo    || a.img  || "",
+  }));
+
+  const rawTestimonials = homepage?.testimonials?.length ? homepage.testimonials : FALLBACK_TESTIMONIALS;
+  const testimonials = rawTestimonials.map(t => ({
+    name: t.name     || "",
+    role: t.location || t.role || "",
+    text: t.quote    || t.text || "",
+    img:  t.photo    || t.img  || "",
+  }));
 
   const [tIdx, setTIdx] = useState(0);
   const [touchStartX, setTouchStartX] = useState(null);

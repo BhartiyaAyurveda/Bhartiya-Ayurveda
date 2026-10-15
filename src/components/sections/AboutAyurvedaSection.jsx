@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Leaf, ShieldCheck, Sparkles, CheckCircle2 } from "lucide-react";
+import { Leaf, ShieldCheck, Sparkles, CheckCircle2 } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
 
 export default function AboutAyurvedaSection({ onOpenConsultation }) {
@@ -144,8 +144,7 @@ export default function AboutAyurvedaSection({ onOpenConsultation }) {
                   className="btn-shimmer w-full xs:w-auto px-8 py-4 rounded-full bg-[#0E3320] hover:bg-[#071F13] text-white text-[15px] xs:text-base sm:text-[17px] font-semibold shadow-md hover:shadow-xl hover:-translate-y-0.5 active:scale-95 flex items-center justify-center gap-3 transition-all group font-sans cursor-pointer"
                 >
                   <span>Know More About Ayurveda</span>
-                  <ArrowRight className="w-4.5 h-4.5 text-[#DEB655] group-hover:translate-x-1 transition-transform" />
-                </button>
+                                  </button>
               </div>
             </Reveal>
           </div>

@@ -2,20 +2,20 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   Image as ImageIcon,
   Plus,
   Trash2,
   Edit2,
   Search,
-  Filter,
   CheckCircle2,
   X,
   ExternalLink,
-  Sparkles,
-  Eye,
   RefreshCw,
-  AlertCircle
+  Upload,
+  Loader2,
+  Link as LinkIcon,
 } from "lucide-react";
 
 // Default gallery assets matching the public gallery
@@ -95,6 +95,10 @@ export default function GalleryManager({ onShowToast }) {
   const [editingItem, setEditingItem] = useState(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
+  // Upload states
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+
   // Form states
   const [formData, setFormData] = useState({
     titleEn: "",
@@ -158,13 +162,40 @@ export default function GalleryManager({ onShowToast }) {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingItem(null);
+    setUploadError("");
+  };
+
+  const handleImageUpload = async (file) => {
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError("File too large. Max size is 5MB.");
+      return;
+    }
+    setUploading(true);
+    setUploadError("");
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("folder", "gallery");
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (data.url) {
+        setFormData((prev) => ({ ...prev, src: data.url }));
+      } else {
+        setUploadError(data.error || "Upload failed.");
+      }
+    } catch {
+      setUploadError("Network error during upload.");
+    }
+    setUploading(false);
   };
 
   // Form submit handler
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (uploading) return;
     if (!formData.titleEn.trim() || !formData.src.trim()) {
-      if (onShowToast) onShowToast("Please enter photo title and image source URL", "error");
+      if (onShowToast) onShowToast("Please add a photo and enter a title", "error");
       return;
     }
 
@@ -379,45 +410,108 @@ export default function GalleryManager({ onShowToast }) {
       {/* Add / Edit Photo Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-[#FAF8F5] text-[#0E3320] max-w-xl w-full rounded-3xl p-6 md:p-8 shadow-2xl border border-[#DDD1BE] relative max-h-[90vh] overflow-y-auto">
-            <button
-              onClick={closeModal}
-              className="absolute top-5 right-5 text-neutral-400 hover:text-neutral-700 p-1 rounded-full hover:bg-neutral-100 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
+          <div className="bg-[#FAF8F5] text-[#0E3320] max-w-xl w-full rounded-3xl shadow-2xl border border-[#DDD1BE] max-h-[90vh] flex flex-col overflow-hidden">
 
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-[#0E3320] text-[#C59B3F] flex items-center justify-center shadow-sm">
-                <ImageIcon className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold font-serif text-[#0E3320]">
-                  {editingItem ? "Edit Gallery Photo" : "Add New Gallery Photo"}
-                </h3>
-                <p className="text-xs text-[#5C8261]">
-                  Configure photo details, title, and display category
-                </p>
+            {/* Fixed header */}
+            <div className="px-6 md:px-8 pt-6 md:pt-7 pb-4 shrink-0 relative border-b border-[#DDD1BE]">
+              <button
+                onClick={closeModal}
+                className="absolute top-5 right-5 text-neutral-400 hover:text-neutral-700 p-1 rounded-full hover:bg-neutral-100 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#0E3320] text-[#C59B3F] flex items-center justify-center shadow-sm">
+                  <ImageIcon className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold font-serif text-[#0E3320]">
+                    {editingItem ? "Edit Gallery Photo" : "Add New Gallery Photo"}
+                  </h3>
+                  <p className="text-xs text-[#5C8261]">
+                    Configure photo details, title, and display category
+                  </p>
+                </div>
               </div>
             </div>
 
+            {/* Scrollable body */}
+            <div className="flex-1 overflow-y-auto px-6 md:px-8 py-5">
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Image Source */}
+              {/* Image Upload */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#0E3320] mb-1">
-                  Image Path / URL <span className="text-red-500">*</span>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#0E3320] mb-2">
+                  Photo <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
-                  value={formData.src}
-                  onChange={(e) => setFormData({ ...formData, src: e.target.value })}
-                  placeholder="/images/ayurveda/herbs-mortar.jpg"
-                  required
-                  className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#DDD1BE] bg-white text-[#0E3320] focus:outline-none focus:ring-2 focus:ring-[#C59B3F]"
-                />
-                <span className="text-[11px] text-[#8C671D] block mt-1">
-                  Tip: Use paths like <code className="bg-[#EBE2D4] px-1 rounded">/images/ayurveda/herbs-mortar.jpg</code> or external image URLs.
-                </span>
+
+                {/* Upload zone */}
+                <label className={`relative flex flex-col items-center justify-center w-full rounded-xl border-2 border-dashed cursor-pointer transition-all overflow-hidden
+                  ${uploading ? "border-[#C59B3F]/60 bg-[#FAF8F5]" : "border-[#DDD1BE] hover:border-[#C59B3F] bg-white hover:bg-[#FAF8F5]"}`}
+                  style={{ minHeight: formData.src ? "0" : "120px" }}
+                >
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="sr-only"
+                    disabled={uploading}
+                    onChange={(e) => handleImageUpload(e.target.files?.[0])}
+                  />
+
+                  {/* Preview if image already set */}
+                  {formData.src ? (
+                    <div className="relative w-40 h-40 mx-auto group">
+                      <Image
+                        src={formData.src}
+                        alt="Preview"
+                        fill
+                        className="object-cover rounded-xl"
+                        unoptimized
+                      />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex flex-col items-center justify-center gap-2">
+                        <Upload className="w-6 h-6 text-white" />
+                        <span className="text-white text-xs font-semibold">Click to replace</span>
+                      </div>
+                      {uploading && (
+                        <div className="absolute inset-0 bg-black/60 rounded-xl flex items-center justify-center">
+                          <Loader2 className="w-8 h-8 text-[#C59B3F] animate-spin" />
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
+                      {uploading ? (
+                        <>
+                          <Loader2 className="w-8 h-8 text-[#C59B3F] animate-spin mb-2" />
+                          <p className="text-xs text-[#5C8261] font-medium">Uploading...</p>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-10 h-10 rounded-full bg-[#E6EFE9] flex items-center justify-center mb-2">
+                            <Upload className="w-5 h-5 text-[#1E603D]" />
+                          </div>
+                          <p className="text-xs font-semibold text-[#0E3320]">Click to upload photo</p>
+                          <p className="text-[11px] text-[#8C671D] mt-0.5">JPG, PNG, WebP — max 5MB</p>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </label>
+
+                {/* URL fallback input */}
+                <div className="mt-2 flex items-center gap-2">
+                  <LinkIcon className="w-3.5 h-3.5 text-[#8C671D] shrink-0" />
+                  <input
+                    type="text"
+                    value={formData.src}
+                    onChange={(e) => setFormData({ ...formData, src: e.target.value })}
+                    placeholder="Or paste external image URL..."
+                    className="flex-1 px-3 py-1.5 text-[11px] rounded-lg border border-[#DDD1BE] bg-white text-[#0E3320] focus:outline-none focus:ring-2 focus:ring-[#C59B3F] placeholder-[#C8B79E]"
+                  />
+                </div>
+
+                {uploadError && (
+                  <p className="text-[11px] text-red-600 mt-1 font-medium">{uploadError}</p>
+                )}
               </div>
 
               {/* Title (English) */}
@@ -506,13 +600,15 @@ export default function GalleryManager({ onShowToast }) {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-[#0E3320] hover:bg-[#15482D] text-white text-xs font-bold transition-all shadow-md flex items-center gap-1.5"
+                  disabled={uploading}
+                  className="px-5 py-2 rounded-xl bg-[#0E3320] hover:bg-[#15482D] disabled:opacity-60 disabled:cursor-not-allowed text-white text-xs font-bold transition-all shadow-md flex items-center gap-1.5"
                 >
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#C59B3F]" />
-                  <span>{editingItem ? "Save Changes" : "Publish Photo"}</span>
+                  {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5 text-[#C59B3F]" />}
+                  <span>{uploading ? "Uploading..." : editingItem ? "Save Changes" : "Publish Photo"}</span>
                 </button>
               </div>
             </form>
+            </div>{/* end scrollable body */}
           </div>
         </div>
       )}

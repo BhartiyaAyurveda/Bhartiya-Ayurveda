@@ -15,8 +15,7 @@ import {
   CheckCircle2,
   ExternalLink,
   Sparkles,
-  Eye,
-  Check
+  RefreshCw,
 } from "lucide-react";
 
 const DEFAULT_SOCIALS = [
@@ -88,20 +87,16 @@ const DEFAULT_SOCIALS = [
 export default function SocialLinksManager({ onShowToast }) {
   const [socials, setSocials] = useState(DEFAULT_SOCIALS);
   const [isSaved, setIsSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("bhartiya_admin_social");
-      if (stored) {
-        try {
-          setSocials(JSON.parse(stored));
-          return;
-        } catch (e) {
-          // ignore
-        }
-      }
-      setSocials(DEFAULT_SOCIALS);
-    }
+    fetch("/api/public/site-settings")
+      .then(r => r.json())
+      .then(data => {
+        if (data.ok && Array.isArray(data.socials) && data.socials.length > 0) setSocials(data.socials);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
   const handleToggle = (id) => {
@@ -131,28 +126,31 @@ export default function SocialLinksManager({ onShowToast }) {
     setIsSaved(false);
   };
 
-  const handleSave = (e) => {
-    e.preventDefault();
-    if (typeof window !== "undefined") {
-      localStorage.setItem("bhartiya_admin_social", JSON.stringify(socials));
+  const handleSave = async (e) => {
+    e?.preventDefault();
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: "social_links", value: JSON.stringify(socials) }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setIsSaved(true);
+        onShowToast?.("Social media links saved to database!", "success");
+        setTimeout(() => setIsSaved(false), 3000);
+      } else {
+        onShowToast?.(data.error || "Save failed", "error");
+      }
+    } catch {
+      onShowToast?.("Network error", "error");
     }
-    setIsSaved(true);
-    if (onShowToast) {
-      onShowToast("Social media links & channels saved successfully!", "success");
-    }
-    setTimeout(() => setIsSaved(false), 3000);
   };
 
-  const handleReset = () => {
-    if (confirm("Reset social links to default configurations?")) {
-      setSocials(DEFAULT_SOCIALS);
-      if (typeof window !== "undefined") {
-        localStorage.setItem("bhartiya_admin_social", JSON.stringify(DEFAULT_SOCIALS));
-      }
-      if (onShowToast) {
-        onShowToast("Social links restored to defaults.", "info");
-      }
-    }
+  const handleReset = async () => {
+    if (!confirm("Reset social links to default configurations?")) return;
+    setSocials(DEFAULT_SOCIALS);
+    onShowToast?.("Social links restored to defaults.", "info");
   };
 
   // Render proper icon based on id
@@ -176,6 +174,8 @@ export default function SocialLinksManager({ onShowToast }) {
         return <Share2 className="w-4 h-4" />;
     }
   };
+
+  if (loading) return <div className="p-10 text-center"><RefreshCw className="w-6 h-6 animate-spin mx-auto text-[#C59B3F]" /></div>;
 
   return (
     <div className="space-y-6">

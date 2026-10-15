@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Check, ArrowRight } from "lucide-react";
+import { X, Check } from "lucide-react";
 
 export default function ProgramDetailsModal({ program, onClose, onOpenConsultation }) {
   if (!program) return null;
@@ -89,8 +89,7 @@ export default function ProgramDetailsModal({ program, onClose, onOpenConsultati
             className="btn-shimmer w-full py-3.5 rounded-xl bg-[#0E3320] hover:bg-[#071F13] text-white text-sm font-semibold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             <span>Book This Program</span>
-            <ArrowRight className="w-4 h-4 text-[#E4BF64]" />
-          </button>
+                      </button>
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { siteContent } from "@/data/content";
-import { Sparkles, Award, ArrowRight } from "lucide-react";
+import { Sparkles, Award } from "lucide-react";
 
 export default function AcharyasSection({ onOpenConsultation }) {
   const { acharyas } = siteContent;
@@ -69,8 +69,7 @@ export default function AcharyasSection({ onOpenConsultation }) {
                   className="w-full py-2.5 rounded-xl border border-forest-800 text-forest-800 hover:bg-forest-800 hover:text-white font-semibold text-xs transition-colors flex items-center justify-center gap-1.5"
                 >
                   <span>Book Consultation</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
+                                  </button>
               </div>
             </div>
           ))}

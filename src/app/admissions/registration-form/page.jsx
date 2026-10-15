@@ -12,10 +12,13 @@ import {
   Building2,
   GraduationCap,
   Printer,
-  ArrowRight,
-  ArrowLeft,
   Check,
   ClipboardList,
+  Shield,
+  Mail,
+  KeyRound,
+  RefreshCw,
+  AlertTriangle,
 } from "lucide-react";
 import TopBar from "@/components/layout/TopBar";
 import Navbar from "@/components/layout/Navbar";
@@ -73,6 +76,7 @@ const requiredFieldsByStep = {
   5: [],
 };
 
+
 export default function AdmissionRegistrationFormPage() {
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -80,6 +84,23 @@ export default function AdmissionRegistrationFormPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [stepError, setStepError] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
+
+  // OTP gate state
+  const [gate, setGate] = useState("email"); // "email" | "otp" | "verified"
+  const [gateEmail, setGateEmail] = useState("");
+  const [gateOtp, setGateOtp] = useState("");
+  const [gateLoading, setGateLoading] = useState(false);
+  const [gateError, setGateError] = useState("");
+  const [gateResendTimer, setGateResendTimer] = useState(0);
+
+  // Captcha state
+  const newCaptcha = () => ({
+    a: Math.floor(Math.random() * 12) + 1,
+    b: Math.floor(Math.random() * 12) + 1,
+  });
+  const [captcha, setCaptcha] = useState(newCaptcha);
+  const [captchaInput, setCaptchaInput] = useState("");
+  const [captchaError, setCaptchaError] = useState("");
 
   const [formData, setFormData] = useState(initialFormData);
 
@@ -136,6 +157,12 @@ export default function AdmissionRegistrationFormPage() {
       setStepError("Please confirm the declaration before submitting.");
       return;
     }
+    if (parseInt(captchaInput, 10) !== captcha.a + captcha.b) {
+      setCaptchaError("Incorrect answer. Please try again.");
+      setCaptcha(newCaptcha());
+      setCaptchaInput("");
+      return;
+    }
     const randomAppNo = "BA-ADM-" + Math.floor(100000 + Math.random() * 900000);
     setApplicationNo(randomAppNo);
     setIsSubmitted(true);
@@ -148,6 +175,57 @@ export default function AdmissionRegistrationFormPage() {
     setTermsAccepted(false);
     setStepError("");
     setFormData(initialFormData);
+    setCaptcha(newCaptcha());
+    setCaptchaInput("");
+    setCaptchaError("");
+  };
+
+  const handleSendOtp = async () => {
+    if (!gateEmail.trim() || !/\S+@\S+\.\S+/.test(gateEmail)) {
+      setGateError("Please enter a valid email address.");
+      return;
+    }
+    setGateLoading(true);
+    setGateError("");
+    try {
+      const res = await fetch("/api/public/otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "send", email: gateEmail.trim() }),
+      });
+      const json = await res.json();
+      if (!res.ok) { setGateError(json.error || "Failed to send OTP."); }
+      else {
+        setGate("otp");
+        // 60 second resend cooldown
+        setGateResendTimer(60);
+        const interval = setInterval(() => {
+          setGateResendTimer((t) => { if (t <= 1) { clearInterval(interval); return 0; } return t - 1; });
+        }, 1000);
+      }
+    } catch { setGateError("Network error. Please try again."); }
+    setGateLoading(false);
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!gateOtp.trim()) { setGateError("Please enter the OTP."); return; }
+    setGateLoading(true);
+    setGateError("");
+    try {
+      const res = await fetch("/api/public/otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "verify", email: gateEmail.trim(), otp: gateOtp.trim() }),
+      });
+      const json = await res.json();
+      if (!res.ok) { setGateError(json.error || "Verification failed."); }
+      else {
+        setGate("verified");
+        // Pre-fill email in form
+        setFormData((f) => ({ ...f, email: gateEmail.trim() }));
+      }
+    } catch { setGateError("Network error. Please try again."); }
+    setGateLoading(false);
   };
 
   const inputClass =
@@ -243,7 +321,92 @@ export default function AdmissionRegistrationFormPage() {
       <section className="py-10 sm:py-16 md:py-20 px-3.5 sm:px-4 md:px-8 border-b border-[#EBE2D4]">
         <div className="max-w-5xl mx-auto">
 
-          {isSubmitted ? (
+          {/* OTP Gate */}
+          {gate !== "verified" ? (
+            <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-12 border border-[#E4D9C7] shadow-lg max-w-lg mx-auto">
+              <div className="flex flex-col items-center text-center space-y-4 mb-8">
+                <div className="w-14 h-14 rounded-2xl bg-[#EAE2D3] flex items-center justify-center">
+                  <Shield className="w-7 h-7 text-[#0E3320]" />
+                </div>
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-devanagari font-bold text-[#0E3320]">ईमेल सत्यापन</h2>
+                  <p className="text-sm text-[#52725D] mt-1">Verify your email to access the registration form</p>
+                </div>
+              </div>
+
+              {gate === "email" ? (
+                <div className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="block text-xs sm:text-sm font-bold text-[#0E3320]">Email Address *</label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8C9E90]" />
+                      <input
+                        type="email"
+                        value={gateEmail}
+                        onChange={(e) => { setGateEmail(e.target.value); setGateError(""); }}
+                        onKeyDown={(e) => e.key === "Enter" && handleSendOtp()}
+                        placeholder="your@email.com"
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-[#D5C7B7] bg-[#FAF8F5] focus:outline-none focus:ring-2 focus:ring-[#0E3320] text-sm text-[#0E3320]"
+                      />
+                    </div>
+                  </div>
+                  {gateError && (
+                    <div className="flex items-center gap-2 p-3 rounded-xl bg-[#FCEAE7] border border-[#E8B4A8] text-[#9A3B2A] text-xs">
+                      <AlertTriangle className="w-4 h-4 shrink-0" />{gateError}
+                    </div>
+                  )}
+                  <button
+                    onClick={handleSendOtp}
+                    disabled={gateLoading}
+                    className="w-full py-3 rounded-full bg-[#0E3320] hover:bg-[#071F13] text-white text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-60 transition-colors"
+                  >
+                    {gateLoading ? <><RefreshCw className="w-4 h-4 animate-spin" />Sending…</> : <><Send className="w-4 h-4" />Send OTP</>}
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-xs text-[#52725D] text-center">OTP sent to <span className="font-bold text-[#0E3320]">{gateEmail}</span></p>
+                  <div className="space-y-1.5">
+                    <label className="block text-xs sm:text-sm font-bold text-[#0E3320]">Enter 6-digit OTP *</label>
+                    <div className="relative">
+                      <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8C9E90]" />
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={6}
+                        value={gateOtp}
+                        onChange={(e) => { setGateOtp(e.target.value.replace(/\D/g, "")); setGateError(""); }}
+                        onKeyDown={(e) => e.key === "Enter" && handleVerifyOtp()}
+                        placeholder="_ _ _ _ _ _"
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-[#D5C7B7] bg-[#FAF8F5] focus:outline-none focus:ring-2 focus:ring-[#0E3320] text-sm text-[#0E3320] tracking-widest text-center"
+                      />
+                    </div>
+                  </div>
+                  {gateError && (
+                    <div className="flex items-center gap-2 p-3 rounded-xl bg-[#FCEAE7] border border-[#E8B4A8] text-[#9A3B2A] text-xs">
+                      <AlertTriangle className="w-4 h-4 shrink-0" />{gateError}
+                    </div>
+                  )}
+                  <button
+                    onClick={handleVerifyOtp}
+                    disabled={gateLoading}
+                    className="w-full py-3 rounded-full bg-[#0E3320] hover:bg-[#071F13] text-white text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-60 transition-colors"
+                  >
+                    {gateLoading ? <><RefreshCw className="w-4 h-4 animate-spin" />Verifying…</> : <><CheckCircle2 className="w-4 h-4" />Verify OTP</>}
+                  </button>
+                  <div className="text-center">
+                    {gateResendTimer > 0 ? (
+                      <p className="text-xs text-[#8C9E90]">Resend OTP in {gateResendTimer}s</p>
+                    ) : (
+                      <button onClick={() => { setGate("email"); setGateOtp(""); setGateError(""); }} className="text-xs text-[#0E3320] underline font-semibold">
+                        Change email / Resend OTP
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : isSubmitted ? (
             <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-12 border-2 border-[#A5D4B2] shadow-xl text-center space-y-6">
               <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#EAF5ED] text-[#2A7A50] flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-10 h-10 sm:w-12 sm:h-12 stroke-[2.2]" />
@@ -749,6 +912,30 @@ export default function AdmissionRegistrationFormPage() {
                     ))}
                   </div>
 
+                  {/* Math Captcha */}
+                  <div className="p-4 rounded-xl bg-[#F0EBE0] border border-[#DDD1BE] space-y-2">
+                    <p className="text-[10px] sm:text-xs font-bold text-[#52725D] uppercase tracking-wide flex items-center gap-1.5">
+                      <Shield className="w-3.5 h-3.5" />Security Verification
+                    </p>
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <span className="text-base sm:text-lg font-black text-[#0E3320]">
+                        {captcha.a} + {captcha.b} = ?
+                      </span>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={captchaInput}
+                        onChange={(e) => { setCaptchaInput(e.target.value.replace(/\D/g, "")); setCaptchaError(""); }}
+                        placeholder="Answer"
+                        maxLength={3}
+                        className="w-24 px-3 py-2 rounded-lg border border-[#D5C7B7] bg-white text-sm text-[#0E3320] focus:outline-none focus:ring-2 focus:ring-[#0E3320] text-center font-bold"
+                      />
+                    </div>
+                    {captchaError && (
+                      <p className="text-[11px] text-[#9A3B2A] font-semibold">{captchaError}</p>
+                    )}
+                  </div>
+
                   <label className="flex items-start gap-2.5 pt-2 cursor-pointer">
                     <input
                       type="checkbox"
@@ -771,8 +958,7 @@ export default function AdmissionRegistrationFormPage() {
                     onClick={goBack}
                     className="w-full sm:w-auto px-6 py-3 rounded-full bg-white text-[#0E3320] border border-[#D5C7B7] text-sm font-semibold hover:border-[#0E3320] transition-colors flex items-center justify-center gap-2"
                   >
-                    <ArrowLeft className="w-4 h-4" />
-                    <span>Back</span>
+                                        <span>Back</span>
                   </button>
                 ) : (
                   <span />
@@ -785,8 +971,7 @@ export default function AdmissionRegistrationFormPage() {
                     className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#0E3320] hover:bg-[#071F13] text-white text-sm sm:text-base font-bold shadow-md transition-all flex items-center justify-center gap-2"
                   >
                     <span>Next Step</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
+                                      </button>
                 ) : (
                   <button
                     type="submit"

@@ -47,14 +47,68 @@ body {
 @media print {
   @page {
     size: A4 portrait;
-    margin: 12mm;
+    margin: 12mm 14mm;
   }
+
   html, body {
     font-size: 11px !important;
+    background: white !important;
+    overflow: visible !important;
   }
+
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+  }
+
+  /* Hide all dashboard chrome */
+  aside,
+  header,
+  nav,
+  .no-print,
+  [data-no-print] {
+    display: none !important;
+  }
+
+  /* Make the main workspace take full width */
+  .flex.h-screen.overflow-hidden {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .flex-1.flex.flex-col.min-w-0.overflow-hidden {
+    overflow: visible !important;
+  }
+
+  /* Main content area full width */
+  main {
+    padding: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  /* Hide buttons, tabs, action elements */
+  button,
+  a[href="/college/dashboard/registrations"],
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Keep View document links visible */
+  a[target="_blank"] {
+    display: inline-flex !important;
+  }
+
+  /* Remove shadows and rounded corners for clean print */
+  .shadow-sm, .shadow-xs, .shadow-md, .shadow-lg, .shadow-2xl {
+    box-shadow: none !important;
+  }
+
+  /* Page breaks */
+  .bg-white.rounded-2xl {
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 }
 
@@ -67,20 +121,27 @@ body {
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 5px;
+  height: 3px;
 }
 
 ::-webkit-scrollbar-track {
   background: #f1ede4;
+  border-radius: 99px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1b5e3a;
-  border-radius: 4px;
+  background: #c59b3f;
+  border-radius: 99px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #0e311e;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c59b3f #f1ede4;
 }
 
 /* Hero Section Bold All-Caps Sans Callout (Matches HEAL BALANCE TRANSFORM) */

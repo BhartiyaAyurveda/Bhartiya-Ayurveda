@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { siteContent } from "@/data/content";
-import { ChevronDown, HelpCircle, MessageCircle, ArrowRight } from "lucide-react";
+import { ChevronDown, HelpCircle, MessageCircle } from "lucide-react";
 
 export default function FaqSection({ onOpenConsultation }) {
   const { faqs } = siteContent;
@@ -95,8 +95,7 @@ export default function FaqSection({ onOpenConsultation }) {
             className="px-6 py-3 rounded-full bg-gold-500 hover:bg-gold-600 text-forest-950 font-semibold text-xs sm:text-sm shadow whitespace-nowrap shrink-0 flex items-center gap-2"
           >
             <span>Ask a Vaidya</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+                      </button>
         </div>
       </div>
     </section>

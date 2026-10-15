@@ -11,7 +11,6 @@ import {
   Sparkles, 
   Flower2, 
   Image as ImageIcon,
-  ArrowRight,
   Download,
   Share2
 } from "lucide-react";

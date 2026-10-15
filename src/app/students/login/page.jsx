@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 import Link from "next/link";
 import {
   GraduationCap,
   User,
   Lock,
-  ArrowRight,
   ShieldCheck,
   Eye,
   EyeOff,
@@ -28,6 +28,7 @@ import Footer from "@/components/layout/Footer";
 import ConsultationModal from "@/components/ui/ConsultationModal";
 
 export default function StudentLoginPage() {
+  const { contact } = useSiteSettings();
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rollNumber, setRollNumber] = useState("");
@@ -224,8 +225,7 @@ export default function StudentLoginPage() {
                   className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#1A5C38] text-white hover:bg-[#0E3320] font-semibold text-xs transition-colors"
                 >
                   <span>Go to Results Portal</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
+                                  </Link>
               </div>
 
               {/* Card 3: Syllabus & Study Material */}
@@ -337,7 +337,7 @@ export default function StudentLoginPage() {
                   </label>
                   <button
                     type="button"
-                    onClick={() => alert("Please contact Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad student helpdesk at +91 98765 43210 or email hello@bhartiyaayurveda.in to reset your password.")}
+                    onClick={() => alert(`Please contact Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad student helpdesk at ${contact.primaryPhone} or email ${contact.primaryEmail} to reset your password.`)}
                     className="text-xs text-[#7A583A] hover:text-[#0E3320] underline"
                   >
                     Forgot Password?
@@ -388,8 +388,7 @@ export default function StudentLoginPage() {
                   ) : (
                     <>
                       <span>Sign In to Student Portal</span>
-                      <ArrowRight className="w-4 h-4 text-[#E4BF64] group-hover:translate-x-1 transition-transform" />
-                    </>
+                                          </>
                   )}
                 </button>
               </div>
@@ -419,7 +418,7 @@ export default function StudentLoginPage() {
             Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad Student Helpdesk & Support
           </p>
           <p className="text-xs text-[#666]">
-            Facing trouble logging in? Call Helpline: <strong className="text-[#0E3320]">+91 98765 43210</strong> or email <strong className="text-[#0E3320]">hello@bhartiyaayurveda.in</strong>
+            Facing trouble logging in? Call Helpline: <strong className="text-[#0E3320]">{contact.primaryPhone}</strong> or email <strong className="text-[#0E3320]">{contact.primaryEmail}</strong>
           </p>
         </div>
       </section>

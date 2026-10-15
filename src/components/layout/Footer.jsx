@@ -1,26 +1,38 @@
 "use client";
 
 import Image from "next/image";
-import { MapPin, Phone, Mail, Twitter, Instagram, Youtube, Linkedin } from "lucide-react";
+import { MapPin, Phone, Mail, Twitter, Instagram, Youtube, Linkedin, Facebook, MessageCircle, Send, Share2 } from "lucide-react";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
+
+const SOCIAL_ICONS = {
+  twitter:   <Twitter   className="w-3.5 h-3.5" />,
+  instagram: <Instagram className="w-3.5 h-3.5" />,
+  youtube:   <Youtube   className="w-3.5 h-3.5" />,
+  linkedin:  <Linkedin  className="w-3.5 h-3.5" />,
+  facebook:  <Facebook  className="w-3.5 h-3.5" />,
+  whatsapp:  <MessageCircle className="w-3.5 h-3.5" />,
+  telegram:  <Send      className="w-3.5 h-3.5" />,
+};
 
 export default function Footer() {
+  const { contact, socials: allSocials } = useSiteSettings();
+  const socials = allSocials.filter(s => s.enabled);
+  const address = [contact.addressLine1, contact.city, contact.state, "India"].filter(Boolean).join(", ");
+
   return (
     <footer id="contact" className="relative bg-[#F5F0E8] text-[#152118] pt-14 pb-20 sm:pb-8 px-4 md:px-8 border-t border-[#E6DDCE] font-sans overflow-hidden print:hidden">
-      {/* Decorative leaves accent behind slogan */}
       <div className="block absolute bottom-4 right-3 md:right-6 w-24 sm:w-36 md:w-48 lg:w-56 pointer-events-none select-none z-0 opacity-50">
         <img src="/images/leaves.png" alt="" className="w-full h-auto object-contain" />
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
-
-        {/* Main Footer Columns */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 pb-12 border-b border-[#E6DDCE]">
 
-          {/* Brand Info (Full on mobile, 2 cols on tablet/desktop) */}
+          {/* Brand */}
           <div className="col-span-1 sm:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
               <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-white shadow-md shrink-0 border border-[#E4DAC9]">
-                <Image src="/logo.png" alt="Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad" fill sizes="96px" className="object-cover" />
+                <Image src="/logo.png" alt="Bhartiya Ayurveda" fill sizes="96px" className="object-cover" />
               </div>
               <div className="min-w-0">
                 <span className="block font-devanagari text-base sm:text-lg font-bold text-[#0E3320] tracking-tight leading-tight">
@@ -31,7 +43,6 @@ export default function Footer() {
                 </span>
               </div>
             </div>
-
             <div className="p-4 bg-white rounded-2xl border border-[#E4DAC9] max-w-sm shadow-sm">
               <p className="font-devanagari text-sm sm:text-base text-[#0E3320] font-bold">
                 स्वस्थ शरीर • समृद्ध समाज • समृद्ध भारत
@@ -44,9 +55,7 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div className="space-y-3.5">
-            <h4 className="text-[15px] font-sans font-bold text-[#0E3320] uppercase tracking-wider">
-              Quick Links
-            </h4>
+            <h4 className="text-[15px] font-sans font-bold text-[#0E3320] uppercase tracking-wider">Quick Links</h4>
             <ul className="space-y-2.5 text-base sm:text-lg text-[#152118] font-semibold">
               <li><a href="/" className="hover:text-[#0E3320] transition-colors">Home</a></li>
               <li><a href="/affiliated-institutes" className="hover:text-[#0E3320] transition-colors">Affiliated Institutes</a></li>
@@ -57,11 +66,9 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Admissions & Students */}
+          {/* Students */}
           <div className="space-y-3.5">
-            <h4 className="text-[15px] font-sans font-bold text-[#0E3320] uppercase tracking-wider">
-              Students & Admissions
-            </h4>
+            <h4 className="text-[15px] font-sans font-bold text-[#0E3320] uppercase tracking-wider">Students &amp; Admissions</h4>
             <ul className="space-y-2.5 text-base sm:text-lg text-[#152118] font-semibold">
               <li><a href="/admissions/registration-form" className="hover:text-[#8C671D] transition-colors">Registration Form</a></li>
               <li><a href="/students/registration" className="hover:text-[#8C671D] transition-colors">Student Registration</a></li>
@@ -69,60 +76,59 @@ export default function Footer() {
               <li><a href="/students/results" className="hover:text-[#8C671D] transition-colors">Examination Results</a></li>
               <li><a href="/certificate-verification" className="hover:text-[#8C671D] transition-colors">Certificate Verification</a></li>
               <li><a href="/affiliated-institutes" className="hover:text-[#8C671D] transition-colors">Approved Colleges</a></li>
-              <li><a href="/super-admin/login" className="hover:text-[#8C671D] transition-colors text-[#8C671D] font-medium">Super Admin Login</a></li>
+              <li><a href="/super-admin/login" className="text-[#8C671D] hover:text-[#0E3320] transition-colors font-medium">Super Admin Login</a></li>
             </ul>
           </div>
 
-          {/* Our Programs */}
+          {/* Programs */}
           <div className="space-y-3.5">
-            <h4 className="text-sm font-sans font-bold text-[#0E3320] uppercase tracking-wider">
-              Programs & Retreats
-            </h4>
+            <h4 className="text-sm font-sans font-bold text-[#0E3320] uppercase tracking-wider">Programs &amp; Retreats</h4>
             <ul className="space-y-2 text-sm text-[#152118] font-semibold">
               <li><a href="/#programs" className="hover:text-[#0E3320] transition-colors">Ayurveda Retreats</a></li>
               <li><a href="/#programs" className="hover:text-[#0E3320] transition-colors">Yoga Programs</a></li>
               <li><a href="/#programs" className="hover:text-[#0E3320] transition-colors">Naturopathy Courses</a></li>
               <li><a href="/#programs" className="hover:text-[#0E3320] transition-colors">Wellness Retreats</a></li>
               <li><a href="/#programs" className="hover:text-[#0E3320] transition-colors">Electro-Homeopathy Courses</a></li>
-              <li><a href="/#faq" className="hover:text-[#0E3320] transition-colors">FAQs & Guidance</a></li>
+              <li><a href="/#faq" className="hover:text-[#0E3320] transition-colors">FAQs &amp; Guidance</a></li>
             </ul>
           </div>
 
-          {/* Contact Us */}
+          {/* Contact */}
           <div className="space-y-3.5">
-            <h4 className="text-sm font-sans font-bold text-[#0E3320] uppercase tracking-wider">
-              Contact Us
-            </h4>
+            <h4 className="text-sm font-sans font-bold text-[#0E3320] uppercase tracking-wider">Contact Us</h4>
             <ul className="space-y-2.5 text-sm text-[#152118] font-semibold">
-              <li className="flex items-start gap-2">
-                <MapPin className="w-4 h-4 text-[#C59B3F] shrink-0 mt-0.5" />
-                <span>Rishikesh, Uttarakhand, India</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-[#C59B3F] shrink-0" />
-                <a href="tel:+919876543210" className="hover:text-[#0E3320]">+91 98765 43210</a>
-              </li>
-              <li className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-[#C59B3F] shrink-0" />
-                <a href="mailto:hello@bhartiyaayurveda.in" className="hover:text-[#0E3320]">hello@bhartiyaayurveda.in</a>
-              </li>
+              {address && (
+                <li className="flex items-start gap-2">
+                  <MapPin className="w-4 h-4 text-[#C59B3F] shrink-0 mt-0.5" />
+                  <span>{address}</span>
+                </li>
+              )}
+              {contact.primaryPhone && (
+                <li className="flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-[#C59B3F] shrink-0" />
+                  <a href={`tel:${contact.primaryPhone.replace(/\s/g, "")}`} className="hover:text-[#0E3320]">{contact.primaryPhone}</a>
+                </li>
+              )}
+              {contact.primaryEmail && (
+                <li className="flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-[#C59B3F] shrink-0" />
+                  <a href={`mailto:${contact.primaryEmail}`} className="hover:text-[#0E3320] break-all">{contact.primaryEmail}</a>
+                </li>
+              )}
             </ul>
 
-            {/* Social Icons */}
-            <div className="flex items-center gap-2.5 pt-2">
-              <a href="#" className="w-7 h-7 rounded-full bg-[#EAE2D3] flex items-center justify-center text-[#0E3320] hover:bg-[#C59B3F]/20 hover:text-[#8C671D] transition-colors" aria-label="Twitter">
-                <Twitter className="w-3.5 h-3.5" />
-              </a>
-              <a href="#" className="w-7 h-7 rounded-full bg-[#EAE2D3] flex items-center justify-center text-[#0E3320] hover:bg-[#C59B3F]/20 hover:text-[#8C671D] transition-colors" aria-label="Instagram">
-                <Instagram className="w-3.5 h-3.5" />
-              </a>
-              <a href="#" className="w-7 h-7 rounded-full bg-[#EAE2D3] flex items-center justify-center text-[#0E3320] hover:bg-[#C59B3F]/20 hover:text-[#8C671D] transition-colors" aria-label="YouTube">
-                <Youtube className="w-3.5 h-3.5" />
-              </a>
-              <a href="#" className="w-7 h-7 rounded-full bg-[#EAE2D3] flex items-center justify-center text-[#0E3320] hover:bg-[#C59B3F]/20 hover:text-[#8C671D] transition-colors" aria-label="LinkedIn">
-                <Linkedin className="w-3.5 h-3.5" />
-              </a>
-            </div>
+            {/* Social Icons from DB */}
+            {socials.length > 0 && (
+              <div className="flex items-center gap-2.5 pt-2 flex-wrap">
+                {socials.map(s => (
+                  <a key={s.id} href={s.url || "#"} target="_blank" rel="noopener noreferrer"
+                    className="w-7 h-7 rounded-full bg-[#EAE2D3] flex items-center justify-center text-[#0E3320] hover:bg-[#C59B3F]/20 hover:text-[#8C671D] transition-colors"
+                    aria-label={s.name}>
+                    {SOCIAL_ICONS[s.id] || <Share2 className="w-3.5 h-3.5" />}
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
 
         </div>
@@ -132,16 +138,14 @@ export default function Footer() {
           <div>
             © 2023 Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad / <span className="font-devanagari">भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद्</span>. All rights reserved.
           </div>
-
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
             <a href="#" className="hover:text-[#0E3320] transition-colors">Privacy Policy</a>
             <span>|</span>
-            <a href="#" className="hover:text-[#0E3320] transition-colors">Terms & Conditions</a>
+            <a href="#" className="hover:text-[#0E3320] transition-colors">Terms &amp; Conditions</a>
             <span>|</span>
             <a href="#" className="hover:text-[#0E3320] transition-colors">Sitemap</a>
           </div>
         </div>
-
       </div>
     </footer>
   );

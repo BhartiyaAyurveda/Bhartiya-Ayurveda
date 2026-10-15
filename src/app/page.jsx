@@ -18,8 +18,13 @@ import ArticlesAndFaqSection from "@/components/sections/ArticlesAndFaqSection";
 import CtaBannerSection from "@/components/sections/CtaBannerSection";
 import ConsultationModal from "@/components/ui/ConsultationModal";
 import VideoModal from "@/components/ui/VideoModal";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 
 export default function Home() {
+  const { homepage } = useSiteSettings();
+  const vis = homepage?.sections || {};
+  const show = (key) => vis[key] !== false; // default: visible if not explicitly false
+
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -47,41 +52,19 @@ export default function Home() {
       {/* 2. Sticky Navbar */}
       <Navbar onOpenConsultation={openConsultation} />
 
-      {/* 3. Hero Section */}
-      <HeroSection
-        onOpenConsultation={openConsultation}
-        onOpenVideo={openVideo}
-      />
+      {/* 3. Hero Section — always shown */}
+      <HeroSection />
 
-      {/* 4. Four Pillars & Right Quote */}
-      <PillarsSection />
-
-      {/* 5. About Ayurveda (Mortar + Text + Sage) */}
-      <AboutAyurvedaSection onOpenConsultation={openConsultation} />
-
-      {/* 6. Yoga Section with Mountain Panorama */}
-      <YogaSection onOpenConsultation={openConsultation} />
-
-      {/* 7. Naturopathy Section (6 Circles + Quote) */}
-      <NaturopathySection />
-
-      {/* 8. Popular Programs (Deep Forest Green, 4 Cards) */}
-      <ProgramsSection onOpenConsultation={openConsultation} />
-
-      {/* 9. The Three Doshas (3 Pastel Cards + Charaka Samhita Quote) */}
-      <DoshasSection />
-
-      {/* 10. Why Choose Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad (5 Circles + Leaves Video Card) */}
-      <WhyChooseSection onOpenVideo={openVideo} />
-
-      {/* 11. Side-by-Side: Meet Our Acharyas (4 cards) & What People Say (Priya Patel review) */}
-      <AcharyasAndTestimonialsSection onOpenConsultation={openConsultation} />
-
-      {/* 12. Side-by-Side: Latest Articles (3 cards) & Frequently Asked Questions (5 accordion items) */}
-      <ArticlesAndFaqSection onOpenConsultation={openConsultation} />
-
-      {/* 13. CTA Banner: Mountain Landscape + Slogan */}
-      <CtaBannerSection onOpenConsultation={openConsultation} />
+      {show("pillars")     && <PillarsSection />}
+      {show("about")       && <AboutAyurvedaSection onOpenConsultation={openConsultation} />}
+      {show("yoga")        && <YogaSection onOpenConsultation={openConsultation} />}
+      {show("naturopathy") && <NaturopathySection />}
+      {show("programs")    && <ProgramsSection onOpenConsultation={openConsultation} />}
+      {show("doshas")      && <DoshasSection />}
+      {show("whyChoose")   && <WhyChooseSection onOpenVideo={openVideo} />}
+      {show("acharyas")    && <AcharyasAndTestimonialsSection onOpenConsultation={openConsultation} />}
+      {show("faq")         && <ArticlesAndFaqSection onOpenConsultation={openConsultation} />}
+      {show("cta")         && <CtaBannerSection onOpenConsultation={openConsultation} />}
 
       {/* 14. Rich Emerald 6-Column Footer */}
       <Footer />
