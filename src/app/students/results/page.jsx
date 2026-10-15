@@ -405,7 +405,7 @@ export default function StudentResultsPage() {
                 <div className="flex-1 text-xs sm:text-sm">
                   <span className="font-bold">Demo Preview Mode</span> — This is sample data to preview the marksheet template. Real student results require a valid Roll Number &amp; Date of Birth.
                 </div>
-                <button onClick={handleReset} className="shrink-0 px-3 py-1.5 rounded-full bg-[#0E3320] text-white text-xs font-semibold hover:bg-[#15482D] transition-colors">
+                <button onClick={handleReset} className="shrink-0 px-3 py-1.5 rounded-full bg-[#0B1E36] text-white text-xs font-semibold hover:bg-[#132E52] transition-colors">
                   Close Demo
                 </button>
               </div>
@@ -413,7 +413,7 @@ export default function StudentResultsPage() {
             {/* ── TOP ACTION BAR ── */}
             <div className="no-print mb-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 max-w-[860px] mx-auto">
               <button onClick={handlePrint}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full bg-[#0E3320] text-[#E4BF64] hover:bg-[#071F13] font-semibold text-sm transition-colors shadow-lg">
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full bg-[#0B1E36] text-[#E4BF64] hover:bg-[#071527] font-semibold text-sm transition-colors shadow-lg">
                 <Printer className="w-4 h-4" />
                 Print / Download Marksheet
               </button>
@@ -429,17 +429,17 @@ export default function StudentResultsPage() {
             <div className="result-marksheet-wrapper w-full max-w-[860px] mx-auto font-sans text-[#1e293b] shadow-2xl print:shadow-none">
               <style>{`
               @media print {
-                @page { size: A4 portrait; margin: 6mm 8mm; }
+                @page { size: A4 portrait; margin: 12mm 8mm 10mm 8mm; }
                 html,body { background:#fff!important; -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; margin:0!important; padding:0!important; }
                 .no-print { display:none!important; }
-                .result-marksheet-wrapper { width:100%!important; max-width:100%!important; box-shadow:none!important; }
+                .result-marksheet-wrapper { width:100%!important; max-width:100%!important; box-shadow:none!important; margin-top:3mm!important; }
               }
               .ms-detail-label { color:#64748b; font-size:10px; font-weight:600; min-width:96px; flex-shrink:0; }
-              .ms-detail-value { color:#0E3320; font-size:10.5px; font-weight:700; }
+              .ms-detail-value { color:#0B1E36; font-size:10.5px; font-weight:700; }
             `}</style>
 
               {/* ── OUTER PREMIUM FRAME ── */}
-              <div style={{ background: "linear-gradient(135deg,#0E3320,#1A5C38,#0E3320)", padding: "5px", borderRadius: 2 }}>
+              <div style={{ background: "linear-gradient(135deg,#071527,#0E2A47,#163861)", padding: "5px", borderRadius: 2 }}>
                 <div style={{ border: "1.5px solid #C59B3F", borderRadius: 1 }}>
                   <div className="relative bg-white overflow-hidden">
 
@@ -463,7 +463,7 @@ export default function StudentResultsPage() {
                     <div className="relative z-10">
 
                       {/* ── 1. HEADER BAND ── */}
-                      <div style={{ background: "linear-gradient(135deg,#071F13 0%,#0E3320 40%,#1A5C38 100%)" }} className="px-5 py-4 flex items-center gap-4">
+                      <div style={{ background: "linear-gradient(135deg,#071527 0%,#0B1E36 40%,#132E52 100%)" }} className="px-5 py-4 flex items-center gap-4">
                         {/* Left logo */}
                         <div className="shrink-0 w-[90px] h-[90px] rounded-full bg-white flex items-center justify-center shadow-xl"
                           style={{ border: "2.5px solid #C59B3F", boxShadow: "0 0 0 4px #C59B3F30, 0 4px 16px #00000060" }}>
@@ -471,15 +471,15 @@ export default function StudentResultsPage() {
                         </div>
                         {/* Center text */}
                         <div className="flex-1 text-center">
-                          <div className="text-[#E4BF64] text-[13.5px] font-bold tracking-wide" style={{ fontFamily: "'Noto Sans Devanagari', sans-serif" }}>
+                          <div className="text-[#E4BF64] text-[18px] sm:text-[20px] font-extrabold tracking-wide leading-tight" style={{ fontFamily: "'Noto Sans Devanagari', sans-serif" }}>
                             भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद्
                           </div>
-                          <h1 className="text-white text-[15px] sm:text-[17px] font-extrabold tracking-widest uppercase leading-tight mt-0.5">
-                            Bhartiya Ayurveda Yoga Evam<br className="hidden sm:block" />Prakritik Chikitsa Parishad
+                          <h1 className="text-white/95 text-[12px] sm:text-[13px] font-bold tracking-[0.16em] uppercase leading-tight mt-1">
+                            Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad
                           </h1>
                           <div className="flex items-center justify-center gap-2 mt-1.5">
                             <div className="h-px flex-1 max-w-[80px]" style={{ background: "linear-gradient(90deg,transparent,#C59B3F)" }}></div>
-                            <span className="text-[#A8C5B0] text-[8.5px] font-medium tracking-wider whitespace-nowrap px-1">
+                            <span className="text-[#A2B7CF] text-[8.5px] font-medium tracking-wider whitespace-nowrap px-1">
                               Regd. Under Indian Trust Act 2013 &nbsp;✦&nbsp; ISO 9001:2015 Certified
                             </span>
                             <div className="h-px flex-1 max-w-[80px]" style={{ background: "linear-gradient(90deg,#C59B3F,transparent)" }}></div>
@@ -497,7 +497,7 @@ export default function StudentResultsPage() {
                         <div className="flex items-center justify-center gap-3">
                           <div className="h-px flex-1" style={{ background: "linear-gradient(90deg,transparent,#C59B3F)" }}></div>
                           <div>
-                            <div className="text-[#0E3320] font-extrabold text-[13px] tracking-[0.2em] uppercase">Statement of Marks &nbsp;/&nbsp; अंक तालिका</div>
+                            <div className="text-[#0B1E36] font-extrabold text-[13px] tracking-[0.2em] uppercase">Statement of Marks &nbsp;/&nbsp; अंक तालिका</div>
                             <div className="text-[#8C671D] text-[9.5px] font-semibold tracking-wider mt-0.5">{resultData.session}</div>
                           </div>
                           <div className="h-px flex-1" style={{ background: "linear-gradient(90deg,#C59B3F,transparent)" }}></div>
@@ -508,7 +508,7 @@ export default function StudentResultsPage() {
 
                         {/* ── 3. CANDIDATE DETAILS + PHOTO ── */}
                         <div className="overflow-hidden" style={{ border: "1px solid #C59B3F", borderRadius: 4 }}>
-                          <div style={{ background: "linear-gradient(90deg,#0E3320,#1A5C38)" }} className="px-4 py-1.5 flex items-center gap-2">
+                          <div style={{ background: "linear-gradient(90deg,#0B1E36,#132E52)" }} className="px-4 py-1.5 flex items-center gap-2">
                             <span style={{ width: 3, height: 14, background: "#C59B3F", borderRadius: 2, flexShrink: 0, display: "inline-block" }}></span>
                             <span className="text-[9.5px] font-extrabold text-white uppercase tracking-[0.15em]">Candidate &amp; Examination Particulars</span>
                           </div>
@@ -524,7 +524,7 @@ export default function StudentResultsPage() {
                                     <div key={label} className="flex items-center gap-2 px-4 py-[5px]" style={{ borderRight: row.indexOf(arguments) === 0 ? "1px dashed #E2D5C0" : undefined }}>
                                       <span style={{ color: "#64748b", fontSize: 9.5, fontWeight: 600, minWidth: 96, flexShrink: 0 }}>{label}</span>
                                       <span style={{ color: "#64748b", fontSize: 10 }}>:</span>
-                                      <span style={{ color: "#0E3320", fontSize: bold ? 11.5 : 10.5, fontWeight: 700, fontFamily: mono ? "monospace" : undefined, letterSpacing: mono ? "0.05em" : undefined }}>{val}</span>
+                                      <span style={{ color: "#0B1E36", fontSize: bold ? 11.5 : 10.5, fontWeight: 700, fontFamily: mono ? "monospace" : undefined, letterSpacing: mono ? "0.05em" : undefined }}>{val}</span>
                                     </div>
                                   ))}
                                 </div>
@@ -532,12 +532,12 @@ export default function StudentResultsPage() {
                               <div className="flex items-start gap-2 px-4 py-[5px]" style={{ borderBottom: "1px dashed #E2D5C0" }}>
                                 <span style={{ color: "#64748b", fontSize: 9.5, fontWeight: 600, minWidth: 96, flexShrink: 0, marginTop: 1 }}>Programme / Course</span>
                                 <span style={{ color: "#64748b", fontSize: 10, marginTop: 1 }}>:</span>
-                                <span style={{ color: "#0E3320", fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", lineHeight: 1.4 }}>{resultData.course}</span>
+                                <span style={{ color: "#0B1E36", fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", lineHeight: 1.4 }}>{resultData.course}</span>
                               </div>
                               <div className="flex items-start gap-2 px-4 py-[6px]">
                                 <span style={{ color: "#64748b", fontSize: 9.5, fontWeight: 600, minWidth: 96, flexShrink: 0, marginTop: 1 }}>Affiliated Institution</span>
                                 <span style={{ color: "#64748b", fontSize: 10, marginTop: 1 }}>:</span>
-                                <span style={{ color: "#0E3320", fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", lineHeight: 1.4 }}>
+                                <span style={{ color: "#0B1E36", fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", lineHeight: 1.4 }}>
                                   {resultData.institute}{resultData.city ? `, ${resultData.city}` : ""}
                                   {resultData.instituteCode ? <span style={{ color: "#8C671D", fontFamily: "monospace", fontWeight: 600, textTransform: "none", fontSize: 9, marginLeft: 4 }}>({resultData.instituteCode})</span> : ""}
                                 </span>
@@ -545,16 +545,16 @@ export default function StudentResultsPage() {
                             </div>
                             {/* Photo */}
                             <div className="shrink-0 w-[96px] flex flex-col items-center justify-center gap-1 p-2" style={{ borderLeft: "1px dashed #E2D5C0", background: "#FAFAF8" }}>
-                              <div style={{ border: "2px solid #0E3320", width: 78, height: 100, overflow: "hidden", background: "#F5F0E8", position: "relative", boxShadow: "2px 2px 6px #0003" }}>
+                              <div style={{ border: "2px solid #0B1E36", width: 78, height: 100, overflow: "hidden", background: "#F5F0E8", position: "relative", boxShadow: "2px 2px 6px #0003" }}>
                                 {resultData.photoUrl ? (
                                   <img src={resultData.photoUrl} alt={resultData.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }}
                                     onError={(e) => { e.target.style.display = "none"; e.target.parentNode.querySelector(".photo-placeholder").style.display = "flex"; }} />
                                 ) : null}
                                 <div className="photo-placeholder absolute inset-0 flex-col items-center justify-center gap-1" style={{ display: resultData.photoUrl ? "none" : "flex" }}>
-                                  <svg style={{ width: 24, height: 24, color: "#0E332040" }} fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                                  <svg style={{ width: 24, height: 24, color: "#0B1E3640" }} fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                                   </svg>
-                                  <span style={{ fontSize: 7, fontWeight: 700, color: "#0E332050", textAlign: "center", lineHeight: 1.3, textTransform: "uppercase" }}>Candidate<br />Photo</span>
+                                  <span style={{ fontSize: 7, fontWeight: 700, color: "#0B1E3650", textAlign: "center", lineHeight: 1.3, textTransform: "uppercase" }}>Candidate<br />Photo</span>
                                 </div>
                               </div>
                               <div style={{ fontSize: 7.5, color: "#94a3b8", textAlign: "center" }}>Passport Size</div>
@@ -564,14 +564,14 @@ export default function StudentResultsPage() {
 
                         {/* ── 4. MARKS TABLE ── */}
                         <div className="overflow-hidden" style={{ border: "1px solid #C59B3F", borderRadius: 4 }}>
-                          <div style={{ background: "linear-gradient(90deg,#0E3320,#1A5C38)" }} className="px-4 py-1.5 flex items-center gap-2">
+                          <div style={{ background: "linear-gradient(90deg,#0B1E36,#132E52)" }} className="px-4 py-1.5 flex items-center gap-2">
                             <span style={{ width: 3, height: 14, background: "#C59B3F", borderRadius: 2, flexShrink: 0, display: "inline-block" }}></span>
                             <span className="text-[9.5px] font-extrabold text-white uppercase tracking-[0.15em]">Subject-Wise Marks / विषयवार अंक</span>
                           </div>
                           <div className="overflow-x-auto">
                             <table className="w-full border-collapse text-left">
                               <thead>
-                                <tr style={{ background: "#163D27" }} className="text-white">
+                                <tr style={{ background: "#0E243F" }} className="text-white">
                                   <th className="py-2.5 px-2 text-center font-bold uppercase tracking-wide border-r border-white/10" style={{ width: "12%", fontSize: 11 }}>Code</th>
                                   <th className="py-2.5 px-3 font-bold uppercase tracking-wide border-r border-white/10" style={{ width: "30%", fontSize: 11 }}>Subject Name</th>
                                   <th className="py-2.5 px-2 text-center font-bold uppercase tracking-wide border-r border-white/10" style={{ width: "8%", fontSize: 10.5 }}>Max<br /><span style={{ fontWeight: 400, fontSize: 8.5, color: "rgba(255,255,255,0.6)", textTransform: "none" }}>Marks</span></th>
@@ -585,17 +585,17 @@ export default function StudentResultsPage() {
                               <tbody>
                                 {resultData.subjects.map((sub, idx) => (
                                   <tr key={idx} style={{ background: !sub.pass ? "#fff1f2" : idx % 2 === 0 ? "#ffffff" : "#F7F3ED", borderBottom: "1px solid #E8E0D4" }}>
-                                    <td className="py-2.5 px-2 text-center font-mono font-extrabold border-r border-slate-200" style={{ color: "#0E3320", fontSize: 11 }}>{sub.code}</td>
+                                    <td className="py-2.5 px-2 text-center font-mono font-extrabold border-r border-slate-200" style={{ color: "#0B1E36", fontSize: 11 }}>{sub.code}</td>
                                     <td className="py-2.5 px-3 border-r border-slate-200" style={{ fontWeight: 700, color: "#1e293b", fontSize: 12 }}>{sub.name}</td>
                                     <td className="py-2.5 px-2 text-center border-r border-slate-200" style={{ color: "#64748b", fontWeight: 600, fontSize: 11 }}>{sub.totalMax}</td>
                                     <td className="py-2.5 px-2 text-center font-mono border-r border-slate-200" style={{ fontWeight: 700, color: "#334155", fontSize: 11.5 }}>{sub.thObt ?? "—"}</td>
                                     <td className="py-2.5 px-2 text-center font-mono border-r border-slate-200" style={{ fontWeight: 700, color: "#334155", fontSize: 11.5 }}>{sub.prObt ?? "—"}</td>
                                     <td className="py-2.5 px-2 text-center font-mono border-r border-slate-200" style={{ fontWeight: 600, color: "#475569", fontSize: 11 }}>{sub.caObt ?? "—"}</td>
-                                    <td className={`py-2.5 px-2 text-center font-mono font-extrabold border-r border-slate-200 ${!sub.pass ? "text-red-600" : "text-[#0E3320]"}`} style={{ fontSize: 14 }}>{sub.totalObt}</td>
+                                    <td className={`py-2.5 px-2 text-center font-mono font-extrabold border-r border-slate-200 ${!sub.pass ? "text-red-600" : "text-[#0B1E36]"}`} style={{ fontSize: 14 }}>{sub.totalObt}</td>
                                     <td className={`py-2.5 px-2 text-center font-extrabold ${!sub.pass ? "text-red-600" : "text-emerald-700"}`} style={{ fontSize: 13 }}>{sub.grade || "—"}</td>
                                   </tr>
                                 ))}
-                                <tr style={{ background: "linear-gradient(90deg,#071F13,#0E3320)", borderTop: "2px solid #C59B3F" }}>
+                                <tr style={{ background: "linear-gradient(90deg,#061322,#0B1E36)", borderTop: "2px solid #C59B3F" }}>
                                   <td colSpan={2} className="py-2.5 px-3 text-right border-r border-white/15" style={{ fontSize: 9.5, fontWeight: 800, color: "#E4BF64", textTransform: "uppercase", letterSpacing: "0.08em" }}>
                                     Grand Total / कुल प्राप्तांक
                                   </td>
@@ -614,13 +614,13 @@ export default function StudentResultsPage() {
                           {/* Total */}
                           <div style={{ border: "1.5px solid #C59B3F", borderRadius: 6, background: "linear-gradient(135deg,#FAF8F5,#F0E9DC)", padding: "10px 8px", textAlign: "center" }}>
                             <div style={{ fontSize: 8, color: "#8C671D", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Total Marks</div>
-                            <div style={{ fontSize: 26, fontWeight: 900, color: "#0E3320", fontFamily: "monospace", lineHeight: 1 }}>{resultData.grandTotalObt}</div>
+                            <div style={{ fontSize: 26, fontWeight: 900, color: "#0B1E36", fontFamily: "monospace", lineHeight: 1 }}>{resultData.grandTotalObt}</div>
                             <div style={{ fontSize: 9, color: "#94a3b8", marginTop: 3 }}>out of {resultData.grandTotalMax}</div>
                           </div>
                           {/* Percentage */}
                           <div style={{ border: "1.5px solid #C59B3F", borderRadius: 6, background: "linear-gradient(135deg,#FAF8F5,#F0E9DC)", padding: "10px 8px", textAlign: "center" }}>
                             <div style={{ fontSize: 8, color: "#8C671D", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Percentage</div>
-                            <div style={{ fontSize: 26, fontWeight: 900, color: "#0E3320", fontFamily: "monospace", lineHeight: 1 }}>{resultData.percentage}%</div>
+                            <div style={{ fontSize: 26, fontWeight: 900, color: "#0B1E36", fontFamily: "monospace", lineHeight: 1 }}>{resultData.percentage}%</div>
                             <div style={{ fontSize: 9, color: "#8C671D", fontWeight: 700, marginTop: 3 }}>{resultData.division}</div>
                           </div>
                           {/* Result */}
@@ -643,19 +643,19 @@ export default function StudentResultsPage() {
 
                         {/* ── 6. GRADING SCALE ── */}
                         <div style={{ border: "1px solid #D4C5A9", borderRadius: 4, background: "#F7F2EA", padding: "7px 14px" }}>
-                          <span style={{ fontSize: 8.5, fontWeight: 800, color: "#0E3320", textTransform: "uppercase", letterSpacing: "0.12em", marginRight: 10 }}>Grading Scale:</span>
+                          <span style={{ fontSize: 8.5, fontWeight: 800, color: "#0B1E36", textTransform: "uppercase", letterSpacing: "0.12em", marginRight: 10 }}>Grading Scale:</span>
                           {[["A+", "90–100%"], ["A", "80–89%"], ["B+", "70–79%"], ["B", "60–69%"], ["C", "50–59%"], ["D", "40–49%"], ["F", "<40%"]].map(([g, r]) => (
                             <span key={g} style={{ marginRight: 10, fontSize: 10, color: "#475569" }}>
-                              <strong style={{ color: g === "F" ? "#dc2626" : g === "D" ? "#b45309" : "#0E3320", fontSize: 10.5 }}>{g}</strong> {r}
+                              <strong style={{ color: g === "F" ? "#dc2626" : g === "D" ? "#b45309" : "#0B1E36", fontSize: 10.5 }}>{g}</strong> {r}
                             </span>
                           ))}
-                          <span style={{ fontSize: 9, fontWeight: 700, color: "#0E3320", marginLeft: 6, paddingLeft: 10, borderLeft: "1px solid #C59B3F" }}>✦ Min. Pass: 40%</span>
+                          <span style={{ fontSize: 9, fontWeight: 700, color: "#0B1E36", marginLeft: 6, paddingLeft: 10, borderLeft: "1px solid #C59B3F" }}>✦ Min. Pass: 40%</span>
                         </div>
 
                         {/* ── 7. SIGNATURES + SEAL ── */}
                         <div style={{ border: "1px solid #C59B3F", borderRadius: 4, overflow: "hidden" }}>
                           {/* Top label bar */}
-                          <div style={{ background: "linear-gradient(90deg,#0E3320,#1A5C38)", padding: "5px 14px", display: "flex", alignItems: "center", gap: 8 }}>
+                          <div style={{ background: "linear-gradient(90deg,#0B1E36,#132E52)", padding: "5px 14px", display: "flex", alignItems: "center", gap: 8 }}>
                             <span style={{ width: 3, height: 12, background: "#C59B3F", borderRadius: 2, flexShrink: 0, display: "inline-block" }}></span>
                             <span style={{ fontSize: 9.5, fontWeight: 800, color: "white", textTransform: "uppercase", letterSpacing: "0.15em" }}>Authorisation &amp; Verification</span>
                           </div>
@@ -667,7 +667,7 @@ export default function StudentResultsPage() {
                               <div style={{ height: 44, borderBottom: "1.5px solid #94a3b8", marginBottom: 8, marginLeft: 8, marginRight: 8, position: "relative" }}>
                                 <div style={{ position: "absolute", bottom: -1, left: "50%", transform: "translateX(-50%)", width: 6, height: 6, borderRadius: "50%", background: "#C59B3F", marginBottom: -3 }}></div>
                               </div>
-                              <div style={{ fontSize: 10, fontWeight: 800, color: "#0E3320", letterSpacing: "0.03em" }}>Controller of Examinations</div>
+                              <div style={{ fontSize: 10, fontWeight: 800, color: "#0B1E36", letterSpacing: "0.03em" }}>Controller of Examinations</div>
                               <div style={{ fontSize: 8.5, color: "#8C671D", fontWeight: 600, marginTop: 2 }}>B.A.Y.E.P.C.P.</div>
                             </div>
 
@@ -675,18 +675,18 @@ export default function StudentResultsPage() {
                             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0, gap: 8 }}>
                               <div style={{
                                 width: 100, height: 100, borderRadius: "50%",
-                                border: "3px solid #0E3320",
+                                border: "3px solid #0B1E36",
                                 background: "radial-gradient(circle at 40% 35%,#fff 60%,#F5F0E8)",
-                                boxShadow: "0 0 0 2px #C59B3F, 0 0 0 5px #C59B3F25, 0 4px 16px #0E332025",
+                                boxShadow: "0 0 0 2px #C59B3F, 0 0 0 5px #C59B3F25, 0 4px 16px #0B1E3625",
                                 display: "flex", alignItems: "center", justifyContent: "center",
                                 position: "relative"
                               }}>
-                                <div style={{ position: "absolute", inset: 7, borderRadius: "50%", border: "1.5px dashed #0E332050" }}></div>
+                                <div style={{ position: "absolute", inset: 7, borderRadius: "50%", border: "1.5px dashed #0B1E3650" }}></div>
                                 <div style={{ position: "absolute", inset: 14, borderRadius: "50%", border: "0.5px dotted #C59B3F70" }}></div>
                                 <img src="/logo.png" alt="" style={{ width: 50, height: 50, objectFit: "contain", position: "relative", zIndex: 1 }} />
                               </div>
                               <div style={{ textAlign: "center" }}>
-                                <div style={{ fontSize: 9, fontWeight: 800, color: "#0E3320", textTransform: "uppercase", letterSpacing: "0.1em" }}>Digitally Verified</div>
+                                <div style={{ fontSize: 9, fontWeight: 800, color: "#0B1E36", textTransform: "uppercase", letterSpacing: "0.1em" }}>Digitally Verified</div>
                                 <div style={{ fontSize: 7.5, color: "#94a3b8", marginTop: 1 }}>System Generated · Valid for Official Use</div>
                               </div>
                             </div>
@@ -696,7 +696,7 @@ export default function StudentResultsPage() {
                               <div style={{ height: 44, borderBottom: "1.5px solid #94a3b8", marginBottom: 8, marginLeft: 8, marginRight: 8, position: "relative" }}>
                                 <div style={{ position: "absolute", bottom: -1, left: "50%", transform: "translateX(-50%)", width: 6, height: 6, borderRadius: "50%", background: "#C59B3F", marginBottom: -3 }}></div>
                               </div>
-                              <div style={{ fontSize: 10, fontWeight: 800, color: "#0E3320", letterSpacing: "0.03em" }}>Secretary / सचिव</div>
+                              <div style={{ fontSize: 10, fontWeight: 800, color: "#0B1E36", letterSpacing: "0.03em" }}>Secretary / सचिव</div>
                               <div style={{ fontSize: 8.5, color: "#8C671D", fontWeight: 600, marginTop: 2 }}>B.A.Y.E.P.C.P.</div>
                             </div>
 
