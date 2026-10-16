@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
   RefreshCw, Save, CheckCircle2, AlertTriangle,
   XCircle, Award, BookOpen,
@@ -12,6 +12,8 @@ const RESULT_COLORS = { PASS: "bg-emerald-100 text-emerald-700", FAIL: "bg-red-1
 export default function ResultEntryPage() {
   const { id } = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const yearParam = searchParams.get("year");
 
   const [result, setResult]   = useState(null);
   const [loading, setLoading] = useState(true);
@@ -26,7 +28,8 @@ export default function ResultEntryPage() {
   const load = async () => {
     setLoading(true); setError("");
     try {
-      const res = await fetch(`/api/admin/results/${id}`);
+      const q = yearParam ? `?year=${yearParam}` : "";
+      const res = await fetch(`/api/admin/results/${id}${q}`);
       const json = await res.json();
       if (!res.ok) { setError(json.error || "Not found"); }
       else {
@@ -34,7 +37,11 @@ export default function ResultEntryPage() {
         // Init marks from existing data
         const m = {};
         (json.data.subjects || []).forEach(s => {
-          m[s.subject_id] = { theory_marks: s.theory_marks ?? "", practical_marks: s.practical_marks ?? "", ca_marks: s.ca_marks ?? "" };
+          m[s.subject_id] = {
+            theory_marks: s.theory_marks ?? "",
+            practical_marks: s.practical_max > 0 ? (s.practical_marks ?? "") : (s.practical_marks ?? 0),
+            ca_marks: s.ca_max > 0 ? (s.ca_marks ?? "") : (s.ca_marks ?? 0),
+          };
         });
         setMarks(m);
       }
@@ -50,22 +57,41 @@ export default function ResultEntryPage() {
 
   const handleSave = async () => {
     setSaving(true);
-    const marksArr = Object.entries(marks).map(([subject_id, m]) => ({
-      subject_id,
-      theory_marks: Number(m.theory_marks) || 0,
-      practical_marks: Number(m.practical_marks) || 0,
-      ca_marks: Number(m.ca_marks) || 0,
-    }));
-    const res = await fetch(`/api/admin/results/${id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ marks: marksArr }) });
+    const marksArr = (result?.subjects || []).map(s => {
+      const m = marks[s.subject_id] || {};
+      return {
+        subject_id: s.subject_id,
+        theory_marks: m.theory_marks === "" || m.theory_marks === null || m.theory_marks === undefined ? 0 : Number(m.theory_marks),
+        practical_marks: m.practical_marks === "" || m.practical_marks === null || m.practical_marks === undefined ? 0 : Number(m.practical_marks),
+        ca_marks: m.ca_marks === "" || m.ca_marks === null || m.ca_marks === undefined ? 0 : Number(m.ca_marks),
+      };
+    });
+    const q = yearParam ? `?year=${yearParam}` : "";
+    const res = await fetch(`/api/admin/results/${id}${q}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ marks: marksArr, year: yearParam }) });
     const json = await res.json();
     if (!res.ok) showMsg(json.error || "Failed to save", "error");
-    else { showMsg("Marks saved!"); if (json.data) setResult(json.data); }
+    else {
+      showMsg("Marks saved successfully!");
+      if (json.data) {
+        setResult(json.data);
+        const m = {};
+        (json.data.subjects || []).forEach(s => {
+          m[s.subject_id] = {
+            theory_marks: s.theory_marks ?? "",
+            practical_marks: s.practical_max > 0 ? (s.practical_marks ?? "") : (s.practical_marks ?? 0),
+            ca_marks: s.ca_max > 0 ? (s.ca_marks ?? "") : (s.ca_marks ?? 0),
+          };
+        });
+        setMarks(m);
+      }
+    }
     setSaving(false);
   };
 
   const handlePublish = async (publish) => {
     setPublishing(true);
-    const res = await fetch(`/api/admin/results/${id}/publish`, { method: publish ? "POST" : "DELETE" });
+    const q = yearParam ? `?year=${yearParam}` : "";
+    const res = await fetch(`/api/admin/results/${id}/publish${q}`, { method: publish ? "POST" : "DELETE" });
     const json = await res.json();
     if (!res.ok) showMsg(json.error || "Failed", "error");
     else { showMsg(publish ? "Result published!" : "Result unpublished"); load(); }
@@ -80,7 +106,53 @@ export default function ResultEntryPage() {
     </div>
   );
 
-  const finalColor = RESULT_COLORS[result.final_result] || "bg-gray-100 text-gray-600";
+  // Live marks check and live summary calculation
+  const allSubjectsFilled = (result?.subjects || []).length > 0 && (result?.subjects || []).every(s => {
+    const m = marks[s.subject_id];
+    if (!m) return false;
+    const thFilled = s.theory_max === 0 || (m.theory_marks !== "" && m.theory_marks !== null && m.theory_marks !== undefined);
+    const prFilled = s.practical_max === 0 || (m.practical_marks !== "" && m.practical_marks !== null && m.practical_marks !== undefined);
+    const caFilled = s.ca_max === 0 || (m.ca_marks !== "" && m.ca_marks !== null && m.ca_marks !== undefined);
+    return thFilled && prFilled && caFilled;
+  });
+
+  let liveGrandObtained = 0;
+  let liveGrandMax = 0;
+  let liveAnyFail = false;
+
+  (result?.subjects || []).forEach(s => {
+    const m = marks[s.subject_id] || {};
+    const th = Number(m.theory_marks) || 0;
+    const pr = Number(m.practical_marks) || 0;
+    const ca = Number(m.ca_marks) || 0;
+    const total = th + pr + ca;
+    const totalMax = (s.theory_max ?? 0) + (s.practical_max ?? 0) + (s.ca_max ?? 0);
+    liveGrandMax += totalMax;
+    liveGrandObtained += total;
+    const pct = totalMax > 0 ? (total / totalMax) * 100 : 0;
+    if (pct < 40) liveAnyFail = true;
+  });
+
+  const isDirty = (result?.subjects || []).some(s => {
+    const m = marks[s.subject_id] || {};
+    const savedTh = s.theory_marks ?? "";
+    const currentTh = m.theory_marks ?? "";
+    const savedPr = s.practical_max > 0 ? (s.practical_marks ?? "") : (s.practical_marks ?? 0);
+    const currentPr = m.practical_marks ?? (s.practical_max > 0 ? "" : 0);
+    const savedCa = s.ca_max > 0 ? (s.ca_marks ?? "") : (s.ca_marks ?? 0);
+    const currentCa = m.ca_marks ?? (s.ca_max > 0 ? "" : 0);
+    return String(currentTh) !== String(savedTh) || String(currentPr) !== String(savedPr) || String(currentCa) !== String(savedCa);
+  });
+
+  const currentResult = allSubjectsFilled
+    ? (liveAnyFail ? "FAIL" : "PASS")
+    : (result?.final_result || "INCOMPLETE");
+
+  const displayTotal = allSubjectsFilled
+    ? `${liveGrandObtained}/${liveGrandMax || result?.grand_total_max}`
+    : (result?.final_result !== "INCOMPLETE" ? `${result?.grand_total_obtained}/${result?.grand_total_max}` : `—/${liveGrandMax || result?.grand_total_max}`);
+
+  const finalColor = RESULT_COLORS[currentResult] || "bg-gray-100 text-gray-600";
 
   return (
     <div className="space-y-5 max-w-3xl">
@@ -92,7 +164,7 @@ export default function ResultEntryPage() {
         </button>
         <div className="flex-1" />
         <span className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide ${finalColor}`}>
-          {result.final_result}
+          {currentResult}
         </span>
         {result.result_published_at && (
           <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-700"><CheckCircle2 className="w-3.5 h-3.5" />Published</span>
@@ -124,8 +196,8 @@ export default function ResultEntryPage() {
         <div className="bg-[#F2EDE4] px-5 py-3 border-b border-[#DDD1BE] flex items-center justify-between">
           <p className="text-xs font-bold text-[#0E3320] uppercase flex items-center gap-1.5"><BookOpen className="w-3.5 h-3.5" />Subject-wise Marks</p>
           <button onClick={handleSave} disabled={saving}
-            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#0E3320] text-white text-xs font-bold hover:bg-[#15482D] disabled:opacity-60">
-            <Save className="w-3.5 h-3.5" />{saving ? "Saving..." : "Save Marks"}
+            className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-white text-xs font-bold disabled:opacity-60 transition-all ${isDirty ? "bg-[#C59B3F] hover:bg-[#a37f2e] ring-2 ring-[#C59B3F]/40 shadow-sm" : "bg-[#0E3320] hover:bg-[#15482D]"}`}>
+            <Save className="w-3.5 h-3.5" />{saving ? "Saving..." : isDirty ? "Save Marks *" : "Save Marks"}
           </button>
         </div>
 
@@ -188,15 +260,23 @@ export default function ResultEntryPage() {
               <tr>
                 <td colSpan={4} className="px-4 py-2.5 font-bold text-[#0E3320] text-xs uppercase">Grand Total</td>
                 <td className="px-4 py-2.5 text-center font-bold text-[#0E3320]">
-                  {result.final_result !== "INCOMPLETE" ? `${result.grand_total_obtained}/${result.grand_total_max}` : `—/${result.grand_total_max}`}
+                  {displayTotal}
                 </td>
                 <td className="px-4 py-2.5 text-center">
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${finalColor}`}>{result.final_result}</span>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${finalColor}`}>{currentResult}</span>
                 </td>
               </tr>
             </tfoot>
           </table>
         </div>
+        {isDirty && (
+          <div className="px-5 py-2.5 bg-amber-50 border-t border-amber-200 text-amber-800 text-[11px] font-semibold flex items-center justify-between">
+            <span>Marks change hue hain. Database me save karne ke liye <strong>&quot;Save Marks&quot;</strong> button click karein.</span>
+            <button onClick={handleSave} disabled={saving} className="px-3 py-1 rounded-md bg-[#C59B3F] text-white text-[11px] font-bold hover:bg-[#a37f2e]">
+              Save Now
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Publish / Unpublish */}
@@ -206,6 +286,8 @@ export default function ResultEntryPage() {
           <p className="text-xs text-[#5C8261] mt-0.5">
             {result.result_published_at
               ? `Published on ${new Date(result.result_published_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}`
+              : isDirty
+              ? "Save marks before publishing"
               : result.final_result === "INCOMPLETE" ? "Save all marks before publishing" : "Ready to publish"}
           </p>
         </div>
@@ -215,7 +297,7 @@ export default function ResultEntryPage() {
             <XCircle className="w-4 h-4" />{publishing ? "..." : "Unpublish"}
           </button>
         ) : (
-          <button onClick={() => handlePublish(true)} disabled={publishing || result.final_result === "INCOMPLETE"}
+          <button onClick={() => handlePublish(true)} disabled={publishing || isDirty || result.final_result === "INCOMPLETE"}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0E3320] hover:bg-[#15482D] text-white text-sm font-bold disabled:opacity-60">
             <Award className="w-4 h-4" />{publishing ? "Publishing..." : "Publish Result"}
           </button>

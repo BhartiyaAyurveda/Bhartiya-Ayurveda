@@ -27,12 +27,18 @@ export default function AdminAdmitCardPage() {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 print:space-y-0">
       <style>{`
         @media print {
-          @page { size: A4 portrait; margin: 6mm 8mm; }
-          html,body { background:#fff!important; -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; }
-          .no-print { display:none!important; }
+          @page { size: A4 portrait; margin: 0; }
+          html, body {
+            background: #fff !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          .no-print { display: none !important; }
         }
       `}</style>
 
@@ -56,7 +62,7 @@ export default function AdminAdmitCardPage() {
           <AlertTriangle className="w-4 h-4 shrink-0" />{error}
         </div>
       ) : (
-        <div className="max-w-[860px] mx-auto">
+        <div className="max-w-[860px] mx-auto print:max-w-none print:w-full print:m-0 print:p-0">
           <AdmitCardTemplate data={data} />
         </div>
       )}

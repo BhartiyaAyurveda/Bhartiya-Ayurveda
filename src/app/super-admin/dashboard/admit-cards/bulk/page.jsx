@@ -49,9 +49,15 @@ function BulkAdmitCardContent() {
     <>
       <style>{`
         @media print {
-          @page { size: A4 portrait; margin: 6mm 8mm; }
-          html,body { background:#fff!important; -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; }
-          .no-print { display:none!important; }
+          @page { size: A4 portrait; margin: 0; }
+          html, body {
+            background: #fff !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          .no-print { display: none !important; }
         }
       `}</style>
       <div className="no-print flex items-center gap-3 mb-4 p-4">
@@ -65,7 +71,7 @@ function BulkAdmitCardContent() {
           <Printer className="w-4 h-4" /> Print All ({admitCards.length})
         </button>
       </div>
-      <div className="space-y-6 max-w-[900px] mx-auto px-4">
+      <div className="space-y-6 print:space-y-0 max-w-[900px] mx-auto px-4 print:max-w-none print:w-full print:p-0 print:m-0">
         {admitCards.map((card, i) => (
           <AdmitCardTemplate key={card.id || i} data={card} showPageBreak={i < admitCards.length - 1} />
         ))}

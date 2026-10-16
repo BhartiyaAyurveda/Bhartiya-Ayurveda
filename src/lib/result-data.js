@@ -1,4 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabase";
+import { getStudentYearMeta, isYearResultPublished } from "@/lib/student-year-utils";
+import { get6DigitSession } from "@/lib/enrollment-roll-utils";
 
 function computeGrade(pct) {
   if (pct >= 90) return "A+";
@@ -10,37 +12,79 @@ function computeGrade(pct) {
   return "F";
 }
 
-export async function getResultData(registrationId) {
+export async function getResultData(registrationId, targetYear = null, targetSessionId = null) {
   const { data: reg, error: regError } = await supabaseAdmin
     .from("student_registrations")
-    .select("enrollment_no, roll_no, candidate_name, father_name, mother_name, dob, course, photo_url, status, admit_card_generated_at, exam_session_id, college_id, colleges(college_name, username), result_published_at")
+    .select("id, enrollment_no, roll_no, roll_no_2nd_year, roll_no_3rd_year, candidate_name, father_name, mother_name, dob, course_id, photo_url, status, admit_card_generated_at, exam_session_id, college_id, session_label, academic_session, colleges(college_name, username), courses(course_name), result_published_at")
     .eq("id", registrationId)
     .single();
 
   if (regError || !reg) return { data: null, error: "Registration not found" };
   if (reg.status !== "approved") return { data: null, error: "Registration is not approved yet" };
-  if (!reg.exam_session_id) return { data: null, error: "Student has not been assigned to an exam session yet" };
 
-  const { data: session, error: sessionError } = await supabaseAdmin
-    .from("exam_sessions")
-    .select("session_label, exam_year_label")
-    .eq("id", reg.exam_session_id)
-    .single();
+  // 1. Determine student year (explicit targetYear or active latest year)
+  const studentYear = targetYear ? Number(targetYear) : (reg.roll_no_3rd_year ? 3 : reg.roll_no_2nd_year ? 2 : 1);
+  const activeRollNo =
+    studentYear === 3 ? (reg.roll_no_3rd_year || reg.roll_no) :
+    studentYear === 2 ? (reg.roll_no_2nd_year || reg.roll_no) :
+    reg.roll_no;
 
-  if (sessionError || !session) return { data: null, error: "Exam session details are missing" };
+  // 2. Resolve exam session for this specific year
+  const meta = getStudentYearMeta(reg);
+  let resolvedSessionId = targetSessionId || meta.sessions[studentYear];
+
+  if (!resolvedSessionId && studentYear === 1 && reg.exam_session_id) {
+    resolvedSessionId = reg.exam_session_id;
+  }
+
+  if (!resolvedSessionId && activeRollNo) {
+    const rollDigits = get6DigitSession(activeRollNo);
+    const { data: allSessions } = await supabaseAdmin
+      .from("exam_sessions")
+      .select("id, session_name, academic_session, session_label");
+
+    const matchedSess = (allSessions || []).find((s) => {
+      const sName = s.session_name || s.academic_session || s.session_label || "";
+      return get6DigitSession(sName) === rollDigits;
+    });
+    if (matchedSess) resolvedSessionId = matchedSess.id;
+  }
+
+  if (!resolvedSessionId) {
+    resolvedSessionId = reg.exam_session_id;
+  }
+
+  let session = null;
+  if (resolvedSessionId) {
+    const { data: s } = await supabaseAdmin
+      .from("exam_sessions")
+      .select("id, session_name, session_label, exam_year_label, academic_session")
+      .eq("id", resolvedSessionId)
+      .maybeSingle();
+    session = s;
+  }
 
   const college = reg.colleges;
   const centerName = college?.college_name || "Examination Center";
   const centerCode = college?.username?.toUpperCase() || "BA";
+  const courseName = reg.courses?.course_name || reg.course || "";
 
-  const { data: subjectRows, error: subjectError } = await supabaseAdmin
+  let subjectQuery = supabaseAdmin
     .from("course_subjects")
-    .select("id, subject_name, subject_code, theory_max, practical_max, ca_max")
-    .eq("course_name", reg.course)
+    .select("id, subject_name, subject_code, theory_max, practical_max, ca_max, year_number")
+    .eq("course_name", courseName)
     .order("created_at", { ascending: true });
 
+  if (studentYear === 1) {
+    subjectQuery = subjectQuery.or("year_number.eq.1,year_number.is.null");
+  } else {
+    subjectQuery = subjectQuery.eq("year_number", studentYear);
+  }
+
+  const { data: subjectRows, error: subjectError } = await subjectQuery;
+
   if (subjectError) return { data: null, error: subjectError.message };
-  if (!subjectRows || subjectRows.length === 0) return { data: null, error: "No subjects defined for this course" };
+  if (!subjectRows || subjectRows.length === 0) return { data: null, error: `No subjects defined for Year ${studentYear}` };
 
   const missingMax = subjectRows.some(s => s.theory_max === null || s.practical_max === null || s.ca_max === null);
   if (missingMax) return { data: null, error: "Max marks not set for all subjects in this course" };
@@ -61,12 +105,22 @@ export async function getResultData(registrationId) {
   let anyMissing = false;
   let anyFail = false;
 
+  const rawSession =
+    session?.session_label ||
+    session?.session_name ||
+    session?.academic_session ||
+    reg.academic_session ||
+    "";
+  const sessionLabel = rawSession || "—";
+
+  const examYearLabel = `${studentYear === 1 ? "1st" : studentYear === 2 ? "2nd" : "3rd"} Year`;
+
   const subjects = subjectRows.map(s => {
     const totalMax = (s.theory_max ?? 0) + (s.practical_max ?? 0) + (s.ca_max ?? 0);
     const m = markMap.get(s.id);
     grandTotalMax += totalMax;
 
-    if (!m) {
+    if (!m || (m.theory_marks === null && m.practical_marks === null && m.ca_marks === null)) {
       anyMissing = true;
       return { subject_id: s.id, subject_name: s.subject_name, subject_code: s.subject_code, theory_max: s.theory_max, practical_max: s.practical_max, ca_max: s.ca_max, theory_marks: null, practical_marks: null, ca_marks: null, total_marks: null, total_max: totalMax, percentage: null, grade: null, subject_result: null };
     }
@@ -83,25 +137,30 @@ export async function getResultData(registrationId) {
 
   const finalResult = anyMissing ? "INCOMPLETE" : anyFail ? "FAIL" : "PASS";
 
+  const isPublished = isYearResultPublished(reg, studentYear);
+  const yearPublishedAt = meta.published[studentYear] || (isPublished ? reg.result_published_at : null);
+
   return {
     data: {
       enrollment_no: reg.enrollment_no,
-      roll_no: reg.roll_no,
+      roll_no: activeRollNo,
       candidate_name: reg.candidate_name,
       father_name: reg.father_name,
       mother_name: reg.mother_name,
       dob: reg.dob,
-      course: reg.course,
+      course: courseName || "—",
       photo_url: reg.photo_url,
-      session_label: session.session_label,
-      exam_year_label: session.exam_year_label,
+      session_label: sessionLabel,
+      exam_year_label: examYearLabel,
+      student_year: studentYear,
       center_name: centerName,
       center_code: centerCode,
       subjects,
       grand_total_obtained: grandTotalObtained,
       grand_total_max: grandTotalMax,
       final_result: finalResult,
-      result_published_at: reg.result_published_at || null,
+      is_published: !!isPublished,
+      result_published_at: yearPublishedAt,
     },
     error: null,
   };

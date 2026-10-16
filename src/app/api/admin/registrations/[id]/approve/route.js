@@ -6,9 +6,36 @@ export async function POST(request, { params }) {
   const session = await requireAdmin(request);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  // Check student registration to find session and link exam_session_id if available
+  const { data: currentReg } = await supabaseAdmin
+    .from("student_registrations")
+    .select("academic_session, session_label, exam_session_id")
+    .eq("id", params.id)
+    .single();
+
+  const updateFields = { status: "approved" };
+
+  if (currentReg && !currentReg.exam_session_id) {
+    const rawDigits = (currentReg.academic_session || currentReg.session_label || "").replace(/\D/g, "");
+    if (rawDigits) {
+      const { data: allSessions } = await supabaseAdmin
+        .from("exam_sessions")
+        .select("id, session_name");
+
+      const match = (allSessions || []).find((es) => {
+        const esDigits = (es.session_name || "").replace(/\D/g, "");
+        return esDigits && (esDigits.includes(rawDigits) || rawDigits.includes(esDigits));
+      });
+
+      if (match) {
+        updateFields.exam_session_id = match.id;
+      }
+    }
+  }
+
   const { data, error } = await supabaseAdmin
     .from("student_registrations")
-    .update({ status: "approved" })
+    .update(updateFields)
     .eq("id", params.id)
     .select()
     .single();

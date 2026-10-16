@@ -157,8 +157,15 @@ export default function SuperAdminDashboardPage() {
   }, [activeTab]);
 
   const handleLogout = async () => {
-    await fetch("/api/admin/logout", { method: "POST" });
-    router.push("/super-admin/login");
+    try {
+      await fetch("/api/admin/logout", { method: "POST" });
+    } catch (err) {
+      console.warn("Logout request error:", err);
+    } finally {
+      // Clear session cookie on client-side as fallback
+      document.cookie = "admin_session=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      window.location.href = "/super-admin/login";
+    }
   };
 
   const toggleMaintenance = async () => {
@@ -290,13 +297,13 @@ export default function SuperAdminDashboardPage() {
   const [newCourseName, setNewCourseName] = useState("");
   const [newCourseHindi, setNewCourseHindi] = useState("");
   const [newCourseDuration, setNewCourseDuration] = useState("");
-  const [newCourseCategory, setNewCourseCategory] = useState("ayurveda");
+  const [newCourseCategory, setNewCourseCategory] = useState("");
   const [courseSubmitting, setCourseSubmitting] = useState(false);
   const [editCourse, setEditCourse] = useState(null);
   const [editCourseName, setEditCourseName] = useState("");
   const [editCourseHindi, setEditCourseHindi] = useState("");
   const [editCourseDuration, setEditCourseDuration] = useState("");
-  const [editCourseCategory, setEditCourseCategory] = useState("ayurveda");
+  const [editCourseCategory, setEditCourseCategory] = useState("");
   const [courseEditSaving, setCourseEditSaving] = useState(false);
 
   // Exam Sessions & Centers state
@@ -582,7 +589,7 @@ export default function SuperAdminDashboardPage() {
         body: JSON.stringify({ course_name: newCourseName, course_name_hindi: newCourseHindi, duration_label: newCourseDuration, category: newCourseCategory }),
       });
       const data = await res.json();
-      if (data.ok) { setNewCourseName(""); setNewCourseHindi(""); setNewCourseDuration(""); setNewCourseCategory("ayurveda"); loadCourses(); showToast("Course added!", "success"); }
+      if (data.ok) { setNewCourseName(""); setNewCourseHindi(""); setNewCourseDuration(""); setNewCourseCategory(""); loadCourses(); showToast("Course added!", "success"); }
       else showToast(data.error || "Failed", "error");
     } catch {}
     setCourseSubmitting(false);
@@ -895,7 +902,10 @@ export default function SuperAdminDashboardPage() {
                 <p className="text-[10px] text-[#C59B3F]">Master Access</p>
               </div>
             </div>
-            <button onClick={handleLogout} title="Logout"
+            <button
+              type="button"
+              onClick={handleLogout}
+              title="Logout"
               className="p-1.5 rounded-lg text-white/40 hover:text-red-300 hover:bg-red-900/30 transition-all shrink-0"
             >
               <LogOut className="w-4 h-4" />
@@ -1741,14 +1751,13 @@ export default function SuperAdminDashboardPage() {
                     className="px-3 py-2.5 rounded-xl border border-[#DDD1BE] bg-[#FAF8F5] text-sm text-[#0E3320] focus:outline-none focus:ring-2 focus:ring-[#C59B3F]"
                   />
                   <div className="flex gap-3">
-                    <select value={newCourseCategory} onChange={(e) => setNewCourseCategory(e.target.value)}
-                      className="flex-1 px-3 py-2.5 rounded-xl border border-[#DDD1BE] bg-[#FAF8F5] text-sm text-[#0E3320] focus:outline-none focus:ring-2 focus:ring-[#C59B3F]">
-                      <option value="ayurveda">Ayurveda</option>
-                      <option value="yoga_naturopathy">Yoga & Naturopathy</option>
-                      <option value="unani">Unani</option>
-                      <option value="acupuncture">Acupuncture</option>
-                      <option value="allied_health">Allied Health</option>
-                    </select>
+                    <input
+                      type="text"
+                      value={newCourseCategory}
+                      onChange={(e) => setNewCourseCategory(e.target.value)}
+                      placeholder="Category (e.g. Ayurveda, Electro-Homeopathy)"
+                      className="flex-1 px-3 py-2.5 rounded-xl border border-[#DDD1BE] bg-[#FAF8F5] text-sm text-[#0E3320] focus:outline-none focus:ring-2 focus:ring-[#C59B3F]"
+                    />
                     <button type="submit" disabled={courseSubmitting || !newCourseName}
                       className="px-5 py-2.5 rounded-xl bg-[#0E3320] hover:bg-[#15482D] text-white text-sm font-bold transition-all disabled:opacity-60 whitespace-nowrap">
                       {courseSubmitting ? "Adding…" : "+ Add"}
@@ -1775,14 +1784,13 @@ export default function SuperAdminDashboardPage() {
                           <input value={editCourseDuration} onChange={(e) => setEditCourseDuration(e.target.value)} placeholder="Duration (e.g. 1 Year)"
                             className="px-3 py-2 rounded-xl border border-[#DDD1BE] text-sm text-[#0E3320] focus:outline-none focus:ring-2 focus:ring-[#C59B3F]"
                           />
-                          <select value={editCourseCategory} onChange={(e) => setEditCourseCategory(e.target.value)}
-                            className="px-3 py-2 rounded-xl border border-[#DDD1BE] text-sm text-[#0E3320] focus:outline-none focus:ring-2 focus:ring-[#C59B3F]">
-                            <option value="ayurveda">Ayurveda</option>
-                            <option value="yoga_naturopathy">Yoga & Naturopathy</option>
-                            <option value="unani">Unani</option>
-                            <option value="acupuncture">Acupuncture</option>
-                            <option value="allied_health">Allied Health</option>
-                          </select>
+                          <input
+                            type="text"
+                            value={editCourseCategory}
+                            onChange={(e) => setEditCourseCategory(e.target.value)}
+                            placeholder="Category (e.g. Ayurveda)"
+                            className="px-3 py-2 rounded-xl border border-[#DDD1BE] text-sm text-[#0E3320] focus:outline-none focus:ring-2 focus:ring-[#C59B3F]"
+                          />
                           <div className="flex gap-2">
                             <button onClick={() => setEditCourse(null)} className="px-3 py-2 rounded-xl border border-[#DDD1BE] text-xs font-bold text-[#5C8261] hover:bg-[#F2EDE4]">Cancel</button>
                             <button onClick={saveEditCourse} disabled={courseEditSaving} className="px-4 py-2 rounded-xl bg-[#0E3320] text-white text-xs font-bold disabled:opacity-60">
@@ -1797,12 +1805,12 @@ export default function SuperAdminDashboardPage() {
                             {course.course_name_hindi && <p className="text-xs text-[#7A583A] mt-0.5">{course.course_name_hindi}</p>}
                             <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                               {course.duration_label && <span className="text-xs text-[#5C8261]">⏱ {course.duration_label}</span>}
-                              {course.category && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#EDE7DE] text-[#5C4033] capitalize">{course.category.replace("_", " ")}</span>}
+                              {course.category && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#EDE7DE] text-[#5C4033] capitalize">{course.category.replace(/_/g, " ")}</span>}
                               {course.subjects?.length > 0 && <span className="text-xs text-[#8C671D]">{course.subjects.length} subject{course.subjects.length !== 1 ? "s" : ""}</span>}
                             </div>
                           </div>
                           <div className="flex items-center gap-1.5 shrink-0">
-                            <button onClick={() => { setEditCourse(course); setEditCourseName(course.course_name); setEditCourseHindi(course.course_name_hindi || ""); setEditCourseDuration(course.duration_label || ""); setEditCourseCategory(course.category || "ayurveda"); }}
+                            <button onClick={() => { setEditCourse(course); setEditCourseName(course.course_name); setEditCourseHindi(course.course_name_hindi || ""); setEditCourseDuration(course.duration_label || ""); setEditCourseCategory(course.category || ""); }}
                               className="p-2 rounded-xl hover:bg-[#F2EDE4] text-[#5C8261] hover:text-[#0E3320] transition-colors"
                             ><Pencil className="w-4 h-4" /></button>
                             <button onClick={() => deleteCourse(course.id)}
@@ -2354,7 +2362,7 @@ export default function SuperAdminDashboardPage() {
                           ["Email", selectedApp.email],
                           ["Course", selectedApp.courses?.course_name],
                           ["College", selectedApp.colleges?.college_name],
-                          ["Session", selectedApp.session_label],
+                          ["Session", selectedApp.session_label || selectedApp.academic_session],
                           ["State", selectedApp.state],
                           ["City", selectedApp.city],
                         ].map(([label, val]) => val ? (

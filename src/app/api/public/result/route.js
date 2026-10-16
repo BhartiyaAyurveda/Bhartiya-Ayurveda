@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { isEmailVerified } from "@/lib/otp";
+import { getResultData } from "@/lib/result-data";
+import { detectYearFromRollNo } from "@/lib/student-year-utils";
 
-const REG_SELECT = `id, roll_no, enrollment_no, candidate_name, father_name, mother_name, dob, gender, category, photo_url, session_label, status, courses(id, course_name, duration_label), colleges(college_name, city, state)`;
+const REG_SELECT = `id, roll_no, roll_no_2nd_year, roll_no_3rd_year, enrollment_no, candidate_name, father_name, mother_name, dob, gender, category, photo_url, session_label, status, result_published_at, courses(id, course_name, duration_label), colleges(college_name, city, state, username)`;
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -21,60 +23,79 @@ export async function GET(request) {
     if (!reg) return NextResponse.json({ error: "No result found for this email. Results are published after exams are evaluated." }, { status: 404 });
   } else {
     if (!roll_no || !dob) return NextResponse.json({ error: "roll_no and dob are required." }, { status: 400 });
-    ({ data: reg, error: err } = await supabaseAdmin.from("student_registrations").select(REG_SELECT).eq("roll_no", roll_no).eq("dob", dob).eq("status", "approved").maybeSingle());
+    ({ data: reg, error: err } = await supabaseAdmin
+      .from("student_registrations")
+      .select(REG_SELECT)
+      .or(`roll_no.eq.${roll_no},roll_no_2nd_year.eq.${roll_no},roll_no_3rd_year.eq.${roll_no}`)
+      .eq("dob", dob)
+      .eq("status", "approved")
+      .maybeSingle());
     if (err) return NextResponse.json({ error: err.message }, { status: 500 });
     if (!reg) return NextResponse.json({ error: "No result found for the given Roll Number and Date of Birth." }, { status: 404 });
   }
 
-  // Fetch subject-wise marks
-  const { data: marks } = await supabaseAdmin
-    .from("student_marks")
-    .select(`
-      theory_marks, practical_marks,
-      subjects(subject_code, subject_name, theory_max, theory_min, practical_max, practical_min, sort_order)
-    `)
-    .eq("registration_id", reg.id)
-    .order("subjects(sort_order)");
+  // Detect which year this search belongs to based on the searched roll number
+  const targetYear = detectYearFromRollNo(reg, roll_no);
 
-  const subjectResults = (marks || []).map((m) => {
-    const th = m.theory_marks ?? 0;
-    const pr = m.practical_marks ?? 0;
-    const total = th + pr;
-    const maxTotal = (m.subjects?.theory_max ?? 80) + (m.subjects?.practical_max ?? 20);
-    const passing = th >= (m.subjects?.theory_min ?? 32) && pr >= (m.subjects?.practical_min ?? 8);
+  // Fetch verified result data for that specific academic year
+  const { data: resultInfo, error: resultErr } = await getResultData(reg.id, targetYear);
+  if (resultErr) {
+    return NextResponse.json({ error: resultErr }, { status: 400 });
+  }
+
+  // Check if result is published for this specific year
+  if (!resultInfo.is_published) {
+    return NextResponse.json(
+      { error: `Result for ${resultInfo.exam_year_label} has not been declared or published yet. Please check back later.` },
+      { status: 404 }
+    );
+  }
+
+  const subjectResults = (resultInfo.subjects || []).map((s) => {
+    const th = s.theory_marks ?? 0;
+    const pr = s.practical_marks ?? 0;
+    const ca = s.ca_marks ?? 0;
+    const tot = s.total_marks ?? (th + pr + ca);
+    const maxTot = s.total_max ?? ((s.theory_max || 0) + (s.practical_max || 0) + (s.ca_max || 0));
     return {
-      subject_code: m.subjects?.subject_code,
-      subject_name: m.subjects?.subject_name,
-      theory_marks: th,
-      theory_max: m.subjects?.theory_max ?? 80,
-      practical_marks: pr,
-      practical_max: m.subjects?.practical_max ?? 20,
-      total,
-      max_total: maxTotal,
-      pass: passing,
+      subject_code: s.subject_code,
+      subject_name: s.subject_name,
+      theory_marks: s.theory_marks,
+      theory_max: s.theory_max,
+      practical_marks: s.practical_max > 0 ? s.practical_marks : null,
+      practical_max: s.practical_max,
+      ca_marks: s.ca_max > 0 ? s.ca_marks : null,
+      ca_max: s.ca_max,
+      total: tot,
+      total_marks: tot,
+      max_total: maxTot,
+      grade: s.grade,
+      pass: s.subject_result === "PASS",
     };
   });
 
-  const grandTotal = subjectResults.reduce((s, r) => s + r.total, 0);
-  const grandMax = subjectResults.reduce((s, r) => s + r.max_total, 0);
-  const overallPass = subjectResults.length > 0 && subjectResults.every((r) => r.pass);
+  const grandTotal = resultInfo.grand_total_obtained ?? 0;
+  const grandMax = resultInfo.grand_total_max ?? 0;
   const percentage = grandMax > 0 ? ((grandTotal / grandMax) * 100).toFixed(2) : "0.00";
+  const finalResult = resultInfo.final_result === "INCOMPLETE" ? "AWAITED" : resultInfo.final_result;
 
   return NextResponse.json({
     ok: true,
     student: {
-      roll_no: reg.roll_no,
-      enrollment_no: reg.enrollment_no,
-      candidate_name: reg.candidate_name,
-      father_name: reg.father_name,
-      mother_name: reg.mother_name,
-      dob: reg.dob,
+      roll_no: resultInfo.roll_no,
+      enrollment_no: resultInfo.enrollment_no || reg.enrollment_no,
+      candidate_name: resultInfo.candidate_name || reg.candidate_name,
+      father_name: resultInfo.father_name || reg.father_name,
+      mother_name: resultInfo.mother_name || reg.mother_name,
+      dob: resultInfo.dob || reg.dob,
       gender: reg.gender,
       category: reg.category,
-      photo_url: reg.photo_url,
-      session_label: reg.session_label,
-      course: reg.courses?.course_name,
-      college: reg.colleges?.college_name,
+      photo_url: resultInfo.photo_url || reg.photo_url,
+      session_label: resultInfo.session_label,
+      exam_year_label: resultInfo.exam_year_label,
+      course: resultInfo.course || reg.courses?.course_name,
+      college: resultInfo.center_name || reg.colleges?.college_name,
+      college_code: resultInfo.center_code || reg.colleges?.username?.toUpperCase(),
       college_city: reg.colleges?.city,
       college_state: reg.colleges?.state,
     },
@@ -83,7 +104,7 @@ export async function GET(request) {
       grand_total: grandTotal,
       grand_max: grandMax,
       percentage,
-      result: overallPass ? "PASS" : subjectResults.length === 0 ? "AWAITED" : "FAIL",
+      result: finalResult,
     },
   });
 }

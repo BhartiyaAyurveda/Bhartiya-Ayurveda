@@ -19,8 +19,8 @@ const QUERY_FIELD_OPTIONS = [
   { value: "photo_url", label: "Passport Photo / पासपोर्ट फोटो" },
   { value: "signature_url", label: "Signature / हस्ताक्षर" },
   { value: "aadhaar_url", label: "Aadhaar Card / आधार कार्ड" },
-  { value: "marksheet_10th_url", label: "10th Marksheet / 10वीं अंकतालिका" },
-  { value: "marksheet_12th_url", label: "12th Marksheet / 12वीं अंकतालिका" },
+  { value: "tenth_marksheet_url", label: "10th Marksheet / 10वीं अंकतालिका" },
+  { value: "twelfth_marksheet_url", label: "12th Marksheet / 12वीं अंकतालिका" },
 ];
 
 const STATUS_COLORS = {
@@ -125,7 +125,7 @@ export default function RegistrationDetailPage({ params }) {
       phone: reg.phone || "",
       email: reg.email || "",
       address: reg.address || "",
-      session_label: reg.session_label || "",
+      session_label: reg.session_label || reg.academic_session || "",
       enrollment_no: reg.enrollment_no || "",
       roll_no: reg.roll_no || "",
     });
@@ -141,7 +141,10 @@ export default function RegistrationDetailPage({ params }) {
       const res = await fetch(`/api/admin/registrations/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editForm),
+        body: JSON.stringify({
+          ...editForm,
+          academic_session: editForm.session_label,
+        }),
       });
       const data = await res.json();
       if (!res.ok || !data.ok) { setEditMsg({ type: "error", text: data.error || "Failed to save." }); return; }
@@ -250,7 +253,7 @@ export default function RegistrationDetailPage({ params }) {
             <div className="bg-white rounded-xl shadow-xs border border-[#E8DDD0] overflow-hidden">
               <div className="bg-[#0E3320] px-5 py-3 text-white border-b-2 border-[#C59B3F] flex items-center justify-between">
                 <h3 className="text-xs font-bold uppercase tracking-wider">1. Personal & Contact Information</h3>
-                <span className="text-[11px] font-mono text-[#C59B3F] font-bold">{reg.session_label || "—"}</span>
+                <span className="text-[11px] font-mono text-[#C59B3F] font-bold">{reg.session_label || reg.academic_session || "—"}</span>
               </div>
               <div className="p-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
                 {[
@@ -289,7 +292,7 @@ export default function RegistrationDetailPage({ params }) {
                 </div>
                 <div className="bg-[#F5F0E8] border border-[#E8DDD0] px-3 py-2 rounded-lg text-xs">
                   <span className="text-[#9CA3AF] block">Academic Session</span>
-                  <span className="font-bold text-[#C59B3F]">{reg.session_label || "—"}</span>
+                  <span className="font-bold text-[#C59B3F]">{reg.session_label || reg.academic_session || "—"}</span>
                 </div>
               </div>
             </div>
@@ -359,8 +362,8 @@ export default function RegistrationDetailPage({ params }) {
 
                 {[
                   { label: "Aadhaar Card", url: reg.aadhaar_url },
-                  { label: "10th Marksheet", url: reg.marksheet_10th_url },
-                  { label: "12th Marksheet", url: reg.marksheet_12th_url },
+                  { label: "10th Marksheet", url: reg.tenth_marksheet_url || reg.marksheet_10th_url },
+                  { label: "12th Marksheet", url: reg.twelfth_marksheet_url || reg.marksheet_12th_url },
                   { label: "Other Document", url: reg.affidavit_url || reg.other_doc_url },
                 ].map(({ label, url }) => (
                   <div key={label} className="p-3 bg-[#F5F0E8] border border-[#E8DDD0] rounded-lg text-center flex flex-col gap-2">

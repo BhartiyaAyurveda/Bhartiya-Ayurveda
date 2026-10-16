@@ -9,15 +9,17 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const exam_session_id = searchParams.get("exam_session_id");
   const course_name = searchParams.get("course_name");
+  const year_number = searchParams.get("year_number");
 
   if (!exam_session_id) return NextResponse.json({ error: "exam_session_id required" }, { status: 400 });
 
   // Get subjects for this course, joined with datesheet entries
   let subjectQuery = supabaseAdmin
     .from("course_subjects")
-    .select("id, subject_name, subject_code, theory_max, practical_max, ca_max")
+    .select("id, subject_name, subject_code, theory_max, practical_max, ca_max, year_number")
     .order("created_at", { ascending: true });
   if (course_name) subjectQuery = subjectQuery.eq("course_name", course_name);
+  if (year_number) subjectQuery = subjectQuery.eq("year_number", Number(year_number));
 
   const { data: subjects, error: subjErr } = await subjectQuery;
   if (subjErr) return NextResponse.json({ error: subjErr.message }, { status: 500 });

@@ -12,6 +12,7 @@ import TopBar from "@/components/layout/TopBar";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ConsultationModal from "@/components/ui/ConsultationModal";
+import AdmitCardTemplate from "@/components/admin/AdmitCardTemplate";
 
 function fmtDate(d) {
   if (!d) return "—";
@@ -113,7 +114,11 @@ export default function AdmitCardPage() {
       if (!res.ok) { setOtpError(json.error || "Incorrect OTP."); setOtpLoading(false); return; }
       // OTP verified — fetch admit card by email
       setError(""); setLoading(true); setCardData(null);
-      const cardRes = await fetch(`/api/public/admit-card?${new URLSearchParams({ email: otpEmail.trim() })}`);
+      const emailParams = { email: otpEmail.trim() };
+      if (examYear && examYear !== "Annual Examination") {
+        emailParams.year = examYear.includes("2") ? "2" : examYear.includes("3") ? "3" : "1";
+      }
+      const cardRes = await fetch(`/api/public/admit-card?${new URLSearchParams(emailParams)}`);
       const cardJson = await cardRes.json();
       if (!cardRes.ok) setError(cardJson.error || "No admit card found.");
       else setCardData(cardJson);
@@ -131,7 +136,11 @@ export default function AdmitCardPage() {
     const dob = `${dobYear}-${dobMonth}-${dobDay}`;
     setError(""); setLoading(true); setCardData(null);
     try {
-      const res  = await fetch(`/api/public/admit-card?${new URLSearchParams({ roll_no: rollNo.trim(), dob })}`);
+      const params = { roll_no: rollNo.trim(), dob };
+      if (examYear && examYear !== "Annual Examination") {
+        params.year = examYear.includes("2") ? "2" : examYear.includes("3") ? "3" : "1";
+      }
+      const res  = await fetch(`/api/public/admit-card?${new URLSearchParams(params)}`);
       const data = await res.json();
       if (!res.ok) setError(data.error || "No admit card found.");
       else         setCardData(data);
@@ -142,6 +151,7 @@ export default function AdmitCardPage() {
   const handleReset = () => {
     setCardData(null); setError(""); setRollNo("");
     setDobDay(""); setDobMonth(""); setDobYear(""); setIsDemo(false);
+    setExamYear("Annual Examination");
     setOtpStep("email"); setOtpCode(""); setOtpError("");
   };
 
@@ -176,246 +186,25 @@ export default function AdmitCardPage() {
         </button>
       </div>
 
-      {/* ══ ADMIT CARD PREMIUM TEMPLATE ══ */}
+      {/* ══ ADMIT CARD TEMPLATE (RESULT STYLE) ══ */}
       <div className="max-w-[860px] mx-auto px-4 pb-12 print:p-0 print:max-w-none">
-        <div id="admit-card" style={{ fontFamily:"sans-serif" }}>
-
-          <style>{`
-            @media print {
-              @page { size: A4 portrait; margin: 6mm 8mm; }
-              html,body { background:#fff!important; -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; margin:0!important; padding:0!important; }
-              .no-print,.print\\:hidden { display:none!important; }
-            }
-          `}</style>
-
-          {/* Outer premium frame */}
-          <div style={{ background:"linear-gradient(135deg,#0E3320,#1A5C38,#0E3320)", padding:"5px", borderRadius:2 }}>
-          <div style={{ border:"1.5px solid #C59B3F" }}>
-          <div style={{ background:"white", position:"relative", overflow:"hidden" }}>
-
-            {/* Corner ornaments */}
-            {[0,1,2,3].map(i => (
-              <div key={i} style={{ position:"absolute", zIndex:30, top: i<2?0:undefined, bottom: i>=2?0:undefined, left: i%2===0?0:undefined, right: i%2===1?0:undefined, width:32, height:32, pointerEvents:"none" }}>
-                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                  {i===0 && <><path d="M2 16 L2 2 L16 2" stroke="#C59B3F" strokeWidth="1.5" fill="none"/><circle cx="2" cy="2" r="2.5" fill="#C59B3F"/></>}
-                  {i===1 && <><path d="M16 2 L30 2 L30 16" stroke="#C59B3F" strokeWidth="1.5" fill="none"/><circle cx="30" cy="2" r="2.5" fill="#C59B3F"/></>}
-                  {i===2 && <><path d="M2 16 L2 30 L16 30" stroke="#C59B3F" strokeWidth="1.5" fill="none"/><circle cx="2" cy="30" r="2.5" fill="#C59B3F"/></>}
-                  {i===3 && <><path d="M16 30 L30 30 L30 16" stroke="#C59B3F" strokeWidth="1.5" fill="none"/><circle cx="30" cy="30" r="2.5" fill="#C59B3F"/></>}
-                </svg>
-              </div>
-            ))}
-
-            {/* Watermark */}
-            <div style={{ pointerEvents:"none", position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center", zIndex:20, overflow:"hidden" }} aria-hidden>
-              <img src="/logo.png" alt="" style={{ width:360, height:360, objectFit:"contain", opacity:0.1 }} />
-            </div>
-
-            <div style={{ position:"relative", zIndex:10 }}>
-
-              {/* ── HEADER ── */}
-              <div style={{ background:"linear-gradient(135deg,#071F13 0%,#0E3320 40%,#1A5C38 100%)", padding:"16px 20px", display:"flex", alignItems:"center", gap:16 }}>
-                <div style={{ flexShrink:0, width:86, height:86, borderRadius:"50%", background:"white", display:"flex", alignItems:"center", justifyContent:"center", border:"2.5px solid #C59B3F", boxShadow:"0 0 0 4px #C59B3F30, 0 4px 16px #00000060" }}>
-                  <img src="/logo.png" alt="Logo" style={{ width:72, height:72, objectFit:"contain" }} />
-                </div>
-                <div style={{ flex:1, textAlign:"center" }}>
-                  <div style={{ color:"#E4BF64", fontSize:13.5, fontWeight:700, fontFamily:"'Noto Sans Devanagari',sans-serif" }}>
-                    भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद्
-                  </div>
-                  <div style={{ color:"white", fontSize:16, fontWeight:900, textTransform:"uppercase", letterSpacing:"0.05em", marginTop:2 }}>
-                    Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad
-                  </div>
-                  <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, marginTop:6 }}>
-                    <div style={{ height:1, flex:1, maxWidth:80, background:"linear-gradient(90deg,transparent,#C59B3F)" }}></div>
-                    <span style={{ color:"#A8C5B0", fontSize:8.5, fontWeight:500, letterSpacing:"0.08em", whiteSpace:"nowrap" }}>Regd. Under Indian Trust Act 2013 ✦ ISO 9001:2015 Certified ✦ Examination Division</span>
-                    <div style={{ height:1, flex:1, maxWidth:80, background:"linear-gradient(90deg,#C59B3F,transparent)" }}></div>
-                  </div>
-                </div>
-                <div style={{ flexShrink:0, width:86, display:"none" }}></div>
-              </div>
-
-              {/* Gold stripe */}
-              <div style={{ height:4, background:"linear-gradient(90deg,#8C671D,#C59B3F,#E4BF64,#C59B3F,#8C671D)" }}></div>
-
-              {/* Hall ticket title */}
-              <div style={{ background:"linear-gradient(180deg,#F5F0E8,#EDE5D5)", padding:"8px 24px", textAlign:"center", borderBottom:"2px solid #D4C5A9" }}>
-                <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:12 }}>
-                  <div style={{ height:1, flex:1, background:"linear-gradient(90deg,transparent,#C59B3F)" }}></div>
-                  <div>
-                    <div style={{ fontSize:13, fontWeight:900, color:"#0E3320", textTransform:"uppercase", letterSpacing:"0.2em" }}>Examination Hall Ticket / प्रवेश पत्र</div>
-                    <div style={{ fontSize:10, fontWeight:700, color:"#8C671D", marginTop:2, letterSpacing:"0.05em" }}>{cardData.student.session_label || "Annual Examination 2025–26"}</div>
-                  </div>
-                  <div style={{ height:1, flex:1, background:"linear-gradient(90deg,#C59B3F,transparent)" }}></div>
-                </div>
-              </div>
-
-              {/* ── BODY ── */}
-              <div style={{ padding:"16px 20px", display:"flex", flexDirection:"column", gap:12 }}>
-
-                {/* Candidate Details */}
-                <div style={{ border:"1px solid #C59B3F", borderRadius:4, overflow:"hidden" }}>
-                  <div style={{ background:"linear-gradient(90deg,#0E3320,#1A5C38)", padding:"6px 14px", display:"flex", alignItems:"center", gap:8 }}>
-                    <span style={{ width:3, height:14, background:"#C59B3F", borderRadius:2, flexShrink:0, display:"inline-block" }}></span>
-                    <span style={{ fontSize:9.5, fontWeight:800, color:"white", textTransform:"uppercase", letterSpacing:"0.15em" }}>Candidate &amp; Examination Details / अभ्यर्थी विवरण</span>
-                  </div>
-                  <div style={{ display:"flex", alignItems:"stretch", background:"white" }}>
-                    <div style={{ flex:1, display:"grid", gridTemplateColumns:"1fr 1fr", borderRight:"1px dashed #E2D5C0" }}>
-                      {[
-                        ["Candidate Name", (cardData.student.candidate_name||"—").toUpperCase(), false],
-                        ["Roll Number",    cardData.student.roll_no||"—", true],
-                        ["Father's Name",  (cardData.student.father_name||"—").toUpperCase(), false],
-                        ["Date of Birth",  fmtDate(cardData.student.dob), false],
-                        ["Gender",         cardData.student.gender||"—", false],
-                        ["Enrollment No.", cardData.student.enrollment_no||"—", true],
-                      ].map(([lbl, val, mono]) => (
-                        <div key={lbl} style={{ display:"flex", alignItems:"center", gap:6, padding:"5px 14px", borderBottom:"1px dashed #E2D5C0" }}>
-                          <span style={{ color:"#64748b", fontSize:9.5, fontWeight:600, minWidth:96, flexShrink:0 }}>{lbl}</span>
-                          <span style={{ color:"#94a3b8", fontSize:10 }}>:</span>
-                          <span style={{ color:"#0E3320", fontSize:11, fontWeight:700, fontFamily:mono?"monospace":undefined, letterSpacing:mono?"0.05em":undefined }}>{val}</span>
-                        </div>
-                      ))}
-                      <div style={{ display:"flex", alignItems:"start", gap:6, padding:"5px 14px", gridColumn:"1 / -1", borderBottom:"1px dashed #E2D5C0" }}>
-                        <span style={{ color:"#64748b", fontSize:9.5, fontWeight:600, minWidth:96, flexShrink:0, marginTop:1 }}>Programme</span>
-                        <span style={{ color:"#94a3b8", fontSize:10, marginTop:1 }}>:</span>
-                        <span style={{ color:"#0E3320", fontSize:11, fontWeight:700, textTransform:"uppercase" }}>{cardData.student.course||"—"}</span>
-                      </div>
-                      <div style={{ display:"flex", alignItems:"start", gap:6, padding:"6px 14px", gridColumn:"1 / -1" }}>
-                        <span style={{ color:"#64748b", fontSize:9.5, fontWeight:600, minWidth:96, flexShrink:0, marginTop:1 }}>Exam Centre</span>
-                        <span style={{ color:"#94a3b8", fontSize:10, marginTop:1 }}>:</span>
-                        <span style={{ color:"#0E3320", fontSize:11, fontWeight:700, textTransform:"uppercase" }}>
-                          {cardData.student.college||"Central Examination Centre"}{cardData.student.college_city?`, ${cardData.student.college_city}`:""}
-                        </span>
-                      </div>
-                    </div>
-                    {/* Photo */}
-                    <div style={{ flexShrink:0, width:96, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:10, background:"#FAFAF8" }}>
-                      <div style={{ border:"2px solid #0E3320", width:78, height:100, overflow:"hidden", background:"#F5F0E8", position:"relative", boxShadow:"2px 2px 6px #0003" }}>
-                        {cardData.student.photo_url ? (
-                          <img src={cardData.student.photo_url} alt="Photo" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"top" }} />
-                        ) : (
-                          <div style={{ width:"100%", height:"100%", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:4 }}>
-                            <User style={{ width:24, height:24, color:"#0E332040" }} />
-                            <span style={{ fontSize:7, fontWeight:700, color:"#0E332050", textAlign:"center", textTransform:"uppercase", lineHeight:1.3 }}>Affix<br/>Photo</span>
-                          </div>
-                        )}
-                      </div>
-                      <div style={{ fontSize:7.5, color:"#94a3b8", marginTop:3 }}>Passport Size</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Exam Schedule */}
-                <div style={{ border:"1px solid #C59B3F", borderRadius:4, overflow:"hidden" }}>
-                  <div style={{ background:"linear-gradient(90deg,#0E3320,#1A5C38)", padding:"6px 14px", display:"flex", alignItems:"center", gap:8 }}>
-                    <span style={{ width:3, height:14, background:"#C59B3F", borderRadius:2, flexShrink:0, display:"inline-block" }}></span>
-                    <span style={{ fontSize:9.5, fontWeight:800, color:"white", textTransform:"uppercase", letterSpacing:"0.15em" }}>Examination Schedule / परीक्षा कार्यक्रम</span>
-                  </div>
-                  <table style={{ width:"100%", borderCollapse:"collapse" }}>
-                    <thead>
-                      <tr style={{ background:"#163D27", color:"white" }}>
-                        <th style={{ padding:"8px 10px", fontSize:10, fontWeight:700, textTransform:"uppercase", textAlign:"center", borderRight:"1px solid rgba(255,255,255,0.1)", width:"6%" }}>S.No.</th>
-                        <th style={{ padding:"8px 12px", fontSize:10, fontWeight:700, textTransform:"uppercase", textAlign:"left", borderRight:"1px solid rgba(255,255,255,0.1)", width:"44%" }}>Subject Name</th>
-                        <th style={{ padding:"8px 12px", fontSize:10, fontWeight:700, textTransform:"uppercase", textAlign:"center", borderRight:"1px solid rgba(255,255,255,0.1)", width:"25%" }}>Date of Exam</th>
-                        <th style={{ padding:"8px 12px", fontSize:10, fontWeight:700, textTransform:"uppercase", textAlign:"center", width:"25%" }}>Shift / Timing</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {cardData.subjects?.length > 0 ? cardData.subjects.map((sub, i) => (
-                        <tr key={sub.subject_code||i} style={{ background: i%2===0?"#ffffff":"#F7F3ED", borderBottom:"1px solid #E8E0D4" }}>
-                          <td style={{ padding:"7px 10px", textAlign:"center", fontWeight:700, color:"#8C671D", fontSize:11, borderRight:"1px solid #E8E0D4" }}>{i+1}</td>
-                          <td style={{ padding:"7px 12px", fontWeight:700, color:"#0E3320", textTransform:"uppercase", fontSize:11, borderRight:"1px solid #E8E0D4" }}>
-                            {sub.subject_name}
-                            {sub.subject_code && <span style={{ color:"#8C671D", fontFamily:"monospace", fontSize:9.5, fontWeight:600, marginLeft:6 }}>({sub.subject_code})</span>}
-                          </td>
-                          <td style={{ padding:"7px 12px", textAlign:"center", fontWeight:700, color:"#1e293b", fontSize:11, borderRight:"1px solid #E8E0D4", whiteSpace:"nowrap" }}>
-                            {sub.exam_date ? fmtDate(sub.exam_date) : <span style={{ color:"#C59B3F", fontWeight:800 }}>TBA</span>}
-                          </td>
-                          <td style={{ padding:"7px 12px", textAlign:"center", fontWeight:600, color:"#334155", fontSize:10.5 }}>{sub.exam_time||"—"}</td>
-                        </tr>
-                      )) : (
-                        <tr><td colSpan={4} style={{ padding:"16px", textAlign:"center", color:"#94a3b8", fontStyle:"italic", fontSize:11 }}>Exam schedule will be updated shortly.</td></tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Instructions */}
-                <div style={{ border:"1px solid #C59B3F", borderRadius:4, overflow:"hidden" }}>
-                  <div style={{ background:"linear-gradient(90deg,#0E3320,#1A5C38)", padding:"6px 14px", display:"flex", alignItems:"center", gap:8 }}>
-                    <span style={{ width:3, height:14, background:"#C59B3F", borderRadius:2, flexShrink:0, display:"inline-block" }}></span>
-                    <span style={{ fontSize:9.5, fontWeight:800, color:"white", textTransform:"uppercase", letterSpacing:"0.15em" }}>Important Instructions / महत्वपूर्ण निर्देश</span>
-                  </div>
-                  <div style={{ background:"#FFFDF8", display:"grid", gridTemplateColumns:"1fr 1fr", gap:0 }}>
-                    <div style={{ padding:"10px 16px", borderRight:"1px dashed #E2D5C0" }}>
-                      {["Only BLACK or BLUE ballpoint pens are permitted. Mobile phones and electronic devices are strictly prohibited.","Admission is purely provisional. Candidature may be cancelled for misconduct or incorrect information.","Carry this Admit Card along with a valid Govt. Photo ID (Aadhaar, PAN, Voter ID, Driving License).","No candidate will be admitted after 15 minutes from the start of examination."].map((t,i) => (
-                        <div key={i} style={{ display:"flex", gap:8, marginBottom:5 }}>
-                          <span style={{ flexShrink:0, fontWeight:800, color:"#C59B3F", fontSize:10, marginTop:1 }}>{i+1}.</span>
-                          <span style={{ fontSize:9.5, color:"#475569", lineHeight:1.6 }}>{t}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <div style={{ padding:"10px 16px", fontFamily:"'Noto Sans Devanagari',sans-serif" }}>
-                      {["परीक्षा हॉल में केवल काले या नीले बॉल पेन की अनुमति है। मोबाइल फोन सख्त मना है।","परीक्षा में प्रवेश अनंतिम है। गलत जानकारी पर अभ्यर्थिता रद्द हो सकती है।","वैध सरकारी फोटो पहचान पत्र (आधार / पैन / वोटर आईडी) साथ लाना अनिवार्य है।","परीक्षा शुरू होने के 15 मिनट बाद प्रवेश की अनुमति नहीं दी जाएगी।"].map((t,i) => (
-                        <div key={i} style={{ display:"flex", gap:8, marginBottom:5 }}>
-                          <span style={{ flexShrink:0, fontWeight:800, color:"#C59B3F", fontSize:10, marginTop:1 }}>{i+1}.</span>
-                          <span style={{ fontSize:9.5, color:"#475569", lineHeight:1.6 }}>{t}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Signatures */}
-                <div style={{ border:"1px solid #C59B3F", borderRadius:4, overflow:"hidden" }}>
-                  <div style={{ background:"linear-gradient(90deg,#0E3320,#1A5C38)", padding:"5px 14px", display:"flex", alignItems:"center", gap:8 }}>
-                    <span style={{ width:3, height:12, background:"#C59B3F", borderRadius:2, flexShrink:0, display:"inline-block" }}></span>
-                    <span style={{ fontSize:9.5, fontWeight:800, color:"white", textTransform:"uppercase", letterSpacing:"0.15em" }}>Authorisation &amp; Verification</span>
-                  </div>
-                  <div style={{ background:"linear-gradient(180deg,#fff,#F9F5EE)", padding:"16px 24px", display:"flex", alignItems:"flex-end", justifyContent:"space-between", gap:12 }}>
-                    {/* Candidate sig */}
-                    <div style={{ flex:1, textAlign:"center" }}>
-                      <div style={{ height:40, borderBottom:"1.5px solid #94a3b8", marginBottom:8, marginLeft:8, marginRight:8, position:"relative" }}>
-                        <div style={{ position:"absolute", bottom:-3, left:"50%", transform:"translateX(-50%)", width:6, height:6, borderRadius:"50%", background:"#C59B3F" }}></div>
-                      </div>
-                      <div style={{ fontSize:10, fontWeight:800, color:"#0E3320" }}>Signature of Candidate</div>
-                      <div style={{ fontSize:8.5, color:"#94a3b8", marginTop:2 }}>(In presence of Invigilator)</div>
-                    </div>
-
-                    {/* Center seal */}
-                    <div style={{ flexShrink:0, display:"flex", flexDirection:"column", alignItems:"center", gap:6 }}>
-                      <div style={{ width:88, height:88, borderRadius:"50%", border:"3px solid #0E3320", background:"radial-gradient(circle at 40% 35%,#fff 60%,#F5F0E8)", boxShadow:"0 0 0 2px #C59B3F, 0 0 0 5px #C59B3F25, 0 4px 16px #0E332025", display:"flex", alignItems:"center", justifyContent:"center", position:"relative" }}>
-                        <div style={{ position:"absolute", inset:7, borderRadius:"50%", border:"1.5px dashed #0E332050" }}></div>
-                        <div style={{ position:"absolute", inset:14, borderRadius:"50%", border:"0.5px dotted #C59B3F70" }}></div>
-                        <img src="/logo.png" alt="" style={{ width:44, height:44, objectFit:"contain", position:"relative", zIndex:1 }} />
-                      </div>
-                      <div style={{ textAlign:"center" }}>
-                        <div style={{ fontSize:8.5, fontWeight:800, color:"#0E3320", textTransform:"uppercase", letterSpacing:"0.08em" }}>Official Seal</div>
-                        <div style={{ fontSize:7.5, color:"#94a3b8" }}>B.A.Y.E.P.C.P.</div>
-                      </div>
-                    </div>
-
-                    {/* Controller sig */}
-                    <div style={{ flex:1, textAlign:"center" }}>
-                      <div style={{ height:40, borderBottom:"1.5px solid #94a3b8", marginBottom:8, marginLeft:8, marginRight:8, position:"relative" }}>
-                        <div style={{ position:"absolute", bottom:-3, left:"50%", transform:"translateX(-50%)", width:6, height:6, borderRadius:"50%", background:"#C59B3F" }}></div>
-                      </div>
-                      <div style={{ fontSize:10, fontWeight:800, color:"#0E3320" }}>Controller of Examinations</div>
-                      <div style={{ fontSize:8.5, color:"#8C671D", fontWeight:600, marginTop:2 }}>B.A.Y.E.P.C.P.</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Footer note */}
-                <div style={{ height:3, background:"linear-gradient(90deg,#8C671D,#C59B3F,#E4BF64,#C59B3F,#8C671D)", margin:"0 -20px" }}></div>
-                <div style={{ textAlign:"center", paddingTop:4, paddingBottom:8 }}>
-                  <span style={{ fontSize:8.5, color:"#94a3b8" }}>Computer-generated Admit Card — No manual signature required &nbsp;|&nbsp; यह कंप्यूटर जनित प्रवेश पत्र है — हस्ताक्षर की आवश्यकता नहीं</span>
-                </div>
-
-              </div>{/* /body */}
-            </div>{/* /z-10 */}
-          </div>{/* /white bg */}
-          </div>{/* /gold border */}
-          </div>{/* /gradient frame */}
-        </div>
+        <AdmitCardTemplate
+          data={{
+            candidate_name: cardData.student?.candidate_name,
+            roll_no: cardData.student?.roll_no,
+            father_name: cardData.student?.father_name,
+            mother_name: cardData.student?.mother_name,
+            dob: cardData.student?.dob,
+            gender: cardData.student?.gender,
+            enrollment_no: cardData.student?.enrollment_no,
+            course: cardData.student?.course,
+            center_name: cardData.student?.college || cardData.student?.center_name,
+            photo_url: cardData.student?.photo_url,
+            session_label: cardData.student?.session_label,
+            exam_year_label: cardData.student?.exam_year_label,
+            subjects: cardData.subjects || [],
+          }}
+        />
       </div>
       <div className="no-print print:hidden"><Footer /></div>
     </div>

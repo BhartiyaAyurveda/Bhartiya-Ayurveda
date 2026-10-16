@@ -8,9 +8,11 @@ export async function GET(request) {
 
   const { searchParams } = new URL(request.url);
   const course_name = searchParams.get("course_name");
+  const year_number = searchParams.get("year_number");
 
   let query = supabaseAdmin.from("course_subjects").select("*").order("created_at", { ascending: true });
   if (course_name) query = query.eq("course_name", course_name);
+  if (year_number) query = query.eq("year_number", Number(year_number));
 
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

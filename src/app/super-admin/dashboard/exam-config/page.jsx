@@ -113,9 +113,18 @@ export default function ExamConfigPage() {
             </div>
             <div>
               <label className="block text-[10px] font-bold uppercase text-[#5C8261] mb-1">Exam Time</label>
-              <input type="text" value={form.exam_time} onChange={e => setForm(f => ({ ...f, exam_time: e.target.value }))}
-                placeholder="e.g. 10:00 AM – 1:00 PM"
-                className="w-full px-3 py-2 rounded-xl border border-[#DDD1BE] bg-[#FAF8F5] text-sm text-[#0E3320] focus:outline-none focus:ring-2 focus:ring-[#C59B3F]" />
+              <select
+                value={form.exam_time || ""}
+                onChange={e => setForm(f => ({ ...f, exam_time: e.target.value }))}
+                className="w-full px-3 py-2 rounded-xl border border-[#DDD1BE] bg-[#FAF8F5] text-sm text-[#0E3320] focus:outline-none focus:ring-2 focus:ring-[#C59B3F]"
+              >
+                <option value="">— Select Timing —</option>
+                <option value="Morning (10:00 AM - 1:00 PM)">Morning (10:00 AM - 1:00 PM)</option>
+                <option value="Evening (2:00 PM - 5:00 PM)">Evening (2:00 PM - 5:00 PM)</option>
+                {form.exam_time && !["Morning (10:00 AM - 1:00 PM)", "Evening (2:00 PM - 5:00 PM)"].includes(form.exam_time) && (
+                  <option value={form.exam_time}>{form.exam_time}</option>
+                )}
+              </select>
             </div>
             <div>
               <label className="block text-[10px] font-bold uppercase text-[#5C8261] mb-1">Session Label</label>

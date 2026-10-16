@@ -1,48 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireCollege } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
-
-function extractSessionDigits(academicSession) {
-  if (!academicSession) return "2627";
-  const matches = academicSession.match(/\d{4}/g);
-  if (matches && matches.length >= 2) {
-    return matches[0].slice(-2) + matches[1].slice(-2);
-  } else if (matches && matches.length === 1) {
-    const y1 = parseInt(matches[0].slice(-2), 10);
-    const y2 = String((y1 + 1) % 100).padStart(2, "0");
-    return `${matches[0].slice(-2)}${y2}`;
-  }
-  return "2627";
-}
-
-async function generateEnrollmentNo(college_id, academic_session) {
-  const { data: college } = await supabaseAdmin
-    .from("colleges")
-    .select("college_code")
-    .eq("id", college_id)
-    .maybeSingle();
-
-  const rawCode = college?.college_code ? String(college.college_code).trim() : "01";
-  const collegeCode = rawCode.padStart(2, "0").slice(-2);
-  const sessDigits = extractSessionDigits(academic_session);
-  const prefix = `BAI${collegeCode}${sessDigits}`;
-
-  const { data: latest } = await supabaseAdmin
-    .from("student_registrations")
-    .select("enrollment_no")
-    .like("enrollment_no", `${prefix}%`)
-    .order("enrollment_no", { ascending: false })
-    .limit(1);
-
-  let nextSeq = 1;
-  if (latest && latest.length > 0 && latest[0].enrollment_no) {
-    const lastSeqStr = latest[0].enrollment_no.slice(prefix.length);
-    const parsed = parseInt(lastSeqStr, 10);
-    if (!isNaN(parsed)) nextSeq = parsed + 1;
-  }
-
-  return `${prefix}${String(nextSeq).padStart(3, "0")}`;
-}
+import { generateEnrollmentNumber } from "@/lib/enrollment-roll-utils";
 
 export async function POST(request) {
   try {
@@ -62,7 +21,18 @@ export async function POST(request) {
       .from("courses").select("id").eq("id", body.course_id).maybeSingle();
     if (!course) return NextResponse.json({ error: "Invalid course." }, { status: 400 });
 
-    const enrollment_no = await generateEnrollmentNo(session.college_id, body.academic_session);
+    const { data: college } = await supabaseAdmin
+      .from("colleges")
+      .select("college_code")
+      .eq("id", session.college_id)
+      .maybeSingle();
+
+    const enrollment_no = await generateEnrollmentNumber(
+      supabaseAdmin,
+      college?.college_code,
+      body.academic_session,
+      process.env.ORG_PREFIX || "BAI"
+    );
 
     const insertData = {
       enrollment_no,

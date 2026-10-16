@@ -229,8 +229,14 @@ export function DashboardProvider({ children }) {
   };
 
   const handleLogout = async () => {
-    await fetch("/api/college/logout", { method: "POST" });
-    router.push("/college/login");
+    try {
+      await fetch("/api/college/logout", { method: "POST" });
+    } catch (err) {
+      console.warn("College logout request error:", err);
+    } finally {
+      document.cookie = "college_session=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      window.location.href = "/college/login";
+    }
   };
 
   const openNotifCount = notifications.filter((n) => n.status === "open").length;
