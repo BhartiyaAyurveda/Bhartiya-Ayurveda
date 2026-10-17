@@ -1,5 +1,7 @@
 "use client";
 
+// Navigation bar component
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -26,7 +28,6 @@ export default function Navbar({ onOpenConsultation }) {
   const isStudentsActive = pathname?.startsWith("/students");
   const isCoursesActive = pathname === "/courses" || pathname === "/academics";
   const isInstitutesActive = pathname === "/affiliated-institutes";
-  const isCertActive = pathname === "/certificate-verification";
   const isGalleryActive = pathname === "/gallery";
   const isAnnouncementsActive = pathname?.startsWith("/announcements");
 
@@ -139,18 +140,6 @@ export default function Navbar({ onOpenConsultation }) {
             }`}
           >
             Affiliated Institutes
-          </Link>
-
-          {/* Certificate Verification */}
-          <Link
-            href="/certificate-verification"
-            className={`py-1 transition-colors relative whitespace-nowrap ${
-              isCertActive
-                ? "text-[#1A5C38] border-b-2 border-[#1A5C38]"
-                : "text-[#882424] hover:text-[#1A5C38]"
-            }`}
-          >
-            Verification
           </Link>
 
           {/* Gallery */}
@@ -307,18 +296,6 @@ export default function Navbar({ onOpenConsultation }) {
             }`}
           >
             Affiliated Institutes
-          </Link>
-
-          <Link
-            href="/certificate-verification"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`block px-4 py-3 text-base font-semibold rounded-lg transition-colors ${
-              isCertActive
-                ? "bg-[#1A5C38]/10 text-[#1A5C38]"
-                : "text-[#882424] hover:bg-[#EBE2D4]/50"
-            }`}
-          >
-            Certificate Verification
           </Link>
 
           <Link

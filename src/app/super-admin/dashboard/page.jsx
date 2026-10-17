@@ -726,7 +726,6 @@ export default function SuperAdminDashboardPage() {
     { id: "social",         label: "Social Media Links",    icon: Share2 },
     { id: "homepage",       label: "Home Page",             icon: LayoutDashboard },
     { id: "institutes",     label: "Affiliated Institutes", icon: Building2,      badge: instituteCount },
-    { id: "certificates",   label: "Certificate Ledger",    icon: FileCheck },
   ];
 
   return (
@@ -932,7 +931,7 @@ export default function SuperAdminDashboardPage() {
               {/* Active tab label with left border accent */}
               <div className="pl-1 py-3.5">
                 <h1 className="text-sm font-extrabold text-[#0E3320] leading-tight">
-                  {navigationItems.find(n => n.id === activeTab)?.label || "Dashboard"}
+                  {navigationItems.find(n => n.id === activeTab)?.label || (activeTab === "certificates" ? "Certificate Ledger" : "Dashboard")}
                 </h1>
                 <p className="text-[10px] text-[#9B8265] mt-0.5 font-medium">Bhartiya Ayurveda · Super Admin</p>
               </div>

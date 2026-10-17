@@ -4,9 +4,11 @@ import { useState, useMemo, useEffect } from "react";
 import { useSiteSettings } from "@/context/SiteSettingsContext";
 import Link from "next/link";
 import { 
-  Building2, 
-  MapPin, 
-  Search, 
+  Building2,
+  MapPin,
+  Search,
+  Filter,
+  ShieldCheck,
   Phone, 
   Mail, 
   GraduationCap, 
@@ -14,10 +16,6 @@ import {
   CheckCircle2, 
   Send, 
   Award, 
-  ShieldCheck, 
-  Filter,
-  Sparkles,
-  Users,
   Calendar
 } from "lucide-react";
 import TopBar from "@/components/layout/TopBar";
@@ -32,10 +30,10 @@ export default function AffiliatedInstitutesPage() {
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedRegion, setSelectedRegion] = useState("All");
   const [institutes, setInstitutes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedRegion, setSelectedRegion] = useState("All");
 
   const [callBackForm, setCallBackForm] = useState({
     name: "",
@@ -47,21 +45,34 @@ export default function AffiliatedInstitutesPage() {
   });
 
   useEffect(() => {
-    fetch("/api/public/affiliated-institutes")
+    fetch(`/api/public/affiliated-institutes?t=${Date.now()}`, { cache: "no-store" })
       .then(r => r.json())
-      .then(d => { if (d.ok) setInstitutes((d.data || []).map(i => ({ ...i, nameHi: i.name_hindi, status: "Active & Verified" }))); })
+      .then(d => {
+        if (d.ok) setInstitutes((d.data || []).map(i => ({ ...i, nameHi: i.name_hindi, status: "Active & Verified" })));
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
+  const availableRegions = useMemo(() => {
+    const set = new Set();
+    institutes.forEach(i => {
+      if (i.state) set.add(i.state);
+      if (i.city) set.add(i.city);
+    });
+    return ["All", ...Array.from(set)];
+  }, [institutes]);
+
   const filteredInstitutes = useMemo(() => {
     return institutes.filter((inst) => {
+      const q = searchQuery.toLowerCase();
       const matchesSearch =
-        inst.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        !q ||
+        inst.name.toLowerCase().includes(q) ||
         (inst.nameHi || "").includes(searchQuery) ||
-        (inst.city || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (inst.state || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (inst.address || "").toLowerCase().includes(searchQuery.toLowerCase());
+        (inst.city || "").toLowerCase().includes(q) ||
+        (inst.state || "").toLowerCase().includes(q) ||
+        (inst.address || "").toLowerCase().includes(q);
 
       const matchesRegion =
         selectedRegion === "All" ||
@@ -154,7 +165,7 @@ export default function AffiliatedInstitutesPage() {
               संबद्ध शिक्षण संस्थान
             </h1>
             <div className="font-sans text-xl sm:text-2xl lg:text-3xl text-[#C59B3F] font-bold">
-              Affiliated Institutes Directory
+              Affiliated Institutes
             </div>
           </div>
 
@@ -165,186 +176,196 @@ export default function AffiliatedInstitutesPage() {
           {/* Quick stats row */}
           <div className="pt-6 grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 max-w-3xl mx-auto text-center font-sans">
             <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/15">
-              <div className="text-xl sm:text-3xl font-extrabold text-[#C59B3F]">14+</div>
-              <div className="text-[11px] sm:text-xs text-[#CBD8CB] mt-0.5">Affiliated Colleges</div>
+              <div className="text-xl sm:text-3xl font-extrabold text-[#C59B3F]">
+                {institutes.length > 0 ? `${institutes.length}+` : "100%"}
+              </div>
+              <div className="text-[11px] sm:text-xs text-[#CBD8CB] mt-0.5">
+                {institutes.length > 0 ? "Affiliated Colleges" : "Govt Recognized Certs"}
+              </div>
             </div>
             <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/15">
-              <div className="text-xl sm:text-3xl font-extrabold text-[#C59B3F]">100%</div>
-              <div className="text-[11px] sm:text-xs text-[#CBD8CB] mt-0.5">Govt Recognized Certs</div>
+              <div className="text-xl sm:text-3xl font-extrabold text-[#C59B3F]">Verified</div>
+              <div className="text-[11px] sm:text-xs text-[#CBD8CB] mt-0.5">Quality Standards</div>
             </div>
             <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/15">
               <div className="text-xl sm:text-3xl font-extrabold text-[#C59B3F]">5+</div>
               <div className="text-[11px] sm:text-xs text-[#CBD8CB] mt-0.5">Diploma Programs</div>
             </div>
             <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/15">
-              <div className="text-xl sm:text-3xl font-extrabold text-[#C59B3F]">3 States</div>
-              <div className="text-[11px] sm:text-xs text-[#CBD8CB] mt-0.5">UP, Delhi, Karnataka</div>
+              <div className="text-xl sm:text-3xl font-extrabold text-[#C59B3F]">Pan India</div>
+              <div className="text-[11px] sm:text-xs text-[#CBD8CB] mt-0.5">Academic Network</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 3. Search & Interactive Filter Section */}
-      <section className="py-4 sm:py-6 px-4 md:px-8 bg-[#F5F0E8] border-b border-[#E6DDCE] relative md:sticky md:top-[73px] z-30 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sm:gap-4">
-          
-          {/* Search Box */}
-          <div className="relative w-full md:w-96">
-            <Search className="w-4 h-4 sm:w-5 sm:h-5 text-[#52725D] absolute left-4 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by institute name or city..."
-              className="w-full pl-11 sm:pl-12 pr-4 py-2.5 sm:py-3 rounded-full border border-[#D5C7B7] bg-white text-sm text-[#0E3320] focus:outline-none focus:ring-2 focus:ring-[#0E3320] shadow-sm"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-[#8C671D] hover:underline"
-              >
-                Clear
-              </button>
-            )}
-          </div>
+      {/* Dynamic Affiliated Institutes section (only shown when colleges exist in database) */}
+      {!loading && institutes.length > 0 && (
+        <>
+          {/* Search & Interactive Filter Section */}
+          <section className="py-4 sm:py-6 px-4 md:px-8 bg-[#F5F0E8] border-b border-[#E6DDCE] relative md:sticky md:top-[73px] z-30 backdrop-blur-md">
+            <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sm:gap-4">
+              {/* Search Box */}
+              <div className="relative w-full md:w-96">
+                <Search className="w-4 h-4 sm:w-5 sm:h-5 text-[#52725D] absolute left-4 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search by institute name or city..."
+                  className="w-full pl-11 sm:pl-12 pr-4 py-2.5 sm:py-3 rounded-full border border-[#D5C7B7] bg-white text-sm text-[#0E3320] focus:outline-none focus:ring-2 focus:ring-[#0E3320] shadow-sm"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-[#8C671D] hover:underline"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
 
-          {/* Region Quick Filters */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 max-w-full -mx-1 px-1">
-            <span className="text-xs font-bold text-[#8C671D] uppercase flex items-center gap-1 shrink-0 mr-1">
-              <Filter className="w-3.5 h-3.5" /> Filter:
-            </span>
-            {["All", "Uttar Pradesh", "Karnataka", "Delhi", "Jaunpur", "Gorakhpur", "Lucknow"].map((region) => (
-              <button
-                key={region}
-                onClick={() => setSelectedRegion(region)}
-                className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all shrink-0 cursor-pointer ${
-                  selectedRegion === region
-                    ? "bg-[#0E3320] text-white shadow"
-                    : "bg-white text-[#0E3320] border border-[#D5C7B7] hover:border-[#0E3320]"
-                }`}
-              >
-                {region}
-              </button>
-            ))}
-          </div>
-
-        </div>
-      </section>
-
-      {/* 4. Affiliated Institutes Cards Grid */}
-      <section className="py-16 md:py-20 px-4 md:px-8 border-b border-[#EBE2D4]">
-        <div className="max-w-7xl mx-auto space-y-8">
-          
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h2 className="text-lg sm:text-xl font-devanagari font-bold text-[#0E3320]">
-                संबद्ध संस्थानों की सूची ({filteredInstitutes.length})
-              </h2>
-              <p className="text-xs sm:text-sm text-[#52725D] mt-0.5">
-                Showing official recognized examination & training centers
-              </p>
-            </div>
-
-            <div className="inline-flex items-center gap-2 text-xs font-bold text-[#2E7A4A] bg-[#EAF5ED] px-3.5 py-1.5 rounded-full border border-[#BCE1C7]">
-              <ShieldCheck className="w-4 h-4" />
-              <span>All 14 Institutes Officially Affiliated</span>
-            </div>
-          </div>
-
-          {filteredInstitutes.length === 0 ? (
-            <div className="bg-white rounded-3xl p-12 text-center border border-[#E8DFCFA] space-y-3">
-              <Building2 className="w-12 h-12 text-[#8C671D] mx-auto opacity-50" />
-              <h3 className="text-xl font-bold text-[#0E3320]">कोई संस्थान नहीं मिला (No Institute Found)</h3>
-              <p className="text-sm text-[#52725D]">
-                Please clear your search query or select another region filter.
-              </p>
-              <button
-                onClick={() => {
-                  setSearchQuery("");
-                  setSelectedRegion("All");
-                }}
-                className="px-5 py-2 rounded-full bg-[#0E3320] text-white text-xs font-semibold mt-2"
-              >
-                Reset Filters
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredInstitutes.map((inst) => (
-                <div
-                  key={inst.id}
-                  className="bg-white rounded-3xl overflow-hidden border border-[#E8DFCFA] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
-                >
-                  {/* Decorative top accent strip */}
-                  <div className="h-2.5 bg-gradient-to-r from-[#B96647] via-[#C59B3F] to-[#0E3320]"></div>
-
-                  <div className="p-6 space-y-4">
-                    {/* Header with Icon and Code */}
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="w-12 h-12 rounded-2xl bg-[#EAE2D3] text-[#0E3320] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <Building2 className="w-6 h-6 stroke-[1.75]" />
-                      </div>
-                      <span className="px-2.5 py-1 rounded-full bg-[#FAF8F5] border border-[#E0D5C3] text-[11px] font-bold text-[#8C671D] font-sans">
-                        {inst.code}
-                      </span>
-                    </div>
-
-                    {/* Institute Name */}
-                    <div className="space-y-1">
-                      <h3 className="font-sans font-bold text-lg sm:text-xl text-[#0E3320] leading-snug group-hover:text-[#B96647] transition-colors">
-                        {inst.name}
-                      </h3>
-                      <div className="font-devanagari text-xs sm:text-sm text-[#52725D] font-medium">
-                        {inst.nameHi}
-                      </div>
-                    </div>
-
-                    {/* Address & City */}
-                    <div className="pt-2 border-t border-[#F2ECE1] space-y-2">
-                      <div className="flex items-start gap-2.5 text-xs sm:text-sm text-[#466551]">
-                        <MapPin className="w-4 h-4 text-[#B96647] shrink-0 mt-0.5" />
-                        <span className="leading-relaxed">{inst.address}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2 pt-1">
-                        <span className="inline-block px-2.5 py-0.5 rounded-full bg-[#EAF5ED] text-[#2A7A50] text-[11px] font-semibold">
-                          📍 {inst.city}, {inst.state}
-                        </span>
-                        <span className="inline-block px-2.5 py-0.5 rounded-full bg-[#FAF8F5] text-[#8C671D] text-[11px] font-semibold border border-[#E0D5C3]">
-                          {inst.type}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card Footer with Inquire Button */}
-                  <div className="p-6 pt-0 border-t border-[#F5EFE3] mt-2 flex items-center justify-between">
-                    <span className="text-xs text-[#2E7A4A] font-bold flex items-center gap-1">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>{inst.status}</span>
-                    </span>
-
+              {/* Region Quick Filters */}
+              {availableRegions.length > 1 && (
+                <div className="flex items-center gap-2 overflow-x-auto pb-1 max-w-full -mx-1 px-1">
+                  <span className="text-xs font-bold text-[#8C671D] uppercase flex items-center gap-1 shrink-0 mr-1">
+                    <Filter className="w-3.5 h-3.5" /> Filter:
+                  </span>
+                  {availableRegions.map((region) => (
                     <button
-                      onClick={() => {
-                        setCallBackForm(prev => ({ ...prev, institute: inst.name }));
-                        // Smooth scroll to call back section
-                        document.getElementById('call-back-section')?.scrollIntoView({ behavior: 'smooth' });
-                      }}
-                      className="px-4 py-2 rounded-xl bg-[#0E3320] hover:bg-[#071F13] text-white text-xs sm:text-sm font-semibold transition-colors flex items-center gap-1.5 shadow-sm"
+                      key={region}
+                      onClick={() => setSelectedRegion(region)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all shrink-0 cursor-pointer ${
+                        selectedRegion === region
+                          ? "bg-[#0E3320] text-white shadow"
+                          : "bg-white text-[#0E3320] border border-[#D5C7B7] hover:border-[#0E3320]"
+                      }`}
                     >
-                      <span>Inquire / संपर्क करें</span>
-                                          </button>
-                  </div>
-
+                      {region}
+                    </button>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
-          )}
+          </section>
 
-        </div>
-      </section>
+          {/* Affiliated Institutes Cards Grid */}
+          <section className="py-16 md:py-20 px-4 md:px-8 border-b border-[#EBE2D4]">
+            <div className="max-w-7xl mx-auto space-y-8">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-lg sm:text-xl font-devanagari font-bold text-[#0E3320]">
+                    संबद्ध संस्थानों की सूची ({filteredInstitutes.length})
+                  </h2>
+                  <p className="text-xs sm:text-sm text-[#52725D] mt-0.5">
+                    Showing official recognized examination & training centers
+                  </p>
+                </div>
 
-      {/* 5. Courses Offered Across Affiliated Institutes */}
+                <div className="inline-flex items-center gap-2 text-xs font-bold text-[#2E7A4A] bg-[#EAF5ED] px-3.5 py-1.5 rounded-full border border-[#BCE1C7]">
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>{institutes.length} Institutes Officially Affiliated</span>
+                </div>
+              </div>
+
+              {filteredInstitutes.length === 0 ? (
+                <div className="bg-white rounded-3xl p-12 text-center border border-[#E8DFCFA] space-y-3">
+                  <Building2 className="w-12 h-12 text-[#8C671D] mx-auto opacity-50" />
+                  <h3 className="text-xl font-bold text-[#0E3320]">कोई संस्थान नहीं मिला (No Institute Found)</h3>
+                  <p className="text-sm text-[#52725D]">
+                    Please clear your search query or select another region filter.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setSearchQuery("");
+                      setSelectedRegion("All");
+                    }}
+                    className="px-5 py-2 rounded-full bg-[#0E3320] text-white text-xs font-semibold mt-2"
+                  >
+                    Reset Filters
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredInstitutes.map((inst) => (
+                    <div
+                      key={inst.id}
+                      className="bg-white rounded-3xl overflow-hidden border border-[#E8DFCFA] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
+                    >
+                      <div className="h-2.5 bg-gradient-to-r from-[#B96647] via-[#C59B3F] to-[#0E3320]"></div>
+
+                      <div className="p-6 space-y-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="w-12 h-12 rounded-2xl bg-[#EAE2D3] text-[#0E3320] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                            <Building2 className="w-6 h-6 stroke-[1.75]" />
+                          </div>
+                          {inst.code && (
+                            <span className="px-2.5 py-1 rounded-full bg-[#FAF8F5] border border-[#E0D5C3] text-[11px] font-bold text-[#8C671D] font-sans">
+                              {inst.code}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="space-y-1">
+                          <h3 className="font-sans font-bold text-lg sm:text-xl text-[#0E3320] leading-snug group-hover:text-[#B96647] transition-colors">
+                            {inst.name}
+                          </h3>
+                          {inst.nameHi && (
+                            <div className="font-devanagari text-xs sm:text-sm text-[#52725D] font-medium">
+                              {inst.nameHi}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="pt-2 border-t border-[#F2ECE1] space-y-2">
+                          {inst.address && (
+                            <div className="flex items-start gap-2.5 text-xs sm:text-sm text-[#466551]">
+                              <MapPin className="w-4 h-4 text-[#B96647] shrink-0 mt-0.5" />
+                              <span className="leading-relaxed">{inst.address}</span>
+                            </div>
+                          )}
+                          
+                          <div className="flex items-center gap-2 pt-1 flex-wrap">
+                            {(inst.city || inst.state) && (
+                              <span className="inline-block px-2.5 py-0.5 rounded-full bg-[#EAF5ED] text-[#2A7A50] text-[11px] font-semibold">
+                                📍 {[inst.city, inst.state].filter(Boolean).join(", ")}
+                              </span>
+                            )}
+                            {inst.type && (
+                              <span className="inline-block px-2.5 py-0.5 rounded-full bg-[#FAF8F5] text-[#8C671D] text-[11px] font-semibold border border-[#E0D5C3]">
+                                {inst.type}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-6 pt-0 border-t border-[#F5EFE3] mt-2 flex items-center justify-between">
+                        <span className="text-xs text-[#2E7A4A] font-bold flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>{inst.status}</span>
+                        </span>
+
+                        <button
+                          onClick={() => {
+                            setCallBackForm(prev => ({ ...prev, institute: inst.name }));
+                            document.getElementById('call-back-section')?.scrollIntoView({ behavior: 'smooth' });
+                          }}
+                          className="px-4 py-2 rounded-xl bg-[#0E3320] hover:bg-[#071F13] text-white text-xs sm:text-sm font-semibold transition-colors flex items-center gap-1.5 shadow-sm"
+                        >
+                          <span>Inquire / संपर्क करें</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        </>
+      )}
+
+      {/* Courses Offered Across Affiliated Institutes */}
       <section className="py-16 md:py-20 px-4 md:px-8 bg-[#F5F0E8] border-b border-[#E6DDCE]">
         <div className="max-w-7xl mx-auto space-y-12">
           
