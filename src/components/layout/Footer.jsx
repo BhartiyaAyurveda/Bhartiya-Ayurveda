@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { MapPin, Phone, Mail, Twitter, Instagram, Youtube, Linkedin, Facebook, MessageCircle, Send, Share2 } from "lucide-react";
 import { useSiteSettings } from "@/context/SiteSettingsContext";
 
@@ -57,12 +58,12 @@ export default function Footer() {
           <div className="space-y-3.5">
             <h4 className="text-[15px] font-sans font-bold text-[#0E3320] uppercase tracking-wider">Quick Links</h4>
             <ul className="space-y-2.5 text-base sm:text-lg text-[#152118] font-semibold">
-              <li><a href="/" className="hover:text-[#0E3320] transition-colors">Home</a></li>
-              <li><a href="/affiliated-institutes" className="hover:text-[#0E3320] transition-colors">Affiliated Institutes</a></li>
-              <li><a href="/gallery" className="hover:text-[#0E3320] transition-colors">Photo Gallery</a></li>
-              <li><a href="/about" className="hover:text-[#0E3320] transition-colors">About Us</a></li>
-              <li><a href="/contact" className="hover:text-[#0E3320] transition-colors">Contact</a></li>
-              <li><a href="/courses" className="hover:text-[#0E3320] transition-colors">Our Courses</a></li>
+              <li><Link href="/" className="hover:text-[#0E3320] transition-colors">Home</Link></li>
+              <li><Link href="/affiliated-institutes" className="hover:text-[#0E3320] transition-colors">Affiliated Institutes</Link></li>
+              <li><Link href="/gallery" className="hover:text-[#0E3320] transition-colors">Photo Gallery</Link></li>
+              <li><Link href="/about" className="hover:text-[#0E3320] transition-colors">About Us</Link></li>
+              <li><Link href="/contact" className="hover:text-[#0E3320] transition-colors">Contact</Link></li>
+              <li><Link href="/courses" className="hover:text-[#0E3320] transition-colors">Our Courses</Link></li>
             </ul>
           </div>
 
@@ -70,13 +71,13 @@ export default function Footer() {
           <div className="space-y-3.5">
             <h4 className="text-[15px] font-sans font-bold text-[#0E3320] uppercase tracking-wider">Students &amp; Admissions</h4>
             <ul className="space-y-2.5 text-base sm:text-lg text-[#152118] font-semibold">
-              <li><a href="/admissions/registration-form" className="hover:text-[#8C671D] transition-colors">Registration Form</a></li>
-              <li><a href="/students/registration" className="hover:text-[#8C671D] transition-colors">Student Registration</a></li>
-              <li><a href="/students/login" className="hover:text-[#8C671D] transition-colors">Student Login</a></li>
-              <li><a href="/students/results" className="hover:text-[#8C671D] transition-colors">Examination Results</a></li>
-              <li><a href="/certificate-verification" className="hover:text-[#8C671D] transition-colors">Certificate Verification</a></li>
-              <li><a href="/affiliated-institutes" className="hover:text-[#8C671D] transition-colors">Approved Colleges</a></li>
-              <li><a href="/super-admin/login" className="text-[#8C671D] hover:text-[#0E3320] transition-colors font-medium">Super Admin Login</a></li>
+              <li><Link href="/admissions/registration-form" className="hover:text-[#8C671D] transition-colors">Registration Form</Link></li>
+              <li><Link href="/students/registration" className="hover:text-[#8C671D] transition-colors">Student Registration</Link></li>
+              <li><Link href="/students/login" className="hover:text-[#8C671D] transition-colors">Student Login</Link></li>
+              <li><Link href="/students/results" className="hover:text-[#8C671D] transition-colors">Examination Results</Link></li>
+              <li><Link href="/certificate-verification" className="hover:text-[#8C671D] transition-colors">Certificate Verification</Link></li>
+              <li><Link href="/affiliated-institutes" className="hover:text-[#8C671D] transition-colors">Approved Colleges</Link></li>
+              <li><Link href="/super-admin/login" className="text-[#8C671D] hover:text-[#0E3320] transition-colors font-medium">Super Admin Login</Link></li>
             </ul>
           </div>
 
@@ -84,12 +85,13 @@ export default function Footer() {
           <div className="space-y-3.5">
             <h4 className="text-sm font-sans font-bold text-[#0E3320] uppercase tracking-wider">Programs &amp; Retreats</h4>
             <ul className="space-y-2 text-sm text-[#152118] font-semibold">
-              <li><a href="/#programs" className="hover:text-[#0E3320] transition-colors">Ayurveda Retreats</a></li>
-              <li><a href="/#programs" className="hover:text-[#0E3320] transition-colors">Yoga Programs</a></li>
-              <li><a href="/#programs" className="hover:text-[#0E3320] transition-colors">Naturopathy Courses</a></li>
-              <li><a href="/#programs" className="hover:text-[#0E3320] transition-colors">Wellness Retreats</a></li>
-              <li><a href="/#programs" className="hover:text-[#0E3320] transition-colors">Electro-Homeopathy Courses</a></li>
-              <li><a href="/#faq" className="hover:text-[#0E3320] transition-colors">FAQs &amp; Guidance</a></li>
+              <li><Link href="/courses" className="hover:text-[#0E3320] transition-colors">Ayurveda Retreats</Link></li>
+              <li><Link href="/courses" className="hover:text-[#0E3320] transition-colors">Yoga Programs</Link></li>
+              <li><Link href="/courses" className="hover:text-[#0E3320] transition-colors">Naturopathy Courses</Link></li>
+              <li><Link href="/courses" className="hover:text-[#0E3320] transition-colors">Wellness Retreats</Link></li>
+              <li><Link href="/courses" className="hover:text-[#0E3320] transition-colors">Electro-Homeopathy Courses</Link></li>
+              <li><Link href="/courses" className="hover:text-[#0E3320] transition-colors">Alternative Medicine</Link></li>
+              <li><Link href="/courses" className="hover:text-[#0E3320] transition-colors">FAQs &amp; Guidance</Link></li>
             </ul>
           </div>
 
