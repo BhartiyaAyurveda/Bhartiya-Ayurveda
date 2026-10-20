@@ -30,7 +30,7 @@ export const footerLinks = {
     { name: "Personal Diet Consultation", href: "#programs" },
   ],
   support: [
-    { name: "Consultation Booking", href: "#" },
+    { name: "Contact & Support", href: "/contact" },
     { name: "Frequently Asked Questions", href: "#faq" },
     { name: "Privacy Policy", href: "#" },
     { name: "Terms of Healing Service", href: "#" },

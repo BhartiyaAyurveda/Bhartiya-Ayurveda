@@ -440,7 +440,7 @@ export const siteContent = {
     titleHi: "अपने स्वास्थ्य की नई यात्रा आज ही प्रारंभ करें",
     titleEn: "Begin Your Sacred Journey to Lasting Health",
     subtitle: "Experience authentic healing amidst the serene tranquility of nature. Our Vaidyas and Yogacharyas are here to guide every step.",
-    btnPrimary: "Book a Free Consultation",
+    btnPrimary: "Get in Touch",
     btnSecondary: "Call Us: +91 98765 43210",
     image: "/images/cta/cta-landscape.jpg",
   },

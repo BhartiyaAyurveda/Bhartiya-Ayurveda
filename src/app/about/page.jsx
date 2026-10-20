@@ -71,10 +71,10 @@ export default function AboutPage() {
                 ))}
               </div>
               <div className="pt-3">
-                <button onClick={() => setIsConsultationOpen(true)}
-                  className="px-7 py-3.5 rounded-full bg-[#0E3320] hover:bg-[#071F13] text-white text-base sm:text-lg font-semibold shadow-md flex items-center gap-2.5 transition-all">
-                  Schedule Consultation with Our Vaidyas
-                </button>
+                <Link href="/contact"
+                  className="px-7 py-3.5 rounded-full bg-[#0E3320] hover:bg-[#071F13] text-white text-base sm:text-lg font-semibold shadow-md inline-flex items-center gap-2.5 transition-all">
+                  Contact Our Vaidyas
+                </Link>
               </div>
             </div>
             <div className="lg:col-span-5">
@@ -277,11 +277,7 @@ export default function AboutPage() {
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-devanagari font-bold text-white leading-tight">{c.cta.headingHi}</h2>
           <p className="text-lg sm:text-xl text-[#E4BF64] font-medium max-w-2xl mx-auto">{c.cta.subtitle}</p>
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-            <button onClick={() => setIsConsultationOpen(true)}
-              className="px-8 py-3.5 rounded-full bg-[#FAF8F5] hover:bg-white text-[#0E3320] text-base sm:text-lg font-bold shadow-lg flex items-center gap-2 transition-all">
-              Book Your Consultation
-            </button>
-            <Link href="/contact" className="px-7 py-3.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-base sm:text-lg font-semibold border border-white/40 backdrop-blur transition-all">
+            <Link href="/contact" className="px-8 py-3.5 rounded-full bg-[#FAF8F5] hover:bg-white text-[#0E3320] text-base sm:text-lg font-bold shadow-lg transition-all">
               Contact Our Ashram
             </Link>
           </div>

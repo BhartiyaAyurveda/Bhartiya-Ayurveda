@@ -34,18 +34,11 @@ export default function CtaBannerSection({ onOpenConsultation }) {
               </div>
 
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3 sm:gap-4 pt-4">
-                <button
-                  onClick={onOpenConsultation}
-                  className="btn-shimmer px-8 py-3.5 rounded-full bg-[#FAF8F5] hover:bg-white text-[#0E3320] text-sm sm:text-base font-bold shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95 flex items-center justify-center gap-2.5 transition-all group font-sans cursor-pointer"
-                >
-                  <span>{cta.btn1Text || "Book a Consultation"}</span>
-                                  </button>
-
                 <a
-                  href="#contact"
-                  className="px-7 py-3.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-sm sm:text-base font-semibold border border-white/40 backdrop-blur hover:scale-105 active:scale-95 transition-all font-sans text-center"
+                  href="/contact"
+                  className="btn-shimmer px-8 py-3.5 rounded-full bg-[#FAF8F5] hover:bg-white text-[#0E3320] text-sm sm:text-base font-bold shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95 flex items-center justify-center gap-2.5 transition-all group font-sans text-center cursor-pointer"
                 >
-                  {cta.btn2Text || "Get in Touch"}
+                  <span>{cta.btn2Text || "Get in Touch"}</span>
                 </a>
               </div>
             </Reveal>

@@ -346,17 +346,7 @@ export default function Navbar({ onOpenConsultation }) {
             Contact
           </Link>
 
-          <div className="pt-3 px-3">
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenConsultation?.();
-              }}
-              className="w-full py-3.5 rounded-full bg-[#0E3320] text-white text-sm font-semibold shadow-md cursor-pointer hover:bg-[#071F13] transition-colors"
-            >
-              Book a Consultation
-            </button>
-          </div>
+
           </div>
       </div>
     </header>

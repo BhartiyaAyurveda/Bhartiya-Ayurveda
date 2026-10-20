@@ -166,7 +166,7 @@ const DEFAULT = {
   cta: {
     headlineHi: "एक स्वस्थ और संतुलित जीवन की ओर पहला कदम",
     headlineEn: "Take the First Step Towards a Healthier, Happier You",
-    btn1Text: "Book a Consultation",
+    btn1Text: "",
     btn2Text: "Get in Touch",
   },
   faq: [
@@ -517,7 +517,7 @@ export default function HomePageManager({ onShowToast }) {
                 <p className="text-xs text-[#5C8261] mt-0.5">Each slide has its own image + text. They auto-swipe on the website.</p>
               </div>
               <button onClick={() => {
-                const ns = { id: uid(), badgeText: "", headlineHi: "नया स्लाइड", headlineEn: "New Slide", descHi: "", descEn: "", cta1Text: "Book a Consultation", cta2Text: "Watch Our Story", imageMobile: "", imageDesktop: "" };
+                const ns = { id: uid(), badgeText: "", headlineHi: "नया स्लाइड", headlineEn: "New Slide", descHi: "", descEn: "", cta1Text: "Explore Courses", cta2Text: "Watch Our Story", imageMobile: "", imageDesktop: "" };
                 setSlides(prev => [...prev, ns]);
                 setExpanded(e => ({ ...e, [ns.id]: true }));
                 setScrollToId(ns.id);

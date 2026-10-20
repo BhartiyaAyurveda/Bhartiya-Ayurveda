@@ -645,15 +645,15 @@ export default function GalleryPage() {
             प्राकृतिक चिकित्सा का साक्षात अनुभव करें
           </h2>
           <p className="text-sm sm:text-base text-[#CBD8CB] max-w-2xl mx-auto">
-            Visit our Rishikesh ashram or schedule a personalized virtual consultation with our experienced Vaidyas.
+            Visit our Rishikesh campus or get in touch with our team for admissions and courses.
           </p>
           <div className="pt-2">
-            <button
-              onClick={() => setIsConsultationOpen(true)}
-              className="px-8 py-3.5 rounded-full bg-[#FAF8F5] hover:bg-white text-[#0E3320] text-sm sm:text-base font-bold shadow-lg transition-all"
+            <Link
+              href="/contact"
+              className="inline-block px-8 py-3.5 rounded-full bg-[#FAF8F5] hover:bg-white text-[#0E3320] text-sm sm:text-base font-bold shadow-lg transition-all"
             >
-              Book a Consultation
-            </button>
+              Get in Touch
+            </Link>
           </div>
         </div>
       </section>
