@@ -695,24 +695,32 @@ export default function StudentResultsPage() {
 
                           <div style={{ background: "linear-gradient(180deg,#ffffff,#F8FAFC)", padding: "12px 28px 12px", display: "flex", alignItems: "center", justifyContent: "space-around", gap: 24 }}>
 
-                            {/* Seal (Left/Center-Left) */}
-                            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0, gap: 4 }}>
-                              <div style={{
-                                width: 74, height: 74, borderRadius: "50%",
-                                border: "2.5px solid #0B1E36",
-                                background: "radial-gradient(circle at 40% 35%,#ffffff 60%,#F1F5F9)",
-                                boxShadow: "0 0 0 2px #C59B3F, 0 0 0 4px #C59B3F25, 0 3px 12px #0B1E3625",
-                                display: "flex", alignItems: "center", justifyContent: "center",
-                                position: "relative"
-                              }}>
-                                <div style={{ position: "absolute", inset: 5, borderRadius: "50%", border: "1.2px dashed #0B1E3650" }}></div>
-                                <div style={{ position: "absolute", inset: 10, borderRadius: "50%", border: "0.5px dotted #C59B3F70" }}></div>
-                                <img src="/logo.png" alt="" style={{ width: 38, height: 38, objectFit: "contain", position: "relative", zIndex: 1 }} />
+                            {/* Prepared By Sig (Left) */}
+                            <div style={{ width: 160, maxWidth: "100%", textAlign: "center" }}>
+                              <div style={{ height: 48, borderBottom: "1.5px solid #94a3b8", marginBottom: 6, marginLeft: 8, marginRight: 8, position: "relative", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+                                <img
+                                  src="/prepared_by.png"
+                                  alt="Prepared By Signature"
+                                  style={{ maxHeight: 40, maxWidth: 80, objectFit: "contain", marginBottom: 6, mixBlendMode: "multiply" }}
+                                />
+                                <div style={{ position: "absolute", bottom: -1, left: "50%", transform: "translateX(-50%)", width: 6, height: 6, borderRadius: "50%", background: "#C59B3F", marginBottom: -3 }}></div>
                               </div>
-                              <div style={{ textAlign: "center" }}>
-                                <div style={{ fontSize: 9, fontWeight: 800, color: "#0B1E36", textTransform: "uppercase", letterSpacing: "0.08em" }}>Digitally Verified</div>
-                                <div style={{ fontSize: 7, color: "#64748b", marginTop: 1 }}>System Generated · Valid for Official Use</div>
+                              <div style={{ fontSize: 10, fontWeight: 800, color: "#0B1E36", letterSpacing: "0.03em" }}>Prepared By / तैयारकर्ता</div>
+                              <div style={{ fontSize: 8.5, color: "#64748b", fontWeight: 600, marginTop: 1, lineHeight: 1.3 }}>Tabulation Section</div>
+                            </div>
+
+                            {/* Checked By Sig (Center) */}
+                            <div style={{ width: 160, maxWidth: "100%", textAlign: "center" }}>
+                              <div style={{ height: 48, borderBottom: "1.5px solid #94a3b8", marginBottom: 6, marginLeft: 8, marginRight: 8, position: "relative", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+                                <img
+                                  src="/checked_by.png"
+                                  alt="Checked By Signature"
+                                  style={{ maxHeight: 40, maxWidth: 80, objectFit: "contain", marginBottom: 6, mixBlendMode: "multiply" }}
+                                />
+                                <div style={{ position: "absolute", bottom: -1, left: "50%", transform: "translateX(-50%)", width: 6, height: 6, borderRadius: "50%", background: "#C59B3F", marginBottom: -3 }}></div>
                               </div>
+                              <div style={{ fontSize: 10, fontWeight: 800, color: "#0B1E36", letterSpacing: "0.03em" }}>Checked By / जांचकर्ता</div>
+                              <div style={{ fontSize: 8.5, color: "#64748b", fontWeight: 600, marginTop: 1, lineHeight: 1.3 }}>Examination Cell</div>
                             </div>
 
                             {/* Secretary Sig (Right) */}

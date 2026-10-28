@@ -156,11 +156,25 @@ export default function MarksheetTemplate({ data, showPageBreak = false }) {
             <p className="mb-6">{issueDate || new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })}</p>
             <div className="w-28 border-t border-[#0B1E36] pt-1 mx-auto text-[#0B1E36] font-medium">Date of Issue</div>
           </div>
-          <div className="text-center text-[10px] text-[#64748b]">
-            <div className="h-12 flex items-end justify-center mb-1">
-              <img src="/Signature.png" alt="Secretary Signature" className="max-h-9 max-w-[120px] object-contain mb-2" />
+          <div className="flex items-end gap-6">
+            <div className="text-center text-[10px] text-[#64748b]">
+              <div className="h-12 flex items-end justify-center mb-1">
+                <img src="/prepared_by.png" alt="Prepared By" className="max-h-9 max-w-[70px] object-contain mb-2" />
+              </div>
+              <div className="w-28 border-t border-[#0B1E36] pt-1 mx-auto text-[#0B1E36] font-medium">Prepared By / तैयारकर्ता</div>
             </div>
-            <div className="w-32 border-t border-[#0B1E36] pt-1 mx-auto text-[#0B1E36] font-medium">Secretary / सचिव</div>
+            <div className="text-center text-[10px] text-[#64748b]">
+              <div className="h-12 flex items-end justify-center mb-1">
+                <img src="/checked_by.png" alt="Checked By" className="max-h-9 max-w-[70px] object-contain mb-2" />
+              </div>
+              <div className="w-28 border-t border-[#0B1E36] pt-1 mx-auto text-[#0B1E36] font-medium">Checked By / जांचकर्ता</div>
+            </div>
+            <div className="text-center text-[10px] text-[#64748b]">
+              <div className="h-12 flex items-end justify-center mb-1">
+                <img src="/Signature.png" alt="Secretary Signature" className="max-h-9 max-w-[120px] object-contain mb-2" />
+              </div>
+              <div className="w-32 border-t border-[#0B1E36] pt-1 mx-auto text-[#0B1E36] font-medium">Secretary / सचिव</div>
+            </div>
           </div>
         </div>
 

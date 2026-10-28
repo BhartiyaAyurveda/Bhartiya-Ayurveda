@@ -13,6 +13,9 @@ const BYPASS_PATTERNS = [
   /^\/_next/,
   /^\/favicon/,
   /^\/logo/,
+  /^\/Signature/,
+  /^\/checked_by/,
+  /^\/prepared_by/,
   /^\/images/,
 ];
 

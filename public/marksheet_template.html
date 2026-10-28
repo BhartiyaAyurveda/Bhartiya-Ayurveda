@@ -317,6 +317,9 @@
         .verified-ref { font-size: 9px; color: #5C8261; margin-top: 3px; font-family: monospace; }
 
         .footer-right { text-align: center; width: 200px; }
+        .sig-group { display: flex; gap: 20px; align-items: flex-end; }
+        .sig-checked-by { text-align: center; width: 130px; }
+        .sig-checked-by .sig-title { min-width: 110px; }
         .sig-space { height: 48px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 2px; }
         .sig-title {
             font-size: 11px;
@@ -491,10 +494,20 @@
                 <div class="verified-ref">Ref: BAYEPCP/{{YEAR}}/{{ENROLLMENT_NO}}</div>
             </div>
 
-            <div class="footer-right">
-                <div class="sig-space"><img src="/Signature.png" style="max-height:40px; max-width:140px; object-fit:contain; mix-blend-mode:multiply; margin-bottom:6px;" alt="Signature"></div>
-                <div class="sig-title">Secretary / सचिव</div>
-                <div class="sig-sub">Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad</div>
+            <div class="sig-group">
+                <div class="sig-checked-by">
+                    <div class="sig-space"><img src="/prepared_by.png" style="max-height:42px; max-width:75px; object-fit:contain; mix-blend-mode:multiply; margin-bottom:4px;" alt="Prepared By"></div>
+                    <div class="sig-title">Prepared By / तैयारकर्ता</div>
+                </div>
+                <div class="sig-checked-by">
+                    <div class="sig-space"><img src="/checked_by.png" style="max-height:42px; max-width:75px; object-fit:contain; mix-blend-mode:multiply; margin-bottom:4px;" alt="Checked By"></div>
+                    <div class="sig-title">Checked By / जांचकर्ता</div>
+                </div>
+                <div class="footer-right">
+                    <div class="sig-space"><img src="/Signature.png" style="max-height:40px; max-width:140px; object-fit:contain; mix-blend-mode:multiply; margin-bottom:6px;" alt="Signature"></div>
+                    <div class="sig-title">Secretary / सचिव</div>
+                    <div class="sig-sub">Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad</div>
+                </div>
             </div>
         </div>
     </div>
