@@ -1,33 +1,24 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useSiteSettings } from "@/context/SiteSettingsContext";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   Building2, Lock, Eye, EyeOff, CheckCircle2, AlertCircle,
-  ShieldCheck, HelpCircle, X, Mail, Phone, RefreshCw,
+  ShieldCheck, HelpCircle, X, Mail, Phone,
 } from "lucide-react";
 
 export default function CollegeLoginPage() {
   const { contact } = useSiteSettings();
   const router = useRouter();
 
-  // Step 1 state
+  // Form state
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-
-  // Step 2 state
-  const [step, setStep] = useState("credentials"); // "credentials" | "otp"
-  const [maskedEmail, setMaskedEmail] = useState("");
-  const [pendingEmail, setPendingEmail] = useState("");
-  const [digits, setDigits] = useState(["", "", "", "", "", ""]);
-  const digitRefs = useRef([]);
-  const otp = digits.join("");
-  const [resendCooldown, setResendCooldown] = useState(0);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -40,13 +31,6 @@ export default function CollegeLoginPage() {
       if (saved) { setUsername(saved); setRememberMe(true); }
     } catch { /* ignore */ }
   }, []);
-
-  const startResendCooldown = () => {
-    setResendCooldown(60);
-    const t = setInterval(() => {
-      setResendCooldown(c => { if (c <= 1) { clearInterval(t); return 0; } return c - 1; });
-    }, 1000);
-  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -63,18 +47,6 @@ export default function CollegeLoginPage() {
       const data = await res.json();
       if (!res.ok) { setError(data.error || "Invalid username or password."); setIsLoading(false); return; }
 
-      if (data.requireOtp) {
-        setMaskedEmail(data.maskedEmail);
-        setPendingEmail(data.email);
-        setStep("otp");
-        setDigits(["", "", "", "", "", ""]);
-        setTimeout(() => digitRefs.current[0]?.focus(), 100);
-        startResendCooldown();
-        setIsLoading(false);
-        return;
-      }
-
-      // No OTP required — direct login
       try {
         if (rememberMe) localStorage.setItem("ba_college_saved_user", cleanUser);
         else localStorage.removeItem("ba_college_saved_user");
@@ -85,49 +57,6 @@ export default function CollegeLoginPage() {
       setError("Network error. Please try again.");
     }
     setIsLoading(false);
-  };
-
-  const handleVerifyOtp = async (e) => {
-    e.preventDefault();
-    setError("");
-    if (!otp.trim()) { setError("Please enter the OTP."); return; }
-    setIsLoading(true);
-    try {
-      const res = await fetch("/api/college/verify-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: pendingEmail, otp: otp.trim() }),
-      });
-      const data = await res.json();
-      if (!res.ok) { setError(data.error || "Invalid OTP."); setIsLoading(false); return; }
-
-      try {
-        if (rememberMe) localStorage.setItem("ba_college_saved_user", username.trim());
-        else localStorage.removeItem("ba_college_saved_user");
-      } catch { /* ignore */ }
-      setIsSuccess(true);
-      setTimeout(() => router.push("/college/dashboard"), 600);
-    } catch {
-      setError("Network error. Please try again.");
-    }
-    setIsLoading(false);
-  };
-
-  const handleResendOtp = async () => {
-    if (resendCooldown > 0) return;
-    setError("");
-    try {
-      const res = await fetch("/api/college/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: username.trim(), password }),
-      });
-      const data = await res.json();
-      if (!res.ok) { setError(data.error || "Failed to resend OTP."); return; }
-      if (data.requireOtp) startResendCooldown();
-    } catch {
-      setError("Network error.");
-    }
   };
 
   return (
@@ -165,7 +94,7 @@ export default function CollegeLoginPage() {
               Bhartiya Ayurveda Yoga Evam Prakritik Chikitsa Parishad
             </p>
             <p className="text-xs text-[#5C8261]">
-              {step === "otp" ? "Two-factor verification" : "Enter credentials to access college dashboard"}
+              Enter credentials to access college dashboard
             </p>
           </div>
 
@@ -180,8 +109,7 @@ export default function CollegeLoginPage() {
             </div>
           )}
 
-          {/* ── STEP 1: Credentials ── */}
-          {step === "credentials" && (
+          <>
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-1.5">
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-[#0E3320]">Username / College Code</label>
@@ -229,87 +157,7 @@ export default function CollegeLoginPage() {
                   : <><span>Sign In to Dashboard</span></>}
               </button>
             </form>
-          )}
-
-          {/* ── STEP 2: OTP ── */}
-          {step === "otp" && (
-            <form onSubmit={handleVerifyOtp} className="space-y-4">
-              <div className="text-center space-y-1 mb-2">
-                <div className="w-12 h-12 rounded-full bg-[#F0FDF4] border-2 border-[#0E3320] flex items-center justify-center mx-auto mb-3">
-                  <ShieldCheck className="w-6 h-6 text-[#0E3320]" />
-                </div>
-                <p className="text-sm font-bold text-[#0E3320]">Two-Factor Verification</p>
-                <p className="text-xs text-[#5C8261]">
-                  A 6-digit OTP has been sent to <strong className="text-[#0E3320]">{maskedEmail}</strong>
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-[#0E3320] text-center">Enter 6-Digit OTP</label>
-                <div className="flex items-center justify-center gap-1.5 sm:gap-2 w-full">
-                  {digits.map((d, i) => (
-                    <input
-                      key={i}
-                      ref={el => digitRefs.current[i] = el}
-                      type="text"
-                      inputMode="numeric"
-                      maxLength={1}
-                      value={d}
-                      disabled={isLoading || isSuccess}
-                      autoComplete="one-time-code"
-                      onChange={e => {
-                        const val = e.target.value.replace(/\D/g, "").slice(-1);
-                        const next = [...digits];
-                        next[i] = val;
-                        setDigits(next);
-                        if (val && i < 5) digitRefs.current[i + 1]?.focus();
-                      }}
-                      onKeyDown={e => {
-                        if (e.key === "Backspace" && !digits[i] && i > 0) {
-                          digitRefs.current[i - 1]?.focus();
-                        }
-                        if (e.key === "ArrowLeft" && i > 0) digitRefs.current[i - 1]?.focus();
-                        if (e.key === "ArrowRight" && i < 5) digitRefs.current[i + 1]?.focus();
-                      }}
-                      onPaste={e => {
-                        e.preventDefault();
-                        const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
-                        const next = ["", "", "", "", "", ""];
-                        pasted.split("").forEach((ch, idx) => { next[idx] = ch; });
-                        setDigits(next);
-                        const focusIdx = Math.min(pasted.length, 5);
-                        digitRefs.current[focusIdx]?.focus();
-                      }}
-                      className={`flex-1 min-w-0 max-w-[52px] aspect-square text-center text-lg sm:text-xl font-bold rounded-xl border-2 outline-none transition-all disabled:opacity-50
-                        ${d
-                          ? "border-[#0E3320] bg-[#0E3320] text-white"
-                          : "border-[#DDD1BE] bg-[#FAF8F5] text-[#0E3320]"}
-                        focus:ring-4 focus:ring-[#C59B3F]/25 focus:border-[#C59B3F]`}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <button type="submit" disabled={isLoading || isSuccess || otp.length < 6 || digits.some(d => !d)}
-                className="w-full py-3 sm:py-3.5 rounded-xl bg-[#0E3320] hover:bg-[#15482D] text-white font-bold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-70">
-                {isLoading
-                  ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /><span>Verifying...</span></>
-                  : <span>Verify & Sign In</span>}
-              </button>
-
-              <div className="flex items-center justify-between text-xs pt-1">
-                <button type="button" onClick={() => { setStep("credentials"); setDigits(["","","","","",""]); setError(""); }}
-                  className="text-[#5C8261] hover:text-[#0E3320] transition-colors">
-                  Back
-                </button>
-                <button type="button" onClick={handleResendOtp} disabled={resendCooldown > 0}
-                  className="flex items-center gap-1 text-[#5C8261] hover:text-[#C59B3F] disabled:opacity-40 transition-colors">
-                  <RefreshCw className="w-3 h-3" />
-                  {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend OTP"}
-                </button>
-              </div>
-            </form>
-          )}
+          </>
 
           <div className="pt-5 mt-5 border-t border-[#EBE2D4] flex items-center justify-center gap-1.5 text-[11px] text-[#5C8261]">
             <ShieldCheck className="w-3.5 h-3.5 text-[#C59B3F]" />
