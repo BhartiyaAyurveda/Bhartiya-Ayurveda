@@ -138,7 +138,7 @@ export default function StudentResultsPage() {
         instituteCode: s.college_code || "",
         city: s.college_city || "",
         course: s.course || "—",
-        session: s.session_label || "Annual Examination",
+        session: s.session_label || "Annual Examination", examYear: s.exam_year_label || "",
         photoUrl: s.photo_url,
         subjects: rJson.subjects.map(sub => {
           const tot = sub.total ?? sub.total_marks ?? 0;
@@ -211,7 +211,7 @@ export default function StudentResultsPage() {
           instituteCode: s.college_code || "",
           city: s.college_city || "",
           course: s.course || "—",
-          session: s.session_label || "Annual Examination",
+          session: s.session_label || "Annual Examination", examYear: s.exam_year_label || "",
           photoUrl: s.photo_url,
           subjects: data.subjects.map((sub) => {
             const tot = sub.total ?? sub.total_marks ?? 0;
@@ -552,6 +552,7 @@ export default function StudentResultsPage() {
                                 [["Candidate Name", resultData.name?.toUpperCase(), true], ["Roll Number", resultData.rollNo, true, true]],
                                 [["Father's Name", resultData.fatherName?.toUpperCase()], ["Enrollment No.", resultData.enrolmentNo, false, true]],
                                 [["Mother's Name", resultData.motherName?.toUpperCase()], ["Date of Birth", resultData.dob || "—"]],
+                                [["Session", resultData.session || "—", true], ["Exam Year", resultData.examYear || "—", true]],
                               ].map((row, ri) => (
                                 <div key={ri} className="grid grid-cols-2" style={{ borderBottom: "1px dashed #E2E8F0" }}>
                                   {row.map(([label, val, bold, mono]) => (
@@ -623,7 +624,7 @@ export default function StudentResultsPage() {
                                     <td className="py-2.5 px-3 border-r border-slate-200" style={{ fontWeight: 700, color: "#0B1E36", fontSize: 12 }}>{sub.name}</td>
                                     <td className="py-2.5 px-2 text-center border-r border-slate-200" style={{ color: "#64748b", fontWeight: 600, fontSize: 11 }}>{sub.totalMax}</td>
                                     <td className="py-2.5 px-2 text-center font-mono border-r border-slate-200" style={{ fontWeight: 700, color: "#0B1E36", fontSize: 11.5 }}>{sub.thObt ?? "—"}</td>
-                                    <td className="py-2.5 px-2 text-center font-mono border-r border-slate-200" style={{ fontWeight: 700, color: "#0B1E36", fontSize: 11.5 }}>{sub.prMax > 0 ? (sub.prObt ?? "—") : "—"}</td>
+                                    <td className="py-2.5 px-2 text-center font-mono border-r border-slate-200" style={{ fontWeight: 700, color: "#0B1E36", fontSize: 11.5 }}>{sub.prObt ?? "—"}</td>
                                     <td className="py-2.5 px-2 text-center font-mono border-r border-slate-200" style={{ fontWeight: 600, color: "#64748b", fontSize: 11 }}>{sub.caObt !== null && sub.caObt !== undefined && sub.caObt !== "" ? sub.caObt : "—"}</td>
                                     <td className={`py-2.5 px-2 text-center font-mono font-extrabold border-r border-slate-200 ${!sub.pass ? "text-red-600" : "text-[#0B1E36]"}`} style={{ fontSize: 14 }}>{sub.totalObt}</td>
                                     <td className={`py-2.5 px-2 text-center font-extrabold ${!sub.pass ? "text-red-600" : "text-[#8C671D]"}`} style={{ fontSize: 13 }}>{sub.grade || "—"}</td>
