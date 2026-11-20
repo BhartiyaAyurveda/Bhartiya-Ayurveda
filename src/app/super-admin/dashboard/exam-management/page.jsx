@@ -10,6 +10,20 @@ import {
 } from "lucide-react";
 import { getNextSession, getPrevSession, get6DigitSession } from "@/lib/enrollment-roll-utils";
 
+// Courses run up to 4 years (e.g. BEMS, BAMS-AM)
+const YEAR_LABELS = { "1": "1st Year", "2": "2nd Year", "3": "3rd Year", "4": "4th Year" };
+const YEAR_ORD = { "1": "1st", "2": "2nd", "3": "3rd", "4": "4th" };
+const ROLL_FIELD_BY_YEAR = { "1": "roll_no", "2": "roll_no_2nd_year", "3": "roll_no_3rd_year", "4": "roll_no_4th_year" };
+// Roll number shown for a student in the selected year (falls back to the closest earlier year, as before)
+function rollForYear(s, year) {
+  const y = Number(year) || 1;
+  for (let i = y; i >= 1; i--) {
+    const v = s[ROLL_FIELD_BY_YEAR[String(i)]];
+    if (v) return v;
+  }
+  return s.roll_no;
+}
+
 const TABS = [
   { id: "subjects",   label: "Subjects",     icon: BookOpen },
   { id: "datesheet",  label: "Datesheet",    icon: Calendar },
@@ -86,7 +100,7 @@ async function advanceOrRecedeSession({
       if (existing) {
         setSelectedSession(existing.id);
         if (showToast) {
-          showToast(`Switched session to ${existing.session_name || targetName} for ${newYear === "3" ? "3rd" : "2nd"} Year`);
+          showToast(`Switched session to ${existing.session_name || targetName} for ${YEAR_ORD[newYear] || "2nd"} Year`);
         }
         return;
       }
@@ -105,7 +119,7 @@ async function advanceOrRecedeSession({
           }
           setSelectedSession(newSess.id);
           if (showToast) {
-            showToast(`Created & switched session to ${targetName} for ${newYear === "3" ? "3rd" : "2nd"} Year`);
+            showToast(`Created & switched session to ${targetName} for ${YEAR_ORD[newYear] || "2nd"} Year`);
           }
           return;
         }
@@ -129,7 +143,7 @@ async function advanceOrRecedeSession({
       if (existing) {
         setSelectedSession(existing.id);
         if (showToast) {
-          showToast(`Switched back to session ${existing.session_name || targetName} for ${newYear === "1" ? "1st" : "2nd"} Year`);
+          showToast(`Switched back to session ${existing.session_name || targetName} for ${YEAR_ORD[newYear] || "1st"} Year`);
         }
         return;
       }
@@ -246,6 +260,7 @@ function SubjectsTab({
                 { yr: "1", label: "1st Year", icon: GraduationCap },
                 { yr: "2", label: "2nd Year", icon: Sparkles },
                 { yr: "3", label: "3rd Year", icon: Sparkles },
+                { yr: "4", label: "4th Year", icon: Sparkles },
               ].map(({ yr, label, icon: Icon }) => (
                 <button
                   key={yr}
@@ -270,7 +285,7 @@ function SubjectsTab({
         <>
           {/* Add subject */}
           <div className="bg-white rounded-xl border border-[#DDD1BE] p-4">
-            <p className="text-xs font-bold text-[#0E3320] uppercase mb-3">Add New Subject ({selectedYear === "1" ? "1st Year" : selectedYear === "2" ? "2nd Year" : "3rd Year"})</p>
+            <p className="text-xs font-bold text-[#0E3320] uppercase mb-3">Add New Subject ({YEAR_LABELS[selectedYear] || "1st Year"})</p>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
               <div className="sm:col-span-2"><label className="text-[10px] font-bold text-[#5C8261] uppercase">Subject Name *</label><input value={addForm.subject_name} onChange={e => setAddForm(f => ({ ...f, subject_name: e.target.value }))} className={inputCls} placeholder="e.g. Anatomy" /></div>
               <div><label className="text-[10px] font-bold text-[#5C8261] uppercase">Code</label><input value={addForm.subject_code} onChange={e => setAddForm(f => ({ ...f, subject_code: e.target.value }))} className={inputCls} placeholder="e.g. ANAT101" /></div>
@@ -285,12 +300,12 @@ function SubjectsTab({
           {/* Subjects list */}
           <div className="bg-white rounded-xl border border-[#DDD1BE] overflow-hidden">
             <div className="bg-[#F2EDE4] px-4 py-2.5 border-b border-[#DDD1BE]">
-              <p className="text-xs font-bold text-[#0E3320] uppercase">Subjects for {selectedCourse} • {selectedYear === "1" ? "1st Year" : selectedYear === "2" ? "2nd Year" : "3rd Year"} ({subjects.length})</p>
+              <p className="text-xs font-bold text-[#0E3320] uppercase">Subjects for {selectedCourse} • {YEAR_LABELS[selectedYear] || "1st Year"} ({subjects.length})</p>
             </div>
             {loading ? (
               <div className="flex items-center justify-center py-10"><RefreshCw className="w-5 h-5 animate-spin text-[#C59B3F]" /></div>
             ) : subjects.length === 0 ? (
-              <div className="text-center py-10 text-[#5C8261] text-sm">No subjects defined yet for {selectedYear === "1" ? "1st Year" : selectedYear === "2" ? "2nd Year" : "3rd Year"}.</div>
+              <div className="text-center py-10 text-[#5C8261] text-sm">No subjects defined yet for {YEAR_LABELS[selectedYear] || "1st Year"}.</div>
             ) : (
               <table className="w-full text-xs">
                 <thead className="border-b border-[#DDD1BE] bg-[#FAF8F5]">
@@ -439,6 +454,7 @@ function DatesheetTab({
                 { yr: "1", label: "1st Year", icon: GraduationCap },
                 { yr: "2", label: "2nd Year", icon: Sparkles },
                 { yr: "3", label: "3rd Year", icon: Sparkles },
+                { yr: "4", label: "4th Year", icon: Sparkles },
               ].map(({ yr, label, icon: Icon }) => (
                 <button
                   key={yr}
@@ -464,11 +480,11 @@ function DatesheetTab({
           {loading ? (
             <div className="flex items-center justify-center py-10"><RefreshCw className="w-5 h-5 animate-spin text-[#C59B3F]" /></div>
           ) : rows.length === 0 ? (
-            <div className="text-center py-10 text-[#5C8261] text-sm">No subjects found for {selectedYear === "1" ? "1st Year" : selectedYear === "2" ? "2nd Year" : "3rd Year"}. Add subjects in Subjects tab first.</div>
+            <div className="text-center py-10 text-[#5C8261] text-sm">No subjects found for {YEAR_LABELS[selectedYear] || "1st Year"}. Add subjects in Subjects tab first.</div>
           ) : (
             <div className="bg-white rounded-xl border border-[#DDD1BE] overflow-hidden">
               <div className="bg-[#F2EDE4] px-4 py-2.5 border-b border-[#DDD1BE] flex items-center justify-between gap-3 flex-wrap">
-                <p className="text-xs font-bold text-[#0E3320] uppercase">Exam Schedule • {selectedYear === "1" ? "1st Year" : selectedYear === "2" ? "2nd Year" : "3rd Year"}</p>
+                <p className="text-xs font-bold text-[#0E3320] uppercase">Exam Schedule • {YEAR_LABELS[selectedYear] || "1st Year"}</p>
                 <div className="flex items-center gap-2">
                   <select
                     defaultValue=""
@@ -657,7 +673,7 @@ function RollNumbersTab({
       if (!res.ok) {
         showToast(json.error || "Failed to allot roll numbers", "error");
       } else {
-        const yearLabel = targetYear === "3" ? "3rd Year" : targetYear === "2" ? "2nd Year" : "1st Year";
+        const yearLabel = YEAR_LABELS[targetYear] || "1st Year";
         showToast(`Allotted ${json.allotted} roll numbers for ${yearLabel}!`);
         setSelectedStudentIds(new Set());
         load();
@@ -670,7 +686,7 @@ function RollNumbersTab({
   };
 
   const handleUnallot = async (id) => {
-    const yrLabel = targetYear === "3" ? "3rd Year " : targetYear === "2" ? "2nd Year " : "";
+    const yrLabel = targetYear === "1" ? "" : `${YEAR_LABELS[targetYear] || ""} `;
     if (!confirm(`Remove ${yrLabel}roll number for this student? Their marks and admit card may also be cleared.`)) return;
     try {
       const res = await fetch("/api/admin/roll-numbers/unallot", {
@@ -736,7 +752,7 @@ function RollNumbersTab({
   const filteredAllotted = courseAllotted.filter((s) => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
-    const roll = targetYear === "3" ? (s.roll_no_3rd_year || s.roll_no_2nd_year || s.roll_no) : targetYear === "2" ? (s.roll_no_2nd_year || s.roll_no) : s.roll_no;
+    const roll = rollForYear(s, targetYear);
     return (
       roll?.toLowerCase().includes(q) ||
       s.candidate_name?.toLowerCase().includes(q) ||
@@ -830,6 +846,18 @@ function RollNumbersTab({
                 >
                   <Sparkles className="w-4 h-4 text-emerald-400" />
                   3rd Year (roll_no_3rd_year)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleTargetYearChange("4")}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+                    targetYear === "4"
+                      ? "bg-[#0E3320] text-white shadow-sm"
+                      : "text-[#5C8261] hover:text-[#0E3320] hover:bg-white/60"
+                  }`}
+                >
+                  <Sparkles className="w-4 h-4 text-amber-400" />
+                  4th Year (roll_no_4th_year)
                 </button>
               </div>
             </div>
@@ -1088,7 +1116,7 @@ function RollNumbersTab({
                       {searchQuery
                         ? "Try adjusting your search query."
                         : `All eligible students in this session have already been allotted ${
-                            targetYear === "2" ? "2nd Year" : "1st Year"
+                            YEAR_LABELS[targetYear] || "1st Year"
                           } roll numbers.`}
                     </p>
                     {stats.allottedCount > 0 && !searchQuery && (
@@ -1192,7 +1220,7 @@ function RollNumbersTab({
                       {searchQuery
                         ? "Try searching with a different keyword."
                         : `There are currently no students with ${
-                            targetYear === "2" ? "2nd Year" : "1st Year"
+                            YEAR_LABELS[targetYear] || "1st Year"
                           } roll numbers in this session.`}
                     </p>
                     {stats.pendingCount > 0 && !searchQuery && (
@@ -1211,7 +1239,7 @@ function RollNumbersTab({
                       <thead className="bg-[#FAF8F5] border-b border-[#DDD1BE]">
                         <tr>
                           <th className="px-4 py-2.5 text-left font-bold text-[#0E3320] uppercase">
-                            {targetYear === "3" ? "3rd Year Roll No." : targetYear === "2" ? "2nd Year Roll No." : "Roll No."}
+                            {targetYear === "1" ? "Roll No." : `${YEAR_LABELS[targetYear] || ""} Roll No.`}
                           </th>
                           <th className="px-4 py-2.5 text-left font-bold text-[#0E3320] uppercase">Candidate</th>
                           <th className="px-4 py-2.5 text-left font-bold text-[#0E3320] uppercase">Enrollment No.</th>
@@ -1222,7 +1250,7 @@ function RollNumbersTab({
                       </thead>
                       <tbody className="divide-y divide-[#F2EDE4]">
                         {filteredAllotted.map((s) => {
-                          const displayRollNo = targetYear === "3" ? (s.roll_no_3rd_year || s.roll_no_2nd_year || s.roll_no) : targetYear === "2" ? (s.roll_no_2nd_year || s.roll_no) : s.roll_no;
+                          const displayRollNo = rollForYear(s, targetYear);
                           return (
                             <tr key={s.id} className="hover:bg-[#FAF8F5]">
                               <td className="px-4 py-2.5 font-mono font-bold text-[#0E3320]">

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
+import { parseYear, rollFieldForYear } from "@/lib/student-year-utils";
 
 export async function POST(request) {
   const session = await requireAdmin(request);
@@ -9,15 +10,14 @@ export async function POST(request) {
   const { registration_id, target_year } = await request.json();
   if (!registration_id) return NextResponse.json({ error: "registration_id required" }, { status: 400 });
 
-  const isThirdYear = target_year === 3 || target_year === "3" || target_year === "3rd";
-  const isSecondYear = target_year === 2 || target_year === "2" || target_year === "2nd";
-  const rollField = isThirdYear ? "roll_no_3rd_year" : isSecondYear ? "roll_no_2nd_year" : "roll_no";
+  const year = parseYear(target_year);
+  const rollField = rollFieldForYear(year);
 
   // Delete existing marks for this student
   await supabaseAdmin.from("student_subject_marks").delete().eq("registration_id", registration_id);
 
   const updateData = { [rollField]: null };
-  if (!isSecondYear && !isThirdYear) {
+  if (year === 1) {
     updateData.admit_card_generated_at = null;
     updateData.result_published_at = null;
   }

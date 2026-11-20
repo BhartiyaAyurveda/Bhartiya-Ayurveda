@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { isEmailVerified } from "@/lib/otp";
 import { getResultData } from "@/lib/result-data";
-import { detectYearFromRollNo } from "@/lib/student-year-utils";
+import { detectYearFromRollNo, rollEqFilter } from "@/lib/student-year-utils";
 
-const REG_SELECT = `id, roll_no, roll_no_2nd_year, roll_no_3rd_year, enrollment_no, candidate_name, father_name, mother_name, dob, gender, category, photo_url, session_label, status, result_published_at, courses(id, course_name, duration_label), colleges(college_name, city, state, username)`;
+const REG_SELECT = `id, roll_no, roll_no_2nd_year, roll_no_3rd_year, roll_no_4th_year, enrollment_no, candidate_name, father_name, mother_name, dob, gender, category, photo_url, session_label, status, result_published_at, courses(id, course_name, duration_label), colleges(college_name, city, state, username)`;
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -26,7 +26,7 @@ export async function GET(request) {
     ({ data: reg, error: err } = await supabaseAdmin
       .from("student_registrations")
       .select(REG_SELECT)
-      .or(`roll_no.eq.${roll_no},roll_no_2nd_year.eq.${roll_no},roll_no_3rd_year.eq.${roll_no}`)
+      .or(rollEqFilter(roll_no))
       .eq("dob", dob)
       .eq("status", "approved")
       .maybeSingle());

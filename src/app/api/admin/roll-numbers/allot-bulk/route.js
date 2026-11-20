@@ -6,7 +6,7 @@ import {
   get6DigitSession,
   getPrevSession,
 } from "@/lib/enrollment-roll-utils";
-import { buildStudentYearMeta } from "@/lib/student-year-utils";
+import { buildStudentYearMeta, courseYears, parseYear, previousRollNo, rollFieldForYear, yearLabel } from "@/lib/student-year-utils";
 
 export async function POST(request) {
   const session = await requireAdmin(request);
@@ -16,14 +16,11 @@ export async function POST(request) {
   const { exam_session_id, prefix: customPrefix, target_year } = body;
   if (!exam_session_id) return NextResponse.json({ error: "exam_session_id required" }, { status: 400 });
 
-  // 1st year (roll_no) vs 2nd year (roll_no_2nd_year) vs 3rd year (roll_no_3rd_year)
-  const isThirdYear = target_year === 3 || target_year === "3" || target_year === "3rd" || target_year === "third";
-  const isSecondYear = target_year === 2 || target_year === "2" || target_year === "2nd" || target_year === "second";
-  const rollField = isThirdYear
-    ? "roll_no_3rd_year"
-    : isSecondYear
-    ? "roll_no_2nd_year"
-    : "roll_no";
+  // 1st year (roll_no), 2nd (roll_no_2nd_year), 3rd (roll_no_3rd_year), 4th (roll_no_4th_year)
+  const targetYearNum = parseYear(target_year);
+  const isLaterYear = targetYearNum > 1;
+  const rollField = rollFieldForYear(targetYearNum);
+  const prevRollField = isLaterYear ? rollFieldForYear(targetYearNum - 1) : null;
 
   // Get session info for roll number session digits
   const { data: examSession } = await supabaseAdmin
@@ -40,8 +37,10 @@ export async function POST(request) {
   const sessionDigits = get6DigitSession(sessionStr);
 
   let prevSessionId = null;
-  if ((isSecondYear || isThirdYear) && sessionStr) {
+  let prevDigits = null;
+  if (isLaterYear && sessionStr) {
     const prevName = getPrevSession(sessionStr);
+    if (prevName) prevDigits = get6DigitSession(prevName);
     if (prevName) {
       const { data: allSessions } = await supabaseAdmin
         .from("exam_sessions")
@@ -62,23 +61,18 @@ export async function POST(request) {
   // Fetch all approved students for this session without a roll number for the target year
   let studentQuery = supabaseAdmin
     .from("student_registrations")
-    .select("id, candidate_name, college_id, roll_no, roll_no_2nd_year, roll_no_3rd_year, session_label, academic_session, colleges(college_name, college_code)")
+    .select("id, candidate_name, college_id, roll_no, roll_no_2nd_year, roll_no_3rd_year, roll_no_4th_year, session_label, academic_session, colleges(college_name, college_code), courses(id, duration_label)")
     .eq("status", "approved");
 
-  if (isThirdYear) {
+  if (isLaterYear) {
     const sessionIds = prevSessionId ? [exam_session_id, prevSessionId] : [exam_session_id];
+    // Eligible if linked to this/previous session, or the previous year's roll number was allotted in the previous session
+    // (exam_session_id stays on the student's 1st-year session, so it alone misses 3rd/4th year students)
     studentQuery = studentQuery
-      .in("exam_session_id", sessionIds)
-      .not("roll_no_2nd_year", "is", null)
-      .neq("roll_no_2nd_year", "")
-      .or(`roll_no_3rd_year.is.null,roll_no_3rd_year.eq.""`);
-  } else if (isSecondYear) {
-    const sessionIds = prevSessionId ? [exam_session_id, prevSessionId] : [exam_session_id];
-    studentQuery = studentQuery
-      .in("exam_session_id", sessionIds)
-      .not("roll_no", "is", null)
-      .neq("roll_no", "")
-      .or(`roll_no_2nd_year.is.null,roll_no_2nd_year.eq.""`);
+      .or(prevDigits ? `exam_session_id.in.(${sessionIds.join(",")}),${prevRollField}.ilike.%${prevDigits}%` : `exam_session_id.in.(${sessionIds.join(",")})`)
+      .not(prevRollField, "is", null)
+      .neq(prevRollField, "")
+      .or(`${rollField}.is.null,${rollField}.eq.""`);
   } else {
     studentQuery = studentQuery
       .eq("exam_session_id", exam_session_id)
@@ -89,7 +83,12 @@ export async function POST(request) {
     studentQuery = studentQuery.in("id", body.student_ids);
   }
 
-  const { data: students, error: fetchErr } = await studentQuery;
+  const { data: fetchedStudents, error: fetchErr } = await studentQuery;
+
+  // 4th year is only for 4-year courses (BEMS, BAMS-AM ...)
+  const students = targetYearNum === 4
+    ? (fetchedStudents || []).filter((st) => (courseYears(st.courses?.duration_label) ?? 0) >= 4)
+    : fetchedStudents;
 
   if (fetchErr) return NextResponse.json({ error: fetchErr.message }, { status: 500 });
   if (!students || students.length === 0) {
@@ -104,11 +103,9 @@ export async function POST(request) {
     let prefix = customPrefix?.trim();
     if (!prefix) {
       let collegeInitials = "";
-      if (isThirdYear && (student.roll_no_2nd_year || student.roll_no)) {
-        const match = (student.roll_no_2nd_year || student.roll_no).match(/^[A-Za-z]+/);
-        if (match) collegeInitials = match[0].toUpperCase();
-      } else if (isSecondYear && student.roll_no) {
-        const match = student.roll_no.match(/^[A-Za-z]+/);
+      const earlierRoll = isLaterYear ? previousRollNo(student, targetYearNum) : null;
+      if (earlierRoll) {
+        const match = earlierRoll.match(/^[A-Za-z]+/);
         if (match) collegeInitials = match[0].toUpperCase();
       }
       if (!collegeInitials) {
@@ -147,8 +144,6 @@ export async function POST(request) {
     });
   }
 
-  const targetYearNum = isThirdYear ? 3 : isSecondYear ? 2 : 1;
-
   // Update each student in DB
   const results = await Promise.all(
     updates.map((u) => {
@@ -157,7 +152,7 @@ export async function POST(request) {
         [rollField]: u[rollField],
       };
 
-      if (!isSecondYear && !isThirdYear) {
+      if (!isLaterYear) {
         updateData.exam_session_id = exam_session_id;
       }
 
@@ -187,7 +182,7 @@ export async function POST(request) {
   return NextResponse.json({
     ok: true,
     allotted: updates.length,
-    target_year: isThirdYear ? "3rd Year" : isSecondYear ? "2nd Year" : "1st Year",
+    target_year: yearLabel(targetYearNum),
     roll_field: rollField,
     roll_numbers: updates.map((u) => ({ id: u.id, roll_no: u[rollField] })),
   });

@@ -8,7 +8,7 @@ export async function GET(request) {
 
   const { data: approved, error } = await supabaseAdmin
     .from("student_registrations")
-    .select("id, candidate_name, roll_no, roll_no_2nd_year, roll_no_3rd_year, enrollment_no, exam_session_id, colleges(college_name), courses(course_name)")
+    .select("id, candidate_name, roll_no, roll_no_2nd_year, roll_no_3rd_year, roll_no_4th_year, enrollment_no, exam_session_id, colleges(college_name), courses(course_name)")
     .eq("status", "approved")
     .order("roll_no", { ascending: true });
 
@@ -67,10 +67,26 @@ export async function GET(request) {
     }
   }
 
+  // Duplicate 4th year roll numbers
+  const rollNos4 = (approved || []).filter(r => r.roll_no_4th_year).map(r => r.roll_no_4th_year);
+  const seen4 = new Set();
+  const dupes4 = new Set();
+  for (const rn of rollNos4) {
+    if (seen4.has(rn)) dupes4.add(rn);
+    seen4.add(rn);
+  }
+  for (const dup of dupes4) {
+    const rows = (approved || []).filter(r => r.roll_no_4th_year === dup);
+    for (const r of rows) {
+      mismatches.push({ type: "duplicate_roll_no_4th_year", id: r.id, candidate_name: r.candidate_name, college: r.colleges?.college_name, roll_no: r.roll_no_4th_year, detail: `Duplicate 4th year roll number: ${dup}` });
+    }
+  }
+
   // Missing enrollment number
-  const noEnrollment = (approved || []).filter(r => (r.roll_no || r.roll_no_2nd_year || r.roll_no_3rd_year) && !r.enrollment_no);
+  const anyRoll = (r) => r.roll_no || r.roll_no_2nd_year || r.roll_no_3rd_year || r.roll_no_4th_year;
+  const noEnrollment = (approved || []).filter(r => anyRoll(r) && !r.enrollment_no);
   for (const r of noEnrollment) {
-    mismatches.push({ type: "missing_enrollment_no", id: r.id, candidate_name: r.candidate_name, roll_no: r.roll_no || r.roll_no_2nd_year || r.roll_no_3rd_year, college: r.colleges?.college_name, detail: "Roll number assigned but no enrollment number" });
+    mismatches.push({ type: "missing_enrollment_no", id: r.id, candidate_name: r.candidate_name, roll_no: anyRoll(r), college: r.colleges?.college_name, detail: "Roll number assigned but no enrollment number" });
   }
 
   return NextResponse.json({

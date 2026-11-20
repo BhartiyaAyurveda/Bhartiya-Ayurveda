@@ -7,6 +7,7 @@ import {
   getNextSession,
   getPrevSession,
 } from "@/lib/enrollment-roll-utils";
+import { courseYears, parseYear, previousRollNo, rollFieldForYear, yearLabel } from "@/lib/student-year-utils";
 
 export async function GET(request) {
   const session = await requireAdmin(request);
@@ -15,17 +16,15 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const exam_session_id = searchParams.get("exam_session_id");
   const target_year = searchParams.get("target_year");
-  const isThirdYear = target_year === "3" || target_year === "3rd";
-  const isSecondYear = target_year === "2" || target_year === "2nd";
-  const rollField = isThirdYear
-    ? "roll_no_3rd_year"
-    : isSecondYear
-    ? "roll_no_2nd_year"
-    : "roll_no";
+  const targetYear = parseYear(target_year);
+  const isLaterYear = targetYear > 1;
+  const rollField = rollFieldForYear(targetYear);
+  const prevRollField = isLaterYear ? rollFieldForYear(targetYear - 1) : null;
 
   // 1. Exam Session details & Auto-link unlinked students
   let sessionDigits = "202324";
   let prevSessionId = null;
+  let prevDigits = null;
 
   if (exam_session_id) {
     const { data: examSession } = await supabaseAdmin
@@ -40,9 +39,10 @@ export async function GET(request) {
       examSession?.session_label;
     if (sessionStr) sessionDigits = get6DigitSession(sessionStr);
 
-    // If 2nd or 3rd year, find previous session ID (e.g. 2025-26 -> 2024-25, or 2024-25 -> 2023-24)
-    if ((isSecondYear || isThirdYear) && sessionStr) {
+    // If 2nd/3rd/4th year, find previous session ID (e.g. 2025-26 -> 2024-25, or 2024-25 -> 2023-24)
+    if (isLaterYear && sessionStr) {
       const prevName = getPrevSession(sessionStr);
+      if (prevName) prevDigits = get6DigitSession(prevName);
       if (prevName) {
         const { data: allSessions } = await supabaseAdmin
           .from("exam_sessions")
@@ -61,7 +61,7 @@ export async function GET(request) {
     }
 
     // Auto-link any approved students whose academic_session matches this exam session but have null exam_session_id
-    if (sessionDigits && !isSecondYear && !isThirdYear) {
+    if (sessionDigits && !isLaterYear) {
       const { data: unlinked } = await supabaseAdmin
         .from("student_registrations")
         .select("id, academic_session, session_label")
@@ -91,6 +91,7 @@ export async function GET(request) {
       roll_no,
       roll_no_2nd_year,
       roll_no_3rd_year,
+      roll_no_4th_year,
       enrollment_no,
       exam_session_id,
       admit_card_generated_at,
@@ -104,13 +105,13 @@ export async function GET(request) {
 
   if (exam_session_id) {
     if (sessionDigits) {
-      if ((isSecondYear || isThirdYear) && prevSessionId) {
+      if (isLaterYear && prevSessionId) {
         allottedQuery = allottedQuery.or(`${rollField}.ilike.%${sessionDigits}%,exam_session_id.in.(${exam_session_id},${prevSessionId})`);
       } else {
         allottedQuery = allottedQuery.or(`${rollField}.ilike.%${sessionDigits}%,exam_session_id.eq.${exam_session_id}`);
       }
     } else {
-      if ((isSecondYear || isThirdYear) && prevSessionId) {
+      if (isLaterYear && prevSessionId) {
         allottedQuery = allottedQuery.in("exam_session_id", [exam_session_id, prevSessionId]);
       } else {
         allottedQuery = allottedQuery.eq("exam_session_id", exam_session_id);
@@ -139,7 +140,8 @@ export async function GET(request) {
   // 3. Fetch Pending Students
   // For 1st Year: approved, in this exam session, roll_no is null or empty
   // For 2nd Year: approved, has 1st year roll_no, roll_no_2nd_year is null or empty, in [exam_session_id, prevSessionId]
-  // For 3rd Year: approved, has 2nd year roll_no (or 1st year), roll_no_3rd_year is null or empty, in [exam_session_id, prevSessionId]
+  // For 3rd/4th Year: approved, has the previous year's roll_no, this year's roll_no is null or empty, in [exam_session_id, prevSessionId]
+  // For 4th Year only 4-year courses are eligible.
   let pendingQuery = supabaseAdmin
     .from("student_registrations")
     .select(`
@@ -149,29 +151,25 @@ export async function GET(request) {
       roll_no,
       roll_no_2nd_year,
       roll_no_3rd_year,
+      roll_no_4th_year,
       enrollment_no,
       academic_session,
       session_label,
       created_at,
       colleges(college_name),
-      courses(id, course_name)
+      courses(id, course_name, duration_label)
     `)
     .eq("status", "approved");
 
-  if (isThirdYear) {
+  if (isLaterYear) {
     const sessionIds = prevSessionId ? [exam_session_id, prevSessionId] : [exam_session_id];
+    // Eligible if linked to this/previous session, or the previous year's roll number was allotted in the previous session
+    // (exam_session_id stays on the student's 1st-year session, so it alone misses 3rd/4th year students)
     pendingQuery = pendingQuery
-      .in("exam_session_id", sessionIds)
-      .not("roll_no_2nd_year", "is", null)
-      .neq("roll_no_2nd_year", "")
-      .or(`roll_no_3rd_year.is.null,roll_no_3rd_year.eq.""`);
-  } else if (isSecondYear) {
-    const sessionIds = prevSessionId ? [exam_session_id, prevSessionId] : [exam_session_id];
-    pendingQuery = pendingQuery
-      .in("exam_session_id", sessionIds)
-      .not("roll_no", "is", null)
-      .neq("roll_no", "")
-      .or(`roll_no_2nd_year.is.null,roll_no_2nd_year.eq.""`);
+      .or(prevDigits ? `exam_session_id.in.(${sessionIds.join(",")}),${prevRollField}.ilike.%${prevDigits}%` : `exam_session_id.in.(${sessionIds.join(",")})`)
+      .not(prevRollField, "is", null)
+      .neq(prevRollField, "")
+      .or(`${rollField}.is.null,${rollField}.eq.""`);
   } else {
     pendingQuery = pendingQuery
       .eq("exam_session_id", exam_session_id)
@@ -180,8 +178,13 @@ export async function GET(request) {
 
   pendingQuery = pendingQuery.order("created_at", { ascending: true });
 
-  const { data: pendingData, error: pendingErr } = await pendingQuery;
+  const { data: pendingRaw, error: pendingErr } = await pendingQuery;
   if (pendingErr) return NextResponse.json({ error: pendingErr.message }, { status: 500 });
+
+  // 4th year is only for 4-year courses (BEMS, BAMS-AM ...)
+  const pendingData = targetYear === 4
+    ? (pendingRaw || []).filter((s) => (courseYears(s.courses?.duration_label) ?? 0) >= 4)
+    : pendingRaw;
 
   // 4. Calculate Projected Roll Numbers for Pending Students
   const seqMap = new Map();
@@ -189,11 +192,9 @@ export async function GET(request) {
 
   for (const s of pendingData || []) {
     let initials = "";
-    if (isThirdYear && (s.roll_no_2nd_year || s.roll_no)) {
-      const match = (s.roll_no_2nd_year || s.roll_no).match(/^[A-Za-z]+/);
-      if (match) initials = match[0].toUpperCase();
-    } else if (isSecondYear && s.roll_no) {
-      const match = s.roll_no.match(/^[A-Za-z]+/);
+    const earlierRoll = isLaterYear ? previousRollNo(s, targetYear) : null;
+    if (earlierRoll) {
+      const match = earlierRoll.match(/^[A-Za-z]+/);
       if (match) initials = match[0].toUpperCase();
     }
     if (!initials) {
@@ -247,7 +248,7 @@ export async function GET(request) {
     },
     pattern_info: {
       session_digits: sessionDigits,
-      target_year: isThirdYear ? "3rd Year" : isSecondYear ? "2nd Year" : "1st Year",
+      target_year: yearLabel(targetYear),
       roll_field: rollField,
     },
   });

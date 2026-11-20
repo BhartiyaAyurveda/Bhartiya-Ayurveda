@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getAdmitCardData } from "@/lib/admit-card-data";
 import { get6DigitSession } from "@/lib/enrollment-roll-utils";
+import { pickYearForSession, rollNoForYear, rollIlikeFilter } from "@/lib/student-year-utils";
 
 export async function GET(request) {
   const session = await requireAdmin(request);
@@ -21,15 +22,15 @@ export async function GET(request) {
   const sessionStr = examSession?.session_name || examSession?.academic_session || examSession?.session_label || "";
   const sessionDigits = get6DigitSession(sessionStr);
 
-  // Fetch all approved students who belong to this session for Year 1, Year 2, or Year 3
+  // Fetch all approved students who belong to this session for Year 1, 2, 3 or 4
   let query = supabaseAdmin
     .from("student_registrations")
-    .select("id, candidate_name, roll_no, roll_no_2nd_year, roll_no_3rd_year, exam_session_id, session_label")
+    .select("id, candidate_name, roll_no, roll_no_2nd_year, roll_no_3rd_year, roll_no_4th_year, exam_session_id, session_label")
     .eq("status", "approved");
 
   if (sessionDigits) {
     query = query.or(
-      `roll_no.ilike.%${sessionDigits}%,roll_no_2nd_year.ilike.%${sessionDigits}%,roll_no_3rd_year.ilike.%${sessionDigits}%,exam_session_id.eq.${exam_session_id}`
+      `${rollIlikeFilter(sessionDigits)},exam_session_id.eq.${exam_session_id}`
     );
   } else {
     query = query.eq("exam_session_id", exam_session_id);
@@ -45,23 +46,8 @@ export async function GET(request) {
 
   for (const student of students) {
     // Determine which year matches this session
-    let targetYear = 1;
-    if (student.roll_no_3rd_year && sessionDigits && student.roll_no_3rd_year.includes(sessionDigits)) {
-      targetYear = 3;
-    } else if (student.roll_no_2nd_year && sessionDigits && student.roll_no_2nd_year.includes(sessionDigits)) {
-      targetYear = 2;
-    } else if (student.roll_no && sessionDigits && student.roll_no.includes(sessionDigits)) {
-      targetYear = 1;
-    } else if (student.roll_no_3rd_year) {
-      targetYear = 3;
-    } else if (student.roll_no_2nd_year) {
-      targetYear = 2;
-    }
-
-    const targetRollNo =
-      targetYear === 3 ? student.roll_no_3rd_year :
-      targetYear === 2 ? student.roll_no_2nd_year :
-      student.roll_no;
+    const targetYear = pickYearForSession(student, sessionDigits);
+    const targetRollNo = targetYear === 1 ? student.roll_no : rollNoForYear(student, targetYear);
 
     if (!targetRollNo) continue;
 

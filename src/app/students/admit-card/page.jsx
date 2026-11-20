@@ -116,7 +116,7 @@ export default function AdmitCardPage() {
       setError(""); setLoading(true); setCardData(null);
       const emailParams = { email: otpEmail.trim() };
       if (examYear && examYear !== "Annual Examination") {
-        emailParams.year = examYear.includes("2") ? "2" : examYear.includes("3") ? "3" : "1";
+        emailParams.year = examYear.includes("4") ? "4" : examYear.includes("3") ? "3" : examYear.includes("2") ? "2" : "1";
       }
       const cardRes = await fetch(`/api/public/admit-card?${new URLSearchParams(emailParams)}`);
       const cardJson = await cardRes.json();
@@ -138,7 +138,7 @@ export default function AdmitCardPage() {
     try {
       const params = { roll_no: rollNo.trim(), dob };
       if (examYear && examYear !== "Annual Examination") {
-        params.year = examYear.includes("2") ? "2" : examYear.includes("3") ? "3" : "1";
+        params.year = examYear.includes("4") ? "4" : examYear.includes("3") ? "3" : examYear.includes("2") ? "2" : "1";
       }
       const res  = await fetch(`/api/public/admit-card?${new URLSearchParams(params)}`);
       const data = await res.json();
@@ -387,6 +387,7 @@ export default function AdmitCardPage() {
                   <option value="1st Year">1st Year / प्रथम वर्ष</option>
                   <option value="2nd Year">2nd Year / द्वितीय वर्ष</option>
                   <option value="3rd Year">3rd Year / तृतीय वर्ष</option>
+                  <option value="4th Year">4th Year / चतुर्थ वर्ष</option>
                 </select>
               </div>
             </div>

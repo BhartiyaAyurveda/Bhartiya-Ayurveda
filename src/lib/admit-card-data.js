@@ -1,11 +1,11 @@
 import { supabaseAdmin } from "@/lib/supabase";
-import { getStudentYearMeta, buildStudentYearMeta } from "@/lib/student-year-utils";
+import { getStudentYearMeta, buildStudentYearMeta, latestYear, rollNoForYear, yearLabel } from "@/lib/student-year-utils";
 import { get6DigitSession } from "@/lib/enrollment-roll-utils";
 
 export async function getAdmitCardData(registrationId, targetYear = null, targetSessionId = null) {
   const { data: reg, error: regError } = await supabaseAdmin
     .from("student_registrations")
-    .select("id, enrollment_no, roll_no, roll_no_2nd_year, roll_no_3rd_year, candidate_name, father_name, mother_name, gender, dob, course_id, photo_url, status, admit_card_generated_at, exam_session_id, college_id, session_label, academic_session, colleges(college_name, username), courses(course_name)")
+    .select("id, enrollment_no, roll_no, roll_no_2nd_year, roll_no_3rd_year, roll_no_4th_year, candidate_name, father_name, mother_name, gender, dob, course_id, photo_url, status, admit_card_generated_at, exam_session_id, college_id, session_label, academic_session, colleges(college_name, username), courses(course_name)")
     .eq("id", registrationId)
     .single();
 
@@ -13,14 +13,11 @@ export async function getAdmitCardData(registrationId, targetYear = null, target
   if (reg.status !== "approved") return { data: null, error: "Registration is not approved yet" };
 
   // 1. Determine student year (explicit targetYear or active latest year)
-  const studentYear = targetYear ? Number(targetYear) : (reg.roll_no_3rd_year ? 3 : reg.roll_no_2nd_year ? 2 : 1);
-  const activeRollNo =
-    studentYear === 3 ? (reg.roll_no_3rd_year || reg.roll_no) :
-    studentYear === 2 ? (reg.roll_no_2nd_year || reg.roll_no) :
-    reg.roll_no;
+  const studentYear = targetYear ? Number(targetYear) : latestYear(reg);
+  const activeRollNo = rollNoForYear(reg, studentYear);
 
   if (!activeRollNo) {
-    return { data: null, error: `Roll number for ${studentYear === 1 ? "1st" : studentYear === 2 ? "2nd" : "3rd"} Year has not been allotted yet` };
+    return { data: null, error: `Roll number for ${yearLabel(studentYear)} has not been allotted yet` };
   }
 
   // 2. Resolve exam session for this specific year
@@ -146,7 +143,7 @@ export async function getAdmitCardData(registrationId, targetYear = null, target
     }
   }
 
-  const examYearLabel = `${studentYear === 1 ? "1st" : studentYear === 2 ? "2nd" : "3rd"} Year`;
+  const examYearLabel = yearLabel(studentYear);
 
   return {
     data: {

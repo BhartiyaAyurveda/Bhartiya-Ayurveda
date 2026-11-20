@@ -1,5 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase";
-import { getStudentYearMeta, isYearResultPublished } from "@/lib/student-year-utils";
+import { getStudentYearMeta, isYearResultPublished, latestYear, rollNoForYear, yearLabel } from "@/lib/student-year-utils";
 import { get6DigitSession } from "@/lib/enrollment-roll-utils";
 
 function computeGrade(pct) {
@@ -15,7 +15,7 @@ function computeGrade(pct) {
 export async function getResultData(registrationId, targetYear = null, targetSessionId = null) {
   const { data: reg, error: regError } = await supabaseAdmin
     .from("student_registrations")
-    .select("id, enrollment_no, roll_no, roll_no_2nd_year, roll_no_3rd_year, candidate_name, father_name, mother_name, dob, course_id, photo_url, status, admit_card_generated_at, exam_session_id, college_id, session_label, academic_session, colleges(college_name, username), courses(course_name), result_published_at")
+    .select("id, enrollment_no, roll_no, roll_no_2nd_year, roll_no_3rd_year, roll_no_4th_year, candidate_name, father_name, mother_name, dob, course_id, photo_url, status, admit_card_generated_at, exam_session_id, college_id, session_label, academic_session, colleges(college_name, username), courses(course_name), result_published_at")
     .eq("id", registrationId)
     .single();
 
@@ -23,11 +23,8 @@ export async function getResultData(registrationId, targetYear = null, targetSes
   if (reg.status !== "approved") return { data: null, error: "Registration is not approved yet" };
 
   // 1. Determine student year (explicit targetYear or active latest year)
-  const studentYear = targetYear ? Number(targetYear) : (reg.roll_no_3rd_year ? 3 : reg.roll_no_2nd_year ? 2 : 1);
-  const activeRollNo =
-    studentYear === 3 ? (reg.roll_no_3rd_year || reg.roll_no) :
-    studentYear === 2 ? (reg.roll_no_2nd_year || reg.roll_no) :
-    reg.roll_no;
+  const studentYear = targetYear ? Number(targetYear) : latestYear(reg);
+  const activeRollNo = rollNoForYear(reg, studentYear);
 
   // 2. Resolve exam session for this specific year
   const meta = getStudentYearMeta(reg);
@@ -113,7 +110,7 @@ export async function getResultData(registrationId, targetYear = null, targetSes
     "";
   const sessionLabel = rawSession || "—";
 
-  const examYearLabel = `${studentYear === 1 ? "1st" : studentYear === 2 ? "2nd" : "3rd"} Year`;
+  const examYearLabel = yearLabel(studentYear);
 
   const subjects = subjectRows.map(s => {
     const totalMax = (s.theory_max ?? 0) + (s.practical_max ?? 0) + (s.ca_max ?? 0);
