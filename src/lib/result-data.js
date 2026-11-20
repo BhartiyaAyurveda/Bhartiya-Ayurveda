@@ -1,5 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase";
-import { getStudentYearMeta, isYearResultPublished, latestYear, rollNoForYear, yearLabel } from "@/lib/student-year-utils";
+import { getStudentYearMeta, isYearResultPublished, latestYear, rollNoForYear, yearTitle } from "@/lib/student-year-utils";
 import { get6DigitSession } from "@/lib/enrollment-roll-utils";
 
 function computeGrade(pct) {
@@ -110,7 +110,7 @@ export async function getResultData(registrationId, targetYear = null, targetSes
     "";
   const sessionLabel = rawSession || "—";
 
-  const examYearLabel = yearLabel(studentYear);
+  const examYearLabel = yearTitle(studentYear);
 
   const subjects = subjectRows.map(s => {
     const totalMax = (s.theory_max ?? 0) + (s.practical_max ?? 0) + (s.ca_max ?? 0);

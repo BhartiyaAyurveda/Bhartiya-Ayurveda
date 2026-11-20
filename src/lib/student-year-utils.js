@@ -58,6 +58,11 @@ export function yearOrdinal(year) {
   return ["", "1st", "2nd", "3rd", "4th"][Number(year)] || "1st";
 }
 
+/** Wording used on marksheets / admit cards: First, Second, Third, Fourth / Final Year */
+export function yearTitle(year) {
+  return ["", "First Year", "Second Year", "Third Year", "Fourth / Final Year"][Number(year)] || "First Year";
+}
+
 /** e.g. "4th Year" */
 export function yearLabel(year) {
   return `${yearOrdinal(year)} Year`;

@@ -1,5 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase";
-import { getStudentYearMeta, buildStudentYearMeta, latestYear, rollNoForYear, yearLabel } from "@/lib/student-year-utils";
+import { getStudentYearMeta, buildStudentYearMeta, latestYear, rollNoForYear, yearLabel, yearTitle } from "@/lib/student-year-utils";
 import { get6DigitSession } from "@/lib/enrollment-roll-utils";
 
 export async function getAdmitCardData(registrationId, targetYear = null, targetSessionId = null) {
@@ -143,7 +143,7 @@ export async function getAdmitCardData(registrationId, targetYear = null, target
     }
   }
 
-  const examYearLabel = yearLabel(studentYear);
+  const examYearLabel = yearTitle(studentYear);
 
   return {
     data: {

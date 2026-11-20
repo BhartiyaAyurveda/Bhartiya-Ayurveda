@@ -532,7 +532,7 @@ export default function StudentResultsPage() {
                           <div className="h-px flex-1" style={{ background: "linear-gradient(90deg,transparent,#C59B3F)" }}></div>
                           <div>
                             <div className="text-[#0B1E36] font-extrabold text-[13px] tracking-[0.2em] uppercase">Statement of Marks &nbsp;/&nbsp; अंक तालिका</div>
-                            <div className="text-[#8C671D] text-[9.5px] font-semibold tracking-wider mt-0.5">{resultData.session}</div>
+                            <div className="text-[#8C671D] text-[11px] font-bold tracking-wider mt-0.5">{[resultData.examYear, resultData.session].filter(Boolean).join("  •  ")}</div>
                           </div>
                           <div className="h-px flex-1" style={{ background: "linear-gradient(90deg,#C59B3F,transparent)" }}></div>
                         </div>
