@@ -961,7 +961,7 @@ function RollNumbersTab({
                   }`}
                 >
                   <Clock className="w-3.5 h-3.5" />
-                  ⏳ Pending Allotment ({currentPendingCount})
+                  Pending Allotment ({currentPendingCount})
                 </button>
                 <button
                   type="button"
@@ -976,7 +976,7 @@ function RollNumbersTab({
                   }`}
                 >
                   <CheckCircle2 className="w-3.5 h-3.5" />
-                  ✅ Allotted Students ({currentAllottedCount})
+                  Allotted Students ({currentAllottedCount})
                 </button>
               </div>
 
@@ -1024,15 +1024,15 @@ function RollNumbersTab({
                     <div className="flex flex-wrap items-center gap-3 pt-1 border-t border-amber-100">
                       <div className="flex items-center gap-1.5 text-xs">
                         <span className="px-2 py-1 bg-white rounded-lg border border-amber-200 font-mono font-semibold text-[#0E3320]">
-                          🏛️ Initials: {sampleInitials}
+                          Initials: {sampleInitials}
                         </span>
                         <span className="text-amber-500 font-bold">+</span>
                         <span className="px-2 py-1 bg-white rounded-lg border border-amber-200 font-mono font-semibold text-[#0E3320]">
-                          🗓️ Session: {sessionDigits}
+                          Session: {sessionDigits}
                         </span>
                         <span className="text-amber-500 font-bold">+</span>
                         <span className="px-2 py-1 bg-white rounded-lg border border-amber-200 font-mono font-semibold text-[#0E3320]">
-                          🔢 Seq: 01, 02..
+                          Seq: 01, 02..
                         </span>
                       </div>
 

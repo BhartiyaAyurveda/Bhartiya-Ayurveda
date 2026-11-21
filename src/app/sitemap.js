@@ -16,6 +16,8 @@ export default function sitemap() {
     { url: "/students/login", priority: 0.5, changeFrequency: "yearly" },
     { url: "/announcements", priority: 0.8, changeFrequency: "daily" },
     { url: "/students/results", priority: 0.8, changeFrequency: "weekly" },
+    { url: "/students/registration-certificate", priority: 0.6, changeFrequency: "monthly" },
+    { url: "/students/noc", priority: 0.6, changeFrequency: "monthly" },
     { url: "/students/admit-card", priority: 0.8, changeFrequency: "weekly" },
   ];
 

@@ -75,6 +75,8 @@ export default function Footer() {
               <li><Link href="/students/registration" className="hover:text-[#8C671D] transition-colors">Student Registration</Link></li>
               <li><Link href="/students/login" className="hover:text-[#8C671D] transition-colors">Student Login</Link></li>
               <li><Link href="/students/results" className="hover:text-[#8C671D] transition-colors">Examination Results</Link></li>
+              <li><Link href="/students/registration-certificate" className="hover:text-[#8C671D] transition-colors">Registration Certificate</Link></li>
+              <li><Link href="/students/noc" className="hover:text-[#8C671D] transition-colors">NOC Certificate</Link></li>
               <li><Link href="/certificate-verification" className="hover:text-[#8C671D] transition-colors">Certificate Verification</Link></li>
               <li><Link href="/affiliated-institutes" className="hover:text-[#8C671D] transition-colors">Approved Colleges</Link></li>
               <li><Link href="/college/login" className="text-[#8C671D] hover:text-[#0E3320] transition-colors font-medium">College Login</Link></li>

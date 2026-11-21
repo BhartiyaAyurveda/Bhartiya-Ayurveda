@@ -117,7 +117,7 @@ export default function PillarsSection() {
                 {/* Subtle top decoration */}
                 <div className="flex items-center justify-center gap-2 mb-1.5">
                   <span className="w-5 xs:w-6 h-[1.5px] bg-[#2E7A4A]/30 rounded-full" />
-                  <span className="text-base sm:text-lg animate-breathe inline-block">🌿</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#C59B3F] animate-breathe inline-block" />
                   <span className="w-5 xs:w-6 h-[1.5px] bg-[#2E7A4A]/30 rounded-full" />
                 </div>
 

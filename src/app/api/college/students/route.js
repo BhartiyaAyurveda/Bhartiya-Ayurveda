@@ -14,7 +14,7 @@ export async function GET(request) {
     .from("student_registrations")
     .select(`
       id, enrollment_no, roll_no, candidate_name, father_name, dob,
-      gender, phone, email, status, created_at, session_label,
+      gender, phone, email, status, created_at, session_label, academic_session,
       courses(course_name)
     `)
     .eq("college_id", session.college_id)

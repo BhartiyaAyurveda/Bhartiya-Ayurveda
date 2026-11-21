@@ -113,6 +113,20 @@ export default function Navbar({ onOpenConsultation }) {
                   >
                     Results
                   </Link>
+                  <Link
+                    href="/students/registration-certificate"
+                    onClick={() => setStudentsDropdown(false)}
+                    className="block px-5 py-2 text-[15px] font-semibold text-[#882424] hover:text-[#1A5C38] hover:bg-[#FAF8F5] transition-colors rounded"
+                  >
+                    Registration Certificate
+                  </Link>
+                  <Link
+                    href="/students/noc"
+                    onClick={() => setStudentsDropdown(false)}
+                    className="block px-5 py-2 text-[15px] font-semibold text-[#882424] hover:text-[#1A5C38] hover:bg-[#FAF8F5] transition-colors rounded"
+                  >
+                    NOC / अनापत्ति प्रमाण-पत्र
+                  </Link>
                 </div>
               </div>
             )}
@@ -269,6 +283,20 @@ export default function Navbar({ onOpenConsultation }) {
                   className="block px-3 py-2.5 text-sm text-[#882424] hover:text-[#0E3320] font-semibold"
                 >
                   Examination Results
+                </Link>
+                <Link
+                  href="/students/registration-certificate"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-3 py-2.5 text-sm text-[#882424] hover:text-[#0E3320] font-semibold"
+                >
+                  Registration Certificate
+                </Link>
+                <Link
+                  href="/students/noc"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-3 py-2.5 text-sm text-[#882424] hover:text-[#0E3320] font-semibold"
+                >
+                  NOC / अनापत्ति प्रमाण-पत्र
                 </Link>
               </div>
             )}

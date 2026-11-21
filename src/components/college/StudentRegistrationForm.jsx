@@ -1138,7 +1138,7 @@ export default function StudentRegistrationForm({ courses = [], college, onSucce
                       : "bg-gray-100 text-gray-400 border border-gray-200"
                   }`}
                 >
-                  {val ? "✓" : "✗"} {lbl}
+                  {lbl}
                 </span>
               ))}
             </div>

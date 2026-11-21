@@ -160,10 +160,7 @@ export default function AboutAyurvedaSection({ onOpenConsultation }) {
                   className="absolute inset-0 w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700 select-none"
                 />
 
-                {/* Subtle decorative leaf hint in top right */}
-                <div className="absolute top-3 right-3 text-[#2E7A4A] opacity-60 text-xs pointer-events-none select-none animate-breathe">
-                  🌿
-                </div>
+                
 
                 {/* Frosted Quote Box overlay */}
                 <div className="relative z-10 m-3 xs:m-3.5 p-4 xs:p-5 rounded-2xl bg-white/90 backdrop-blur-md border border-[#E6DDCE] shadow-sm space-y-1.5">

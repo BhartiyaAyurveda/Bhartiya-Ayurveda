@@ -178,7 +178,7 @@ export default function InquiriesPage() {
             <div className="bg-white rounded-xl border border-[#E8DDD0] overflow-hidden sticky top-6 self-start">
               <div className="bg-[#0E3320] px-5 py-3 text-white flex items-center justify-between">
                 <h3 className="text-xs font-bold uppercase tracking-wider">Inquiry Detail</h3>
-                <button onClick={() => setSelected(null)} className="text-white/60 hover:text-white text-lg">✕</button>
+                <button onClick={() => setSelected(null)} aria-label="Close" className="text-white/60 hover:text-white"><XCircle className="w-5 h-5" /></button>
               </div>
               <div className="p-5 space-y-4">
                 {/* Sender info */}

@@ -164,11 +164,11 @@ export default function YogaSection({ onOpenConsultation }) {
             {/* Mobile-only Trinity Mantra Ribbon */}
             <div className="lg:hidden mt-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-3 text-center">
               <div className="flex items-center justify-around text-[12px] xs:text-[13px] font-semibold italic text-white/90">
-                <span className="hover:text-[#E4BF64] transition-colors">🌱 Stronger Body</span>
+                <span className="hover:text-[#E4BF64] transition-colors">Stronger Body</span>
                 <span className="text-[#E4BF64]">•</span>
-                <span className="text-[#EADBB8] hover:text-white transition-colors">🧘 Calmer Mind</span>
+                <span className="text-[#EADBB8] hover:text-white transition-colors">Calmer Mind</span>
                 <span className="text-[#E4BF64]">•</span>
-                <span className="hover:text-[#E4BF64] transition-colors">✨ Happier You</span>
+                <span className="hover:text-[#E4BF64] transition-colors">Happier You</span>
               </div>
             </div>
           </div>

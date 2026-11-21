@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Pencil, Save, X as XIcon } from "lucide-react";
+import { Pencil, Save, X as XIcon, Check, GraduationCap, AlertTriangle } from "lucide-react";
+import CertificateIssueCard from "@/components/admin/CertificateIssueCard";
+import { plainSession } from "@/lib/session-display";
 
 const QUERY_FIELD_OPTIONS = [
   { value: "candidate_name", label: "Candidate Name / अभ्यर्थी का नाम" },
@@ -125,7 +127,7 @@ export default function RegistrationDetailPage({ params }) {
       phone: reg.phone || "",
       email: reg.email || "",
       address: reg.address || "",
-      session_label: reg.session_label || reg.academic_session || "",
+      academic_session: plainSession(reg),
       enrollment_no: reg.enrollment_no || "",
       roll_no: reg.roll_no || "",
     });
@@ -141,10 +143,7 @@ export default function RegistrationDetailPage({ params }) {
       const res = await fetch(`/api/admin/registrations/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...editForm,
-          academic_session: editForm.session_label,
-        }),
+        body: JSON.stringify(editForm),
       });
       const data = await res.json();
       if (!res.ok || !data.ok) { setEditMsg({ type: "error", text: data.error || "Failed to save." }); return; }
@@ -197,22 +196,22 @@ export default function RegistrationDetailPage({ params }) {
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8">
         {/* Header */}
         <div className="mb-6 flex flex-col md:flex-row md:items-start justify-between gap-4">
-          <div>
-            <nav className="flex items-center gap-2 text-xs text-[#6B7280] mb-2">
+          <div className="min-w-0">
+            <nav className="flex items-center flex-wrap gap-x-2 gap-y-1 text-xs text-[#6B7280] mb-2">
               <Link href="/super-admin/dashboard" className="hover:text-[#0E3320] font-medium">Dashboard</Link>
               <span>/</span>
               <span className="font-mono font-bold text-[#0E3320]">{reg.enrollment_no || reg.roll_no || id.slice(0, 8)}</span>
             </nav>
             <div className="flex items-center gap-3 flex-wrap mb-1">
-              <h1 className="text-xl sm:text-2xl font-black text-[#0E3320] tracking-tight">{reg.candidate_name}</h1>
+              <h1 className="text-xl sm:text-2xl font-black text-[#0E3320] tracking-tight leading-tight break-words">{reg.candidate_name}</h1>
               <StatusBadge status={reg.status} />
               {reg.status === "approved" && (
                 <Link href={`/super-admin/dashboard/admit-cards/${reg.id}`}
                   className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#0E3320] text-white text-xs font-bold rounded shadow-xs">
-                  🎓 Admit Card
+                  <GraduationCap className="w-3.5 h-3.5" /> Admit Card
                 </Link>
               )}
             </div>
@@ -222,22 +221,22 @@ export default function RegistrationDetailPage({ params }) {
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center gap-2">
             <Link href="/super-admin/dashboard"
-              className="px-3 py-2 bg-[#F5F0E8] hover:bg-[#EDE4D6] text-[#374151] text-xs font-bold rounded border border-[#E8DDD0] transition-colors">
+              className="px-3 py-2 text-center bg-[#F5F0E8] hover:bg-[#EDE4D6] text-[#374151] text-xs font-bold rounded border border-[#E8DDD0] transition-colors">
               Back
             </Link>
             <button onClick={openEdit}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#C59B3F] hover:bg-[#A97F30] text-white text-xs font-bold rounded shadow-md transition-all cursor-pointer">
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-[#C59B3F] hover:bg-[#A97F30] text-white text-xs font-bold rounded shadow-md transition-all cursor-pointer">
               <Pencil className="w-3.5 h-3.5" /> Edit Data
             </button>
             <button onClick={() => handleAction("approve")} disabled={actionLoading || isTerminal}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded shadow-md transition-all disabled:opacity-40 cursor-pointer">
-              ✓ Approve
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded shadow-md transition-all disabled:opacity-40 cursor-pointer">
+              <Check className="w-3.5 h-3.5" /> Approve
             </button>
             <button onClick={() => handleAction("reject")} disabled={actionLoading || isTerminal}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded shadow-md transition-all disabled:opacity-40 cursor-pointer">
-              ✕ Reject
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded shadow-md transition-all disabled:opacity-40 cursor-pointer">
+              <XIcon className="w-3.5 h-3.5" /> Reject
             </button>
           </div>
         </div>
@@ -245,17 +244,26 @@ export default function RegistrationDetailPage({ params }) {
         {actionMsg && <div className="mb-5 p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r text-emerald-800 text-sm font-semibold">{actionMsg}</div>}
         {actionErr && <div className="mb-5 p-4 bg-red-50 border-l-4 border-red-500 rounded-r text-red-800 text-sm font-semibold">{actionErr}</div>}
 
+        {/* Registration Certificate & NOC — the admin decides who can download them */}
+        <CertificateIssueCard
+          registrationId={reg.id}
+          status={reg.status}
+          suffix={reg.reg_cert_suffix ?? null}
+          issuedAt={reg.reg_cert_issued_at ?? null}
+          onChanged={(suffix, issuedAt) => setReg((r) => (r ? { ...r, reg_cert_suffix: suffix, reg_cert_issued_at: issuedAt } : r))}
+        />
+
         {/* Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Left: Details */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6 min-w-0">
             {/* Personal Info */}
             <div className="bg-white rounded-xl shadow-xs border border-[#E8DDD0] overflow-hidden">
-              <div className="bg-[#0E3320] px-5 py-3 text-white border-b-2 border-[#C59B3F] flex items-center justify-between">
+              <div className="bg-[#0E3320] px-4 sm:px-5 py-3 text-white border-b-2 border-[#C59B3F] flex flex-wrap items-center justify-between gap-2">
                 <h3 className="text-xs font-bold uppercase tracking-wider">1. Personal & Contact Information</h3>
-                <span className="text-[11px] font-mono text-[#C59B3F] font-bold">{reg.session_label || reg.academic_session || "—"}</span>
+                <span className="text-[11px] font-mono text-[#C59B3F] font-bold">{plainSession(reg) || "—"}</span>
               </div>
-              <div className="p-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
+              <div className="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
                 {[
                   ["Candidate Name / नाम", reg.candidate_name],
                   ["Father's Name / पिता का नाम", reg.father_name],
@@ -268,13 +276,13 @@ export default function RegistrationDetailPage({ params }) {
                 ].map(([label, val]) => (
                   <div key={label}>
                     <span className="text-[#9CA3AF] block font-medium">{label}</span>
-                    <span className="font-bold text-[#1F2937] text-sm">{val || "—"}</span>
+                    <span className="font-bold text-[#1F2937] text-sm break-words [overflow-wrap:anywhere]">{val || "—"}</span>
                   </div>
                 ))}
                 {reg.address && (
-                  <div className="sm:col-span-3 pt-2 border-t border-[#F0E8DC]">
+                  <div className="col-span-full pt-2 border-t border-[#F0E8DC]">
                     <span className="text-[#9CA3AF] block font-medium">Full Address / स्थायी पता</span>
-                    <span className="font-semibold text-[#1F2937]">{reg.address}</span>
+                    <span className="font-semibold text-[#1F2937] break-words">{reg.address}</span>
                   </div>
                 )}
               </div>
@@ -288,11 +296,11 @@ export default function RegistrationDetailPage({ params }) {
               <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <span className="text-xs text-[#9CA3AF] block font-medium">Course Name</span>
-                  <span className="text-base font-black text-[#0E3320]">{reg.courses?.course_name || reg.course_name || "—"}</span>
+                  <span className="text-base font-black text-[#0E3320] break-words">{reg.courses?.course_name || reg.course_name || "—"}</span>
                 </div>
                 <div className="bg-[#F5F0E8] border border-[#E8DDD0] px-3 py-2 rounded-lg text-xs">
                   <span className="text-[#9CA3AF] block">Academic Session</span>
-                  <span className="font-bold text-[#C59B3F]">{reg.session_label || reg.academic_session || "—"}</span>
+                  <span className="font-bold text-[#C59B3F]">{plainSession(reg) || "—"}</span>
                 </div>
               </div>
             </div>
@@ -303,7 +311,7 @@ export default function RegistrationDetailPage({ params }) {
                 <h3 className="text-xs font-bold uppercase tracking-wider">3. Educational Qualifications / शैक्षणिक योग्यता</h3>
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
+                <table className="w-full min-w-[560px] text-left text-xs">
                   <thead>
                     <tr className="bg-[#F5F0E8] text-[#374151] font-bold border-b border-[#E8DDD0] uppercase">
                       {["Examination", "Board / University", "Passing Year", "Max Marks", "Obtained", "Percentage"].map((h) => (
@@ -376,11 +384,11 @@ export default function RegistrationDetailPage({ params }) {
           </div>
 
           {/* Right: Query panel */}
-          <div className="space-y-6">
+          <div className="space-y-6 min-w-0">
             {/* Raise Query */}
             <div className="bg-white rounded-xl shadow-xs border border-[#E8DDD0] overflow-hidden">
               <div className="bg-amber-500 px-5 py-3 text-white flex items-center gap-2">
-                <span>⚠</span>
+                <AlertTriangle className="w-4 h-4" />
                 <h3 className="text-xs font-bold uppercase tracking-wider">Raise Query / आपत्ति दर्ज करें</h3>
               </div>
               <form onSubmit={handleRaiseQuery} className="p-5 space-y-4">
@@ -447,12 +455,12 @@ export default function RegistrationDetailPage({ params }) {
       {/* Edit Data Modal */}
       {editOpen && (
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 p-4 overflow-y-auto" onClick={() => setEditOpen(false)}>
-          <div className="bg-white rounded-xl max-w-2xl w-full my-8 shadow-2xl" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[#E8DDD0] bg-[#0E3320] rounded-t-xl">
+          <div className="bg-white rounded-xl max-w-2xl w-full my-4 sm:my-8 shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-4 border-b border-[#E8DDD0] bg-[#0E3320] rounded-t-xl">
               <h4 className="text-sm font-bold text-white flex items-center gap-2"><Pencil className="w-4 h-4 text-[#C59B3F]" /> Edit Registration Data</h4>
               <button onClick={() => setEditOpen(false)} className="text-white/60 hover:text-white"><XIcon className="w-5 h-5" /></button>
             </div>
-            <form onSubmit={handleSaveEdit} className="p-6 space-y-5">
+            <form onSubmit={handleSaveEdit} className="p-4 sm:p-6 space-y-5">
               {editMsg && (
                 <div className={`p-3 rounded text-xs font-semibold ${editMsg.type === "success" ? "bg-emerald-50 text-emerald-800 border border-emerald-200" : "bg-red-50 text-red-800 border border-red-200"}`}>
                   {editMsg.text}
@@ -524,7 +532,7 @@ export default function RegistrationDetailPage({ params }) {
                   {[
                     { key: "enrollment_no", label: "Enrollment No." },
                     { key: "roll_no", label: "Roll Number" },
-                    { key: "session_label", label: "Academic Session" },
+                    { key: "academic_session", label: "Academic Session" },
                   ].map(({ key, label }) => (
                     <div key={key}>
                       <label className="block text-[11px] font-bold text-[#374151] mb-1">{label}</label>
@@ -535,7 +543,7 @@ export default function RegistrationDetailPage({ params }) {
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-2">
+              <div className="flex flex-col-reverse sm:flex-row gap-3 pt-2">
                 <button type="submit" disabled={editSaving}
                   className="flex-1 py-2.5 bg-[#0E3320] hover:bg-[#071A0E] text-white text-xs font-bold rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
                   {editSaving ? "Saving..." : <><Save className="w-3.5 h-3.5" /> Save Changes</>}
@@ -556,7 +564,7 @@ export default function RegistrationDetailPage({ params }) {
           <div className="bg-white rounded-xl max-w-lg w-full p-4 relative shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between pb-3 border-b border-[#E8DDD0] mb-3">
               <h4 className="text-sm font-bold text-[#1F2937]">{previewImg.title}</h4>
-              <button onClick={() => setPreviewImg(null)} className="text-[#9CA3AF] hover:text-[#374151] text-lg font-bold">✕</button>
+              <button onClick={() => setPreviewImg(null)} aria-label="Close" className="text-[#9CA3AF] hover:text-[#374151]"><XIcon className="w-5 h-5" /></button>
             </div>
             <div className="relative w-full h-80 bg-[#F5F0E8] rounded flex items-center justify-center overflow-hidden">
               <img src={previewImg.src} alt={previewImg.title} className="max-w-full max-h-full object-contain" />

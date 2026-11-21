@@ -393,7 +393,7 @@ export default function GalleryPage() {
           {/* Row 2: Vedic Tag Pill Badge */}
           <div className="flex justify-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-[#C59B3F]/40 text-[#E4BF64] text-xs sm:text-sm font-semibold shadow-sm">
-              <span>🌿</span>
+              
               <span>आश्रम जीवन • प्राकृतिक चिकित्सा • पावन स्मृतियाँ</span>
             </div>
           </div>

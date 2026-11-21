@@ -1,5 +1,6 @@
 "use client";
 
+import { plainSession } from "@/lib/session-display";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -711,6 +712,31 @@ export default function SuperAdminDashboardPage() {
     approved:     { label: "Approved",     color: "bg-emerald-100 text-emerald-800", dot: "bg-emerald-500" },
     rejected:     { label: "Rejected",     color: "bg-red-100 text-red-800",         dot: "bg-red-500" },
   };
+
+  // Display only: "RAM SURAT" / "rohit" -> "Ram Surat" / "Rohit". Mixed-case text (e.g. "SP College of ...") is left alone.
+  const toTitleCase = (value) => {
+    const str = String(value ?? "").trim();
+    if (!str) return "";
+    if (str !== str.toUpperCase() && str !== str.toLowerCase()) return str;
+    const small = new Set(["of", "and", "for", "the", "in", "at"]);
+    return str.toLowerCase().replace(/\S+/g, (w, i) => (i > 0 && small.has(w) ? w : w.charAt(0).toUpperCase() + w.slice(1)));
+  };
+
+  // 2003-01-25 -> 25/01/2003
+  const fmtDmy = (v) => {
+    const m = String(v || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return m ? `${m[3]}/${m[2]}/${m[1]}` : (v || "");
+  };
+
+  // readable session only (session_label can hold per-year JSON metadata)
+  const appSessionLabel = plainSession;
+
+  const filteredApps = applications.filter((a) => {
+    const matchStatus = appFilter === "all" || a.status === appFilter;
+    const q = appSearch.toLowerCase();
+    const matchSearch = !q || a.candidate_name?.toLowerCase().includes(q) || a.enrollment_no?.toLowerCase().includes(q);
+    return matchStatus && matchSearch;
+  });
 
   const navigationItems = [
     { id: "overview",       label: "Overview & Metrics",    icon: LayoutDashboard },
@@ -1803,7 +1829,7 @@ export default function SuperAdminDashboardPage() {
                             <p className="font-bold text-[#0E3320] text-sm">{course.course_name}</p>
                             {course.course_name_hindi && <p className="text-xs text-[#7A583A] mt-0.5">{course.course_name_hindi}</p>}
                             <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                              {course.duration_label && <span className="text-xs text-[#5C8261]">⏱ {course.duration_label}</span>}
+                              {course.duration_label && <span className="text-xs text-[#5C8261]">{course.duration_label}</span>}
                               {course.category && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#EDE7DE] text-[#5C4033] capitalize">{course.category.replace(/_/g, " ")}</span>}
                               {course.subjects?.length > 0 && <span className="text-xs text-[#8C671D]">{course.subjects.length} subject{course.subjects.length !== 1 ? "s" : ""}</span>}
                             </div>
@@ -2043,7 +2069,7 @@ export default function SuperAdminDashboardPage() {
                         {a.attachment_url && (
                           <a href={a.attachment_url} target="_blank" rel="noopener noreferrer"
                             className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-lg bg-[#F2EDE4] text-[#C59B3F] text-[10px] font-bold hover:bg-[#DDD1BE] transition-colors">
-                            📎 {a.attachment_name || "Attachment"}
+                            {a.attachment_name || "Attachment"}
                           </a>
                         )}
                         <p className="text-[10px] text-[#5C8261] mt-1">{new Date(a.created_at).toLocaleDateString("en-IN")}</p>
@@ -2192,13 +2218,13 @@ export default function SuperAdminDashboardPage() {
           {/* TAB: STUDENT APPLICATIONS */}
           {activeTab === "applications" && (
             <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
                   <h2 className="text-lg font-bold text-[#0E3320]">Student Applications</h2>
                   <p className="text-xs text-[#5C8261]">Review, approve, reject or raise queries on submitted registrations.</p>
                 </div>
-                <button onClick={loadApplications} disabled={appLoading}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0E3320] text-white text-xs font-bold hover:bg-[#15482D] transition-all"
+                <button onClick={loadApplications} disabled={appLoading} aria-label="Refresh applications"
+                  className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#0E3320] text-white text-xs font-bold hover:bg-[#15482D] disabled:opacity-60 transition-all"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${appLoading ? "animate-spin" : ""}`} />
                   Refresh
@@ -2206,17 +2232,23 @@ export default function SuperAdminDashboardPage() {
               </div>
 
               {/* Stats Row */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                {Object.entries(APP_STATUS).map(([key, cfg]) => (
-                  <button key={key} onClick={() => setAppFilter(key === appFilter ? "all" : key)}
-                    className={`p-3 rounded-xl border text-left transition-all ${appFilter === key ? "border-[#C59B3F] bg-[#FAF3E0]" : "border-[#DDD1BE] bg-white hover:border-[#C59B3F]/50"}`}
-                  >
-                    <div className={`text-lg font-bold text-[#0E3320]`}>
-                      {applications.filter(a => a.status === key).length}
-                    </div>
-                    <div className="text-[10px] font-semibold text-[#5C8261] mt-0.5">{cfg.label}</div>
-                  </button>
-                ))}
+              <div className="grid grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3">
+                {Object.entries(APP_STATUS).map(([key, cfg]) => {
+                  const count = applications.filter(a => a.status === key).length;
+                  const active = appFilter === key;
+                  return (
+                    <button key={key} type="button" aria-pressed={active}
+                      onClick={() => setAppFilter(active ? "all" : key)}
+                      className={`p-3 rounded-xl border text-left transition-all ${active ? "border-[#C59B3F] bg-[#FAF3E0] ring-1 ring-[#C59B3F]/40" : "border-[#DDD1BE] bg-white hover:border-[#C59B3F]/50"}`}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <span className={`w-2 h-2 rounded-full shrink-0 ${cfg.dot}`} />
+                        <span className="text-[11px] font-semibold leading-tight text-[#5C8261]">{cfg.label}</span>
+                      </div>
+                      <div className={`mt-1.5 text-2xl font-bold leading-none ${count === 0 ? "text-[#B7AA94]" : "text-[#0E3320]"}`}>{count}</div>
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Search + Filter */}
@@ -2246,19 +2278,53 @@ export default function SuperAdminDashboardPage() {
                     <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-3 text-[#C59B3F]" />
                     <p className="text-sm font-semibold">Loading applications...</p>
                   </div>
-                ) : applications.filter(a => {
-                  const matchStatus = appFilter === "all" || a.status === appFilter;
-                  const q = appSearch.toLowerCase();
-                  const matchSearch = !q || a.candidate_name?.toLowerCase().includes(q) || a.enrollment_no?.toLowerCase().includes(q);
-                  return matchStatus && matchSearch;
-                }).length === 0 ? (
+                ) : filteredApps.length === 0 ? (
                   <div className="p-12 text-center text-[#5C8261]">
                     <ClipboardList className="w-10 h-10 mx-auto mb-3 text-[#DDD1BE]" />
                     <p className="font-semibold text-[#0E3320]">No applications found</p>
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs">
+                  <>
+                  {/* Phones: one card per application (a wide table does not fit) */}
+                  <div className="md:hidden divide-y divide-[#F2EDE4]">
+                    {filteredApps.map((app) => {
+                      const cfg = APP_STATUS[app.status] || APP_STATUS.pending;
+                      return (
+                        <div key={app.id} className="p-4 space-y-3">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold leading-snug text-[#0E3320] break-words">{toTitleCase(app.candidate_name)}</p>
+                              <p className="mt-0.5 font-mono text-xs font-bold text-[#5C8261]">{app.enrollment_no || "Enrollment not allotted"}</p>
+                            </div>
+                            <span className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold whitespace-nowrap ${cfg.color}`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
+                              {cfg.label}
+                            </span>
+                          </div>
+                          <div className="space-y-1 text-xs leading-snug text-[#2F4A38]">
+                            <p><span className="font-bold text-[#0E3320]">Course:</span> {app.courses?.course_name || "—"}</p>
+                            <p><span className="font-bold text-[#0E3320]">College:</span> {toTitleCase(app.colleges?.college_name) || "—"}</p>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <button onClick={() => openAppDetail(app)}
+                              className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-[#0E3320] hover:bg-[#15482D] text-white text-xs font-bold transition-all"
+                            >
+                              <Eye className="w-3.5 h-3.5" /> Quick
+                            </button>
+                            <Link href={`/super-admin/dashboard/registrations/${app.id}`}
+                              className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-[#C59B3F] hover:bg-[#B88B35] text-[#0E3320] text-xs font-bold transition-all"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" /> Detail
+                            </Link>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Tablet / desktop: table */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <table className="w-full text-left text-[13px]">
                       <thead className="bg-[#F2EDE4] border-b border-[#DDD1BE]">
                         <tr>
                           <th className="py-3 px-4 font-bold text-[#0E3320] uppercase tracking-wide">Enroll No</th>
@@ -2270,34 +2336,29 @@ export default function SuperAdminDashboardPage() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-[#F2EDE4]">
-                        {applications.filter(a => {
-                          const matchStatus = appFilter === "all" || a.status === appFilter;
-                          const q = appSearch.toLowerCase();
-                          const matchSearch = !q || a.candidate_name?.toLowerCase().includes(q) || a.enrollment_no?.toLowerCase().includes(q);
-                          return matchStatus && matchSearch;
-                        }).map((app) => {
+                        {filteredApps.map((app) => {
                           const cfg = APP_STATUS[app.status] || APP_STATUS.pending;
                           return (
                             <tr key={app.id} className="hover:bg-[#FAF8F5] transition-colors">
-                              <td className="py-3 px-4 font-mono font-bold text-[#0E3320]">{app.enrollment_no || "—"}</td>
-                              <td className="py-3 px-4 font-semibold text-[#0E3320]">{app.candidate_name}</td>
-                              <td className="py-3 px-4 text-[#5C8261] max-w-[200px] truncate">{app.courses?.course_name || "—"}</td>
-                              <td className="py-3 px-4 text-[#5C8261]">{app.colleges?.college_name || "—"}</td>
-                              <td className="py-3 px-4">
-                                <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-bold ${cfg.color}`}>
+                              <td className="py-3.5 px-4 font-mono font-bold text-[#0E3320] whitespace-nowrap">{app.enrollment_no || <span className="font-sans font-medium text-[#A99C84]">Not allotted</span>}</td>
+                              <td className="py-3.5 px-4 font-semibold text-[#0E3320] min-w-[150px]">{toTitleCase(app.candidate_name)}</td>
+                              <td className="py-3.5 px-4 text-[#2F4A38] min-w-[220px] max-w-[300px] leading-snug" title={app.courses?.course_name || ""}>{app.courses?.course_name || "—"}</td>
+                              <td className="py-3.5 px-4 text-[#2F4A38] min-w-[200px] leading-snug">{toTitleCase(app.colleges?.college_name) || "—"}</td>
+                              <td className="py-3.5 px-4 whitespace-nowrap">
+                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold whitespace-nowrap ${cfg.color}`}>
                                   <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
                                   {cfg.label}
                                 </span>
                               </td>
-                              <td className="py-3 px-4 text-right">
+                              <td className="py-3.5 px-4 text-right whitespace-nowrap">
                                 <div className="flex items-center gap-2 justify-end">
                                   <button onClick={() => openAppDetail(app)}
-                                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#0E3320] hover:bg-[#15482D] text-white text-[10px] font-bold transition-all"
+                                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#0E3320] hover:bg-[#15482D] text-white text-[11px] font-bold transition-all"
                                   >
                                     <Eye className="w-3 h-3" /> Quick
                                   </button>
                                   <Link href={`/super-admin/dashboard/registrations/${app.id}`}
-                                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#C59B3F] hover:bg-[#B88B35] text-[#0E3320] text-[10px] font-bold transition-all"
+                                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#C59B3F] hover:bg-[#B88B35] text-[#0E3320] text-[11px] font-bold transition-all"
                                   >
                                     <ExternalLink className="w-3 h-3" /> Detail
                                   </Link>
@@ -2309,6 +2370,7 @@ export default function SuperAdminDashboardPage() {
                       </tbody>
                     </table>
                   </div>
+                </>
                 )}
               </div>
             </div>
@@ -2320,18 +2382,18 @@ export default function SuperAdminDashboardPage() {
               <div className="flex-1 bg-black/50" onClick={() => setSelectedApp(null)} />
               <div className="w-full max-w-2xl bg-white flex flex-col overflow-hidden shadow-2xl">
                 {/* Header */}
-                <div className="bg-[#0E3320] text-white px-6 py-4 flex items-center justify-between shrink-0">
-                  <div>
-                    <h3 className="font-bold text-base">{selectedApp.candidate_name}</h3>
-                    <p className="text-xs text-[#DDD1BE]">{selectedApp.enrollment_no || "No enrollment no."}</p>
+                <div className="bg-[#0E3320] text-white px-4 sm:px-6 py-4 flex items-center justify-between gap-3 shrink-0">
+                  <div className="min-w-0">
+                    <h3 className="font-bold text-base leading-snug break-words">{toTitleCase(selectedApp.candidate_name)}</h3>
+                    <p className="text-xs font-mono text-[#DDD1BE]">{selectedApp.enrollment_no || "No enrollment no."}</p>
                   </div>
-                  <button onClick={() => setSelectedApp(null)} className="p-1.5 rounded-lg hover:bg-white/10 transition-colors">
+                  <button onClick={() => setSelectedApp(null)} aria-label="Close" className="shrink-0 p-1.5 rounded-lg hover:bg-white/10 transition-colors">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
 
                 {/* Body */}
-                <div className="flex-1 overflow-y-auto p-6 space-y-5">
+                <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
                   {appDetailLoading ? (
                     <div className="text-center py-12">
                       <RefreshCw className="w-6 h-6 animate-spin mx-auto text-[#C59B3F]" />
@@ -2352,22 +2414,22 @@ export default function SuperAdminDashboardPage() {
                       {/* Details Grid */}
                       <div className="grid grid-cols-2 gap-3 text-xs">
                         {[
-                          ["Father's Name", selectedApp.father_name],
-                          ["Mother's Name", selectedApp.mother_name],
-                          ["Date of Birth", selectedApp.dob],
+                          ["Father's Name", toTitleCase(selectedApp.father_name)],
+                          ["Mother's Name", toTitleCase(selectedApp.mother_name)],
+                          ["Date of Birth", fmtDmy(selectedApp.dob)],
                           ["Gender", selectedApp.gender],
                           ["Category", selectedApp.category],
                           ["Phone", selectedApp.phone],
-                          ["Email", selectedApp.email],
-                          ["Course", selectedApp.courses?.course_name],
-                          ["College", selectedApp.colleges?.college_name],
-                          ["Session", selectedApp.session_label || selectedApp.academic_session],
+                          ["Email", selectedApp.email, true],
+                          ["Course", selectedApp.courses?.course_name, true],
+                          ["College", toTitleCase(selectedApp.colleges?.college_name), true],
+                          ["Session", appSessionLabel(selectedApp)],
                           ["State", selectedApp.state],
                           ["City", selectedApp.city],
-                        ].map(([label, val]) => val ? (
-                          <div key={label} className="bg-[#FAF8F5] rounded-xl p-3 border border-[#DDD1BE]">
+                        ].map(([label, val, wide]) => val ? (
+                          <div key={label} className={`bg-[#FAF8F5] rounded-xl p-3 border border-[#DDD1BE] min-w-0 ${wide ? "col-span-2" : ""}`}>
                             <p className="text-[10px] font-bold uppercase text-[#5C8261] mb-0.5">{label}</p>
-                            <p className="font-semibold text-[#0E3320] truncate">{val}</p>
+                            <p className="font-semibold text-[#0E3320] break-words">{val}</p>
                           </div>
                         ) : null)}
                       </div>
@@ -2406,6 +2468,17 @@ export default function SuperAdminDashboardPage() {
                     </>
                   )}
                 </div>
+
+                {/* Approved / rejected: no actions left, link to the full application page */}
+                {!appDetailLoading && (selectedApp.status === "approved" || selectedApp.status === "rejected") && (
+                  <div className="border-t border-[#DDD1BE] px-4 sm:px-6 py-4 shrink-0 bg-[#FAF8F5]">
+                    <Link href={`/super-admin/dashboard/registrations/${selectedApp.id}`}
+                      className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#C59B3F] hover:bg-[#B88B35] text-[#0E3320] text-xs font-bold transition-all"
+                    >
+                      <ExternalLink className="w-4 h-4" /> Open full application
+                    </Link>
+                  </div>
+                )}
 
                 {/* Actions Footer */}
                 {!appDetailLoading && selectedApp.status !== "approved" && selectedApp.status !== "rejected" && (

@@ -192,7 +192,7 @@ export default function ConsultationModal({ isOpen, onClose }) {
                   <span>Confirm Consultation Request</span>
                 </button>
                 <p className="text-[11px] text-center text-forest-700/60 mt-2">
-                  🔒 100% confidential. No spam. Guided by licensed Ayurvedic doctors.
+                  100% confidential. No spam. Guided by licensed Ayurvedic doctors.
                 </p>
               </div>
             </form>

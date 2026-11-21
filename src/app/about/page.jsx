@@ -41,7 +41,7 @@ export default function AboutPage() {
           </nav>
           <div className="flex justify-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-[#C59B3F]/40 text-[#E4BF64] text-sm font-semibold shadow-sm">
-              <span>🌿</span><span>{c.hero.tagline}</span>
+              <span>{c.hero.tagline}</span>
             </div>
           </div>
           <div className="space-y-2 pt-1">

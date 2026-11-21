@@ -1,5 +1,6 @@
 "use client";
 
+import { plainSession } from "@/lib/session-display";
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import {
@@ -344,7 +345,7 @@ export default function EnrolledStudentsPage() {
 
                     {/* Session */}
                     <td className="py-4 px-4 text-[#5C8261] font-semibold text-xs sm:text-sm">
-                      {s.session_label || s.academic_session || "2026-27"}
+                      {plainSession(s) || "—"}
                     </td>
 
                     {/* Status */}

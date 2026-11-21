@@ -96,7 +96,7 @@ export default function StudentLoginPage() {
           {/* Row 2: Vedic Tag Pill Badge */}
           <div className="flex justify-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-[#C59B3F]/40 text-[#E4BF64] text-xs sm:text-sm font-semibold shadow-sm">
-              <span>🌿</span>
+              
               <span>भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद् • छात्र पोर्टल</span>
             </div>
           </div>

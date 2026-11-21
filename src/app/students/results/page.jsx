@@ -293,7 +293,7 @@ export default function StudentResultsPage() {
           {/* Row 2: Vedic Tag Pill Badge */}
           <div className="flex justify-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-[#C59B3F]/40 text-[#E4BF64] text-xs sm:text-sm font-semibold shadow-sm">
-              <span>🌿</span>
+              
               <span>भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद् • वार्षिक एवं सत्रीय परीक्षा परिणाम</span>
             </div>
           </div>
@@ -667,7 +667,7 @@ export default function StudentResultsPage() {
                           }}>
                             <div style={{ fontSize: 8, color: "#8C671D", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Final Result</div>
                             <div style={{ fontSize: 26, fontWeight: 900, lineHeight: 1, color: resultData.status === "PASS" ? "#0B1E36" : resultData.status === "AWAITED" ? "#b45309" : "#dc2626" }}>
-                              {resultData.status === "PASS" ? "✓ PASS" : resultData.status === "AWAITED" ? "⏳ AWAITED" : "✗ FAIL"}
+                              {resultData.status === "PASS" ? "PASS" : resultData.status === "AWAITED" ? "AWAITED" : "FAIL"}
                             </div>
                             <div style={{ fontSize: 9, fontWeight: 700, marginTop: 3, color: resultData.status === "PASS" ? "#8C671D" : resultData.status === "AWAITED" ? "#b45309" : "#dc2626" }}>
                               {resultData.status === "PASS" ? "उत्तीर्ण" : resultData.status === "AWAITED" ? "प्रतीक्षित" : "अनुत्तीर्ण"}

@@ -1,5 +1,6 @@
 "use client";
 
+import { plainSession } from "@/lib/session-display";
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import {
@@ -292,7 +293,7 @@ export default function PendingApprovalsPage() {
                           {s.courses?.course_name || "—"}
                         </p>
                         <p className="text-xs text-[#5C8261] mt-0.5">
-                          {s.session_label || "Session 2026-27"}
+                          {plainSession(s) || "—"}
                         </p>
                       </td>
 

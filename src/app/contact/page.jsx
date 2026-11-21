@@ -153,7 +153,7 @@ export default function ContactPage() {
           </nav>
           <div className="flex justify-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-[#C59B3F]/40 text-[#E4BF64] text-xs sm:text-sm font-semibold">
-              <span>🌿</span>
+              
               <span>भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद् • संपर्क केंद्र</span>
             </div>
           </div>
@@ -316,15 +316,15 @@ export default function ContactPage() {
               </div>
               <ul className="space-y-2.5 text-xs text-[#CBD8CB]">
                 <li className="flex items-start gap-2">
-                  <span className="text-[#C59B3F] mt-0.5">🌿</span>
+                  <span className="text-[#C59B3F] mt-0.5">•</span>
                   <span>Registered examination board conducting annual & semester examinations for Ayurveda, Yoga, Naturopathy and allied health programs.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-[#C59B3F] mt-0.5">🌿</span>
+                  <span className="text-[#C59B3F] mt-0.5">•</span>
                   <span>Affiliated institutes across India may apply for course approval and examination registration through the board.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-[#C59B3F] mt-0.5">🌿</span>
+                  <span className="text-[#C59B3F] mt-0.5">•</span>
                   <span>Certificates and marksheets issued by the board are verified and digitally accessible through the student portal.</span>
                 </li>
               </ul>

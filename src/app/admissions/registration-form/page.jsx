@@ -296,7 +296,7 @@ export default function AdmissionRegistrationFormPage() {
           {/* Vedic Tag Pill Row */}
           <div className="flex justify-center">
             <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-[#C59B3F]/40 text-[#E4BF64] text-[11px] sm:text-sm font-semibold shadow-sm text-center">
-              <span>🌿</span>
+              
               <span>शैक्षणिक सत्र 2026-27 • ऑनलाइन प्रवेश पंजीकरण फॉर्म</span>
             </div>
           </div>

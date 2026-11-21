@@ -154,7 +154,7 @@ export default function AffiliatedInstitutesPage() {
           {/* Vedic Tag Pill Row (Distinct separate line) */}
           <div className="flex justify-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-[#C59B3F]/40 text-[#E4BF64] text-xs sm:text-sm font-semibold shadow-sm">
-              <span>🌿</span>
+              
               <span>भारतीय आयुर्वेदा योग एवं प्राकृतिक चिकित्सा परिषद् — संबद्ध शिक्षण संस्थान</span>
             </div>
           </div>
@@ -328,7 +328,7 @@ export default function AffiliatedInstitutesPage() {
                           <div className="flex items-center gap-2 pt-1 flex-wrap">
                             {(inst.city || inst.state) && (
                               <span className="inline-block px-2.5 py-0.5 rounded-full bg-[#EAF5ED] text-[#2A7A50] text-[11px] font-semibold">
-                                📍 {[inst.city, inst.state].filter(Boolean).join(", ")}
+                                {[inst.city, inst.state].filter(Boolean).join(", ")}
                               </span>
                             )}
                             {inst.type && (
@@ -581,7 +581,7 @@ export default function AffiliatedInstitutesPage() {
 
         <div className="max-w-5xl mx-auto relative z-10 text-center space-y-6">
           <div className="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-[#C59B3F]/40 text-[#E4BF64] text-xs sm:text-sm font-semibold">
-            🎓 Career & Global Alumni Network
+            Career & Global Alumni Network
           </div>
 
           <h2 className="text-xl sm:text-2xl md:text-3xl font-devanagari font-bold text-white leading-tight">
