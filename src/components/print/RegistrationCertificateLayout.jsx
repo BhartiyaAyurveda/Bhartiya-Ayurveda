@@ -109,9 +109,9 @@ export default function RegistrationCertificateLayout({ certificate: c, classNam
                 (भारतीय न्यास अधिनियम 2013 के अंतर्गत पंजीकृत • ISO 9001:2015 प्रमाणित संस्था)
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8, margin: "6px 0 0" }}>
-                <span style={{ flex: 1, height: 1.5, background: `linear-gradient(90deg, transparent, ${GOLD})` }} />
+                <span style={{ flex: 1, height: 1.5, background: `linear-gradient(90deg, #FFFFFF, ${GOLD})` }} />
                 <span style={{ width: 8, height: 8, background: GOLD, transform: "rotate(45deg)" }} />
-                <span style={{ flex: 1, height: 1.5, background: `linear-gradient(270deg, transparent, ${GOLD})` }} />
+                <span style={{ flex: 1, height: 1.5, background: `linear-gradient(270deg, #FFFFFF, ${GOLD})` }} />
               </div>
             </div>
 

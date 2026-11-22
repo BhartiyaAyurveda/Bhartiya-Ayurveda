@@ -10,8 +10,6 @@ const MONTHS = [
 ];
 
 const CUR_YEAR = new Date().getFullYear();
-// Wide enough for older candidates too (the admit-card picker only goes back 40 years)
-const YEARS = Array.from({ length: CUR_YEAR - 10 - 1940 + 1 }, (_, i) => String(CUR_YEAR - 10 - i));
 
 const selectCls =
   "w-full py-3 rounded-xl border border-[#D5C7B5] bg-[#FAF8F5] text-sm text-[#0E3320] focus:outline-none focus:ring-2 focus:ring-[#C59B3F] focus:border-[#C59B3F] transition-all cursor-pointer";
@@ -30,8 +28,18 @@ function split(value) {
 /**
  * Date of birth as three theme-styled dropdowns (day / month / year).
  * `value` and `onChange` use YYYY-MM-DD; onChange gets "" until all three parts are chosen.
+ * Years default to a date-of-birth range (1940 .. current year - 10); pass minYear / maxYear for other dates.
  */
-export default function DobSelect({ value, onChange, idPrefix = "dob", required = false, disabled = false }) {
+export default function DobSelect({
+  value,
+  onChange,
+  idPrefix = "dob",
+  required = false,
+  disabled = false,
+  minYear = 1940,
+  maxYear = CUR_YEAR - 10,
+}) {
+  const years = Array.from({ length: Math.max(0, maxYear - minYear + 1) }, (_, i) => String(maxYear - i));
   const [parts, setParts] = useState(() => split(value));
 
   // keep in sync when the parent resets / changes the value
@@ -98,7 +106,7 @@ export default function DobSelect({ value, onChange, idPrefix = "dob", required 
         className={`${selectCls} px-2`}
       >
         <option value="">वर्ष</option>
-        {YEARS.map((y) => <option key={y} value={y}>{y}</option>)}
+        {years.map((y) => <option key={y} value={y}>{y}</option>)}
       </select>
     </div>
   );

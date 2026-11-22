@@ -12,6 +12,8 @@ export default function Navbar({ onOpenConsultation }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [studentsDropdown, setStudentsDropdown] = useState(false);
   const [mobileStudentsOpen, setMobileStudentsOpen] = useState(false);
+  const [formsDropdown, setFormsDropdown] = useState(false);
+  const [mobileFormsOpen, setMobileFormsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   const pathname = usePathname();
@@ -127,6 +129,37 @@ export default function Navbar({ onOpenConsultation }) {
                   >
                     NOC / अनापत्ति प्रमाण-पत्र
                   </Link>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Forms Dropdown */}
+          <div
+            className="relative"
+            onMouseEnter={() => setFormsDropdown(true)}
+            onMouseLeave={() => setFormsDropdown(false)}
+          >
+            <button
+              onClick={() => setFormsDropdown(!formsDropdown)}
+              className="flex items-center gap-1.5 py-1 font-semibold transition-all relative text-[#882424] hover:text-[#1A5C38]"
+            >
+              <span>Forms</span>
+              <ChevronDown className={`w-4 h-4 transition-transform duration-200 text-[#7A9983] ${formsDropdown ? "rotate-180" : ""}`} />
+            </button>
+
+            {formsDropdown && (
+              <div className="absolute top-full left-0 pt-2 z-50 animate-in fade-in-50 slide-in-from-top-1">
+                <div className="w-72 bg-white rounded-md shadow-xl border border-[#EBE2D4] py-3 px-1 space-y-1">
+                  <a
+                    href="/forms/affiliation-application-form.pdf"
+                    download="Affiliation_Application_Form.pdf"
+                    onClick={() => setFormsDropdown(false)}
+                    className="block px-5 py-2 text-[15px] font-semibold text-[#882424] hover:text-[#1A5C38] hover:bg-[#FAF8F5] transition-colors rounded"
+                  >
+                    College Affiliation Application Form
+                    <span className="block text-[12px] font-devanagari font-medium text-[#8C671D]">महाविद्यालय संबद्धता आवेदन पत्र</span>
+                  </a>
                 </div>
               </div>
             )}
@@ -298,6 +331,30 @@ export default function Navbar({ onOpenConsultation }) {
                 >
                   NOC / अनापत्ति प्रमाण-पत्र
                 </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Mobile Forms Accordion */}
+          <div>
+            <button
+              onClick={() => setMobileFormsOpen(!mobileFormsOpen)}
+              className="w-full flex items-center justify-between px-4 py-3 text-base text-[#882424] font-semibold hover:bg-[#EBE2D4]/50 rounded-lg"
+            >
+              <span>Forms</span>
+              <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${mobileFormsOpen ? "rotate-180" : ""}`} />
+            </button>
+            {mobileFormsOpen && (
+              <div className="pl-6 pr-2 py-1 space-y-1 bg-white/70 rounded-xl mx-3 my-1 border border-[#EBE2D4]">
+                <a
+                  href="/forms/affiliation-application-form.pdf"
+                  download="Affiliation_Application_Form.pdf"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-3 py-2.5 text-sm text-[#882424] hover:text-[#0E3320] font-semibold"
+                >
+                  College Affiliation Application Form
+                  <span className="block text-xs font-devanagari font-medium text-[#8C671D]">महाविद्यालय संबद्धता आवेदन पत्र</span>
+                </a>
               </div>
             )}
           </div>

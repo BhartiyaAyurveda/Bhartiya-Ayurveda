@@ -37,3 +37,58 @@ export function normalizeDob(dobInput) {
 
   return trimmed;
 }
+
+// ───────────── Affiliation certificate (institutes) ─────────────
+
+/** Fixed prefix of every Affiliation No. The admin only types the part after it, e.g. "UP-2044". */
+export const AFFIL_PREFIX = "BAYAPCP-";
+export const AFFIL_SUFFIX_MAX = 35;
+
+/** Letters, digits, spaces and / _ . - ; must start with a letter or digit; 1–35 characters. */
+const AFFIL_SUFFIX_RE = /^[A-Z0-9][A-Z0-9 /_.-]{0,34}$/;
+
+/**
+ * Builds the full Affiliation No. from what the admin typed after the fixed prefix, upper-cased.
+ * A pasted full number is accepted too: a leading "BAYAPCP-" is dropped, never doubled.
+ * Returns e.g. "BAYAPCP-UP-2044", or null if invalid.
+ */
+export function parseAffilCertNo(input) {
+  if (typeof input !== "string") return null;
+  let s = input.trim().replace(/\s+/g, " ").toUpperCase();
+  if (s.startsWith(AFFIL_PREFIX)) s = s.slice(AFFIL_PREFIX.length).trim();
+  if (!AFFIL_SUFFIX_RE.test(s) || s.includes("//")) return null;
+  return AFFIL_PREFIX + s;
+}
+
+/** The editable part of a saved Affiliation No. (without the prefix). */
+export function affilSuffixOf(certNo) {
+  if (!certNo) return "";
+  return certNo.toUpperCase().startsWith(AFFIL_PREFIX) ? certNo.slice(AFFIL_PREFIX.length) : certNo;
+}
+
+/** Max length of a person's name printed on a certificate (e.g. Director / Principal). */
+export const PERSON_NAME_MAX = 80;
+/** Letters (any script, incl. Hindi), digits, spaces and . , ' ( ) / - ; must start with a letter. */
+const PERSON_NAME_RE = /^\p{L}[\p{L}\p{M}\p{N} .,'()/-]*$/u;
+
+/**
+ * Validates a person's name typed by the admin for a certificate.
+ * Returns the trimmed name, "" when left blank (field cleared), or null when invalid.
+ */
+export function parsePersonName(input) {
+  if (typeof input !== "string") return null;
+  const s = input.trim().replace(/\s+/g, " ");
+  if (s === "") return "";
+  if (s.length > PERSON_NAME_MAX || !PERSON_NAME_RE.test(s)) return null;
+  return s;
+}
+
+/** A real calendar date as YYYY-MM-DD, "" when left blank, or null when invalid. */
+export function parseDateOnly(input) {
+  if (typeof input !== "string") return null;
+  const s = input.trim();
+  if (s === "") return "";
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return null;
+  const d = new Date(`${s}T00:00:00Z`);
+  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === s ? s : null;
+}

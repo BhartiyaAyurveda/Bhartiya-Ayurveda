@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   ExternalLink,
   RefreshCw,
+  Award,
 } from "lucide-react";
 
 const STATES = [
@@ -289,6 +290,17 @@ export default function InstituteManager({ onShowToast }) {
                     </td>
                     <td className="py-4 px-6 text-right">
                       <div className="flex items-center justify-end gap-1.5">
+                        <Link
+                          href={`/super-admin/dashboard/affiliated-institutes/${inst.id}/certificate`}
+                          className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold border transition-colors ${
+                            inst.affiliation_cert_no
+                              ? "bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100"
+                              : "bg-[#FAF8F5] text-[#8C671D] border-[#DDD1BE] hover:bg-[#F2EDE4]"
+                          }`}
+                          title={inst.affiliation_cert_no ? `Affiliation certificate: ${inst.affiliation_cert_no}` : "Issue / print affiliation certificate"}
+                        >
+                          <Award className="w-3.5 h-3.5" /> Certificate
+                        </Link>
                         <button
                           onClick={() => openModal(inst)}
                           className="p-1.5 rounded-lg text-[#1E603D] hover:bg-[#E6EFE9] transition-colors"
