@@ -997,7 +997,7 @@ function RollNumbersTab({
             {/* Sub-Tab 1: PENDING ALLOTMENT */}
             {activeSubTab === "pending" && (
               <div className="p-5 space-y-5">
-                {stats.pendingCount > 0 && (
+                {currentPendingCount > 0 && (
                   <div className="rounded-xl border border-amber-200 bg-gradient-to-r from-amber-50/70 to-[#FAF8F5] p-4 space-y-3">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
@@ -1088,14 +1088,14 @@ function RollNumbersTab({
 
                     <button
                       type="button"
-                      onClick={() => handleAllot(null)}
-                      disabled={allotting || stats.pendingCount === 0}
+                      onClick={() => handleAllot(coursePending.map((s) => s.id))}
+                      disabled={allotting || currentPendingCount === 0}
                       className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#C59B3F] hover:bg-[#A8852E] text-white text-xs font-bold disabled:opacity-50 transition-colors shadow-xs"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
                       {allotting
                         ? "Allotting..."
-                        : `Allot All ${stats.pendingCount} Pending Students`}
+                        : `Allot All ${currentPendingCount} Pending Students`}
                     </button>
                   </div>
                 </div>
@@ -1179,7 +1179,10 @@ function RollNumbersTab({
                                   </span>
                                 </div>
                               </td>
-                              <td className="px-4 py-2.5 font-mono text-[#5C8261]">{s.enrollment_no || "—"}</td>
+                              <td className="px-4 py-2.5 font-mono text-[#5C8261]">
+                                {s.enrollment_no || "—"}
+                                {s.academic_session && <div className="font-sans text-[10px] text-[#9B8265]">Admitted {s.academic_session}</div>}
+                              </td>
                               <td className="px-4 py-2.5">
                                 <span className="font-mono font-bold text-[#C59B3F] bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
                                   {prefix.trim() ? `${prefix.trim()}..` : s.projected_roll_no}
@@ -1224,13 +1227,13 @@ function RollNumbersTab({
                             YEAR_LABELS[targetYear] || "1st Year"
                           } roll numbers in this session.`}
                     </p>
-                    {stats.pendingCount > 0 && !searchQuery && (
+                    {currentPendingCount > 0 && !searchQuery && (
                       <button
                         type="button"
                         onClick={() => setActiveSubTab("pending")}
                         className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#C59B3F] text-white text-xs font-bold hover:bg-[#A8852E]"
                       >
-                        Go to Pending Allotment ({stats.pendingCount})
+                        Go to Pending Allotment ({currentPendingCount})
                       </button>
                     )}
                   </div>

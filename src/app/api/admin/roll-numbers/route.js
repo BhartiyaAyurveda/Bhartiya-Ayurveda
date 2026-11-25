@@ -171,9 +171,10 @@ export async function GET(request) {
       .neq(prevRollField, "")
       .or(`${rollField}.is.null,${rollField}.eq.""`);
   } else {
-    pendingQuery = pendingQuery
-      .eq("exam_session_id", exam_session_id)
-      .or(`roll_no.is.null,roll_no.eq.""`);
+    // Any approved student without a 1st-year roll number can be allotted into the selected session:
+    // the allotment itself links the student to it. (Filtering on exam_session_id hid students whose
+    // admission session differs from their exam session.)
+    pendingQuery = pendingQuery.or(`roll_no.is.null,roll_no.eq.""`);
   }
 
   pendingQuery = pendingQuery.order("created_at", { ascending: true });

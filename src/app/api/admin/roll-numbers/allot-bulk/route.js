@@ -74,9 +74,13 @@ export async function POST(request) {
       .neq(prevRollField, "")
       .or(`${rollField}.is.null,${rollField}.eq.""`);
   } else {
-    studentQuery = studentQuery
-      .eq("exam_session_id", exam_session_id)
-      .or(`roll_no.is.null,roll_no.eq.""`);
+    // With an explicit list of students the admin chose them on purpose, so they may be allotted into any
+    // session (the allotment sets their exam session). Without a list keep the old rule - only students
+    // already linked to this session - so nobody is allotted by accident.
+    if (!(Array.isArray(body.student_ids) && body.student_ids.length > 0)) {
+      studentQuery = studentQuery.eq("exam_session_id", exam_session_id);
+    }
+    studentQuery = studentQuery.or(`roll_no.is.null,roll_no.eq.""`);
   }
 
   if (Array.isArray(body.student_ids) && body.student_ids.length > 0) {
