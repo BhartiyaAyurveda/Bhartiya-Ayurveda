@@ -1,3 +1,6 @@
+/** Place of issue printed as "स्थान" on the Registration Certificate, NOC and Affiliation Certificate. */
+export const CERT_PLACE = "ऋषिकेश / Rishikesh";
+
 /** Fixed prefixes of the certificate numbers. The admin only types the part after the prefix. */
 export const REG_PREFIX = "BAYAPCP/REG/";
 export const NOC_PREFIX = "BAYAPCP/NOC/";

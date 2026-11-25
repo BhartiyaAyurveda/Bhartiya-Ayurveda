@@ -1,8 +1,7 @@
 "use client";
 
 import A4Fit from "@/components/print/A4Fit";
-import { useSiteSettings } from "@/context/SiteSettingsContext";
-import { istDate } from "@/lib/cert-number";
+import { istDate, CERT_PLACE } from "@/lib/cert-number";
 
 const GREEN = "#0E3320";
 const GOLD = "#C59B3F";
@@ -63,8 +62,7 @@ function Row({ no, hi, en, children, mono }) {
  * affiliation_cert_no set by the admin.
  */
 export default function AffiliationCertificateLayout({ institution: c, className = "" }) {
-  const { contact } = useSiteSettings();
-  const place = contact?.city || "भारत";
+  const place = CERT_PLACE;
   const address = joinAddress([c.address, c.city, c.state]);
   const courses = cleanCourses(c.type);
   const issued = c.affiliation_cert_issued_at ? istDate(c.affiliation_cert_issued_at) : istDate();

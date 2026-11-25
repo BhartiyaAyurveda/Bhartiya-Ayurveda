@@ -1,7 +1,7 @@
 "use client";
 
 import A4Fit from "@/components/print/A4Fit";
-import { useSiteSettings } from "@/context/SiteSettingsContext";
+import { CERT_PLACE } from "@/lib/cert-number";
 
 const GREEN = "#0E3320";
 const GOLD = "#C59B3F";
@@ -65,8 +65,7 @@ function Row({ hi, en, children, alt, mono }) {
 }
 
 export default function RegistrationCertificateLayout({ certificate: c, className = "" }) {
-  const { contact } = useSiteSettings();
-  const place = contact?.city || "भारत";
+  const place = CERT_PLACE;
   const issued = formatDisplayDate(c.registration_date);
 
   return (

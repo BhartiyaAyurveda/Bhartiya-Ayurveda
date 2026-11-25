@@ -606,8 +606,16 @@ export default function SuperAdminDashboardPage() {
         body: JSON.stringify({ course_name: editCourseName, course_name_hindi: editCourseHindi, duration_label: editCourseDuration, category: editCourseCategory }),
       });
       const data = await res.json();
-      if (data.ok) { setEditCourse(null); loadCourses(); showToast("Course updated!", "success"); }
-    } catch {}
+      if (data.ok) {
+        setEditCourse(null);
+        loadCourses();
+        showToast(data.renamed ? `Course updated! ${data.subjects_updated} subject(s) bhi naye naam par aa gaye.` : "Course updated!", "success");
+      } else {
+        showToast(data.error || "Course update nahi hua.", "error");
+      }
+    } catch {
+      showToast("Network error. Dobara try karo.", "error");
+    }
     setCourseEditSaving(false);
   };
 

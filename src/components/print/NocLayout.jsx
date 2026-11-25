@@ -2,6 +2,7 @@
 
 import A4Fit from "@/components/print/A4Fit";
 import { useSiteSettings } from "@/context/SiteSettingsContext";
+import { CERT_PLACE } from "@/lib/cert-number";
 
 const GREEN = "#0E3320";
 const GOLD = "#C59B3F";
@@ -44,7 +45,7 @@ const endDot = (s) => (/[.]$/.test(String(s)) ? s : `${s}.`);
 
 export default function NocLayout({ noc: n, className = "" }) {
   const { contact } = useSiteSettings();
-  const place = contact?.city || "भारत";
+  const place = CERT_PLACE;
   const address = [contact?.addressLine1, contact?.city, contact?.state, contact?.pincode].filter(Boolean).join(", ");
 
   return (
