@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -263,6 +263,31 @@ export default function StudentResultsPage() {
     window.print();
   };
 
+  // The marksheet must always print on ONE A4 page. Just before printing, lay it out at the print width,
+  // measure it and shrink it only as much as needed (long courses have more subjects / longer names).
+  useEffect(() => {
+    const PRINT_WIDTH = 748;   // A4 width minus the 6mm page margins, in CSS px
+    const PRINT_HEIGHT = 1060; // A4 height minus margins, with a little safety room
+
+    const fit = () => {
+      const el = document.querySelector(".result-marksheet-wrapper");
+      if (!el) return;
+      el.classList.add("ms-measure");
+      el.style.removeProperty("--ms-zoom");
+      const height = el.offsetHeight;
+      el.classList.remove("ms-measure");
+      if (height) el.style.setProperty("--ms-zoom", String(Math.min(1, Math.floor((PRINT_HEIGHT / height) * 1000) / 1000)));
+    };
+    const reset = () => document.querySelector(".result-marksheet-wrapper")?.style.removeProperty("--ms-zoom");
+
+    window.addEventListener("beforeprint", fit);
+    window.addEventListener("afterprint", reset);
+    return () => {
+      window.removeEventListener("beforeprint", fit);
+      window.removeEventListener("afterprint", reset);
+    };
+  }, []);
+
   return (
     <main className="min-h-screen bg-[#FAF8F5] text-[#0E3320] font-sans selection:bg-[#C59B3F] selection:text-white">
       {/* 1. Header Navigation */}
@@ -444,7 +469,7 @@ export default function StudentResultsPage() {
       </section>
 
       {/* 4. Result Marksheet Display */}
-      <section className="max-w-5xl mx-auto px-3 sm:px-6 md:px-8 py-8 sm:py-12 md:py-16 print:pt-4 print:pb-0 print:px-3">
+      <section className="ms-print-section max-w-5xl mx-auto px-3 sm:px-6 md:px-8 py-8 sm:py-12 md:py-16">
         {resultData ? (
           <>
             {isDemo && (
@@ -476,11 +501,16 @@ export default function StudentResultsPage() {
           ══════════════════════════════════════════ */}
             <div className="result-marksheet-wrapper w-full max-w-[860px] mx-auto font-sans text-[#0F172A] shadow-2xl print:shadow-none">
               <style>{`
+              .result-marksheet-wrapper.ms-measure { width:748px!important; max-width:748px!important; }
+              .result-marksheet-wrapper.ms-measure tbody td, .result-marksheet-wrapper.ms-measure thead th { padding-top:5px!important; padding-bottom:5px!important; padding-left:4px!important; padding-right:4px!important; }
               @media print {
-                @page { size: A4 portrait; margin: 8mm 8mm 6mm 8mm; }
-                html,body { background:#fff!important; -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; margin:0!important; padding:0!important; }
+                @page { size: A4 portrait; margin: 6mm; }
+                html,body { background:#fff!important; -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; margin:0!important; padding:0!important; font-size:16px!important; /* same sizes as on screen, so the fit measurement is accurate */ }
+                main { min-height:0!important; background:#fff!important; }
                 .no-print { display:none!important; }
-                .result-marksheet-wrapper { width:100%!important; max-width:100%!important; box-shadow:none!important; padding-top:6mm!important; }
+                .ms-print-section { padding:0!important; margin:0!important; max-width:none!important; }
+                .result-marksheet-wrapper { width:748px!important; max-width:748px!important; margin:0 auto!important; padding:0!important; box-shadow:none!important; zoom:var(--ms-zoom, 0.84); break-inside:avoid!important; page-break-inside:avoid!important; }
+                .result-marksheet-wrapper tbody td, .result-marksheet-wrapper thead th { padding-top:5px!important; padding-bottom:5px!important; padding-left:4px!important; padding-right:4px!important; }
               }
               .ms-detail-label { color:#64748b; font-size:10px; font-weight:600; min-width:96px; flex-shrink:0; }
               .ms-detail-value { color:#0B1E36; font-size:10.5px; font-weight:700; }
@@ -620,8 +650,8 @@ export default function StudentResultsPage() {
                               <tbody>
                                 {resultData.subjects.map((sub, idx) => (
                                   <tr key={idx} style={{ background: !sub.pass ? "#fff1f2" : idx % 2 === 0 ? "#ffffff" : "#F8FAFC", borderBottom: "1px solid #E2E8F0" }}>
-                                    <td className="py-2.5 px-2 text-center font-mono font-extrabold border-r border-slate-200" style={{ color: "#8C671D", fontSize: 11 }}>{sub.code}</td>
-                                    <td className="py-2.5 px-3 border-r border-slate-200" style={{ fontWeight: 700, color: "#0B1E36", fontSize: 12 }}>{sub.name}</td>
+                                    <td className="py-2.5 px-2 text-center font-mono font-extrabold whitespace-nowrap border-r border-slate-200" style={{ color: "#8C671D", fontSize: 11 }}>{sub.code}</td>
+                                    <td className="py-2.5 px-3 border-r border-slate-200 break-words" style={{ fontWeight: 700, color: "#0B1E36", fontSize: 12 }}>{String(sub.name || "").replace(/,(?=S)/g, ", ")}</td>
                                     <td className="py-2.5 px-2 text-center border-r border-slate-200" style={{ color: "#64748b", fontWeight: 600, fontSize: 11 }}>{sub.totalMax}</td>
                                     <td className="py-2.5 px-2 text-center font-mono border-r border-slate-200" style={{ fontWeight: 700, color: "#0B1E36", fontSize: 11.5 }}>{sub.thObt ?? "—"}</td>
                                     <td className="py-2.5 px-2 text-center font-mono border-r border-slate-200" style={{ fontWeight: 700, color: "#0B1E36", fontSize: 11.5 }}>{sub.prObt ?? "—"}</td>

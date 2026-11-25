@@ -424,7 +424,7 @@ export default function AdmitCardTemplate({ data, showPageBreak = false }) {
                             {idx + 1}
                           </td>
                           <td
-                            className="py-2.5 px-3 text-center font-mono font-extrabold border-r border-slate-200"
+                            className="py-2.5 px-3 text-center font-mono font-extrabold whitespace-nowrap border-r border-slate-200"
                             style={{ color: "#8C671D", fontSize: 10.5 }}
                           >
                             {sub.subject_code || "—"}
