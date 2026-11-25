@@ -27,8 +27,12 @@ export async function POST(request) {
       return NextResponse.json({ error: "Invalid credentials." }, { status: 401 });
     }
 
+    // Local development only: skips the email OTP when DEV_SKIP_ADMIN_OTP=true is set in .env.local.
+    // Never applies in a production build (NODE_ENV is "production" there).
+    const devSkipOtp = process.env.NODE_ENV === "development" && process.env.DEV_SKIP_ADMIN_OTP === "true";
+
     // If admin has an email, use OTP 2FA
-    if (admin.email) {
+    if (admin.email && !devSkipOtp) {
       const otpResult = await requestOtp(admin.email, "admin_login");
       if (!otpResult.success) {
         return NextResponse.json({ error: otpResult.error }, { status: 500 });

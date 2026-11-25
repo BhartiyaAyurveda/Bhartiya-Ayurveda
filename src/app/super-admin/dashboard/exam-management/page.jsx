@@ -286,11 +286,12 @@ function SubjectsTab({
           {/* Add subject */}
           <div className="bg-white rounded-xl border border-[#DDD1BE] p-4">
             <p className="text-xs font-bold text-[#0E3320] uppercase mb-3">Add New Subject ({YEAR_LABELS[selectedYear] || "1st Year"})</p>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-              <div className="sm:col-span-2"><label className="text-[10px] font-bold text-[#5C8261] uppercase">Subject Name *</label><input value={addForm.subject_name} onChange={e => setAddForm(f => ({ ...f, subject_name: e.target.value }))} className={inputCls} placeholder="e.g. Anatomy" /></div>
+            <div className="grid grid-cols-2 sm:grid-cols-6 gap-2">
+              <div className="col-span-2"><label className="text-[10px] font-bold text-[#5C8261] uppercase">Subject Name *</label><input value={addForm.subject_name} onChange={e => setAddForm(f => ({ ...f, subject_name: e.target.value }))} className={inputCls} placeholder="e.g. Anatomy" /></div>
               <div><label className="text-[10px] font-bold text-[#5C8261] uppercase">Code</label><input value={addForm.subject_code} onChange={e => setAddForm(f => ({ ...f, subject_code: e.target.value }))} className={inputCls} placeholder="e.g. ANAT101" /></div>
               <div><label className="text-[10px] font-bold text-[#5C8261] uppercase">Theory Max</label><input type="number" value={addForm.theory_max} onChange={e => setAddForm(f => ({ ...f, theory_max: +e.target.value }))} className={inputCls} /></div>
               <div><label className="text-[10px] font-bold text-[#5C8261] uppercase">Practical Max</label><input type="number" value={addForm.practical_max} onChange={e => setAddForm(f => ({ ...f, practical_max: +e.target.value }))} className={inputCls} /></div>
+              <div><label className="text-[10px] font-bold text-[#5C8261] uppercase">CA Max</label><input type="number" value={addForm.ca_max} onChange={e => setAddForm(f => ({ ...f, ca_max: +e.target.value }))} className={inputCls} /></div>
             </div>
             <div className="mt-3 flex justify-end">
               <button onClick={handleAdd} disabled={saving} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#0E3320] text-white text-xs font-bold hover:bg-[#15482D] disabled:opacity-60"><Plus className="w-3.5 h-3.5" />{saving ? "Saving..." : "Add Subject"}</button>
@@ -307,7 +308,7 @@ function SubjectsTab({
             ) : subjects.length === 0 ? (
               <div className="text-center py-10 text-[#5C8261] text-sm">No subjects defined yet for {YEAR_LABELS[selectedYear] || "1st Year"}.</div>
             ) : (
-              <table className="w-full text-xs">
+              <div className="overflow-x-auto"><table className="w-full min-w-[640px] text-xs">
                 <thead className="border-b border-[#DDD1BE] bg-[#FAF8F5]">
                   <tr>
                     <th className="px-4 py-2.5 text-left font-bold text-[#0E3320] uppercase">Subject</th>
@@ -315,7 +316,7 @@ function SubjectsTab({
                     <th className="px-4 py-2.5 text-center font-bold text-[#0E3320] uppercase">Theory</th>
                     <th className="px-4 py-2.5 text-center font-bold text-[#0E3320] uppercase">Practical</th>
                     <th className="px-4 py-2.5 text-center font-bold text-[#0E3320] uppercase">CA</th>
-                    <th className="px-4 py-2.5 text-right font-bold text-[#0E3320] uppercase">Actions</th>
+                    <th className="px-4 py-2.5 text-right font-bold text-[#0E3320] uppercase sticky right-0 bg-[#FAF8F5]">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#F2EDE4]">
@@ -323,12 +324,12 @@ function SubjectsTab({
                     <tr key={s.id} className="hover:bg-[#FAF8F5]">
                       {editingId === s.id ? (
                         <>
-                          <td className="px-4 py-2"><input value={editForm.subject_name || ""} onChange={e => setEditForm(f => ({ ...f, subject_name: e.target.value }))} className={inputCls} /></td>
-                          <td className="px-4 py-2"><input value={editForm.subject_code || ""} onChange={e => setEditForm(f => ({ ...f, subject_code: e.target.value }))} className={inputCls} /></td>
-                          <td className="px-4 py-2"><input type="number" value={editForm.theory_max ?? ""} onChange={e => setEditForm(f => ({ ...f, theory_max: +e.target.value }))} className={inputCls} /></td>
-                          <td className="px-4 py-2"><input type="number" value={editForm.practical_max ?? ""} onChange={e => setEditForm(f => ({ ...f, practical_max: +e.target.value }))} className={inputCls} /></td>
-                          <td className="px-4 py-2"><input type="number" value={editForm.ca_max ?? ""} onChange={e => setEditForm(f => ({ ...f, ca_max: +e.target.value }))} className={inputCls} /></td>
-                          <td className="px-4 py-2 text-right">
+                          <td className="px-4 py-2"><input value={editForm.subject_name || ""} onChange={e => setEditForm(f => ({ ...f, subject_name: e.target.value }))} className={`${inputCls} min-w-[180px]`} /></td>
+                          <td className="px-4 py-2"><input value={editForm.subject_code || ""} onChange={e => setEditForm(f => ({ ...f, subject_code: e.target.value }))} className={`${inputCls} min-w-[110px]`} /></td>
+                          <td className="px-4 py-2"><input type="number" value={editForm.theory_max ?? ""} onChange={e => setEditForm(f => ({ ...f, theory_max: +e.target.value }))} className={`${inputCls} min-w-[64px]`} /></td>
+                          <td className="px-4 py-2"><input type="number" value={editForm.practical_max ?? ""} onChange={e => setEditForm(f => ({ ...f, practical_max: +e.target.value }))} className={`${inputCls} min-w-[64px]`} /></td>
+                          <td className="px-4 py-2"><input type="number" value={editForm.ca_max ?? ""} onChange={e => setEditForm(f => ({ ...f, ca_max: +e.target.value }))} className={`${inputCls} min-w-[64px]`} /></td>
+                          <td className="px-4 py-2 text-right sticky right-0 bg-white">
                             <div className="flex items-center justify-end gap-1">
                               <button onClick={() => handleEdit(s.id)} disabled={saving} className="px-2 py-1 rounded-lg bg-[#0E3320] text-white text-[10px] font-bold"><Save className="w-3 h-3" /></button>
                               <button onClick={() => setEditingId(null)} className="px-2 py-1 rounded-lg bg-[#F2EDE4] text-[#0E3320] text-[10px] font-bold">Cancel</button>
@@ -337,12 +338,12 @@ function SubjectsTab({
                         </>
                       ) : (
                         <>
-                          <td className="px-4 py-2.5 font-semibold text-[#0E3320]">{s.subject_name}</td>
+                          <td className="px-4 py-2.5 font-semibold text-[#0E3320] [overflow-wrap:anywhere]">{s.subject_name}<div className="sm:hidden mt-0.5 text-[11px] font-medium text-[#5C8261]">{s.subject_code || "—"} · Theory {s.theory_max} · Practical {s.practical_max} · CA {s.ca_max}</div></td>
                           <td className="px-4 py-2.5 text-[#5C8261]">{s.subject_code || "—"}</td>
                           <td className="px-4 py-2.5 text-center text-[#0E3320]">{s.theory_max}</td>
                           <td className="px-4 py-2.5 text-center text-[#0E3320]">{s.practical_max}</td>
                           <td className="px-4 py-2.5 text-center text-[#0E3320]">{s.ca_max}</td>
-                          <td className="px-4 py-2.5 text-right">
+                          <td className="px-4 py-2.5 text-right sticky right-0 bg-white">
                             <div className="flex items-center justify-end gap-1">
                               <button onClick={() => { setEditingId(s.id); setEditForm({ subject_name: s.subject_name, subject_code: s.subject_code, theory_max: s.theory_max, practical_max: s.practical_max, ca_max: s.ca_max }); }} className="p-1.5 rounded-lg hover:bg-[#F2EDE4] text-[#5C8261] hover:text-[#0E3320]"><Pencil className="w-3.5 h-3.5" /></button>
                               <button onClick={() => handleDelete(s.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-[#5C8261] hover:text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
@@ -353,7 +354,7 @@ function SubjectsTab({
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </table></div>
             )}
           </div>
         </>
@@ -503,7 +504,7 @@ function DatesheetTab({
                   <button onClick={handleSave} disabled={saving} className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#0E3320] text-white text-xs font-bold hover:bg-[#15482D] disabled:opacity-60"><Save className="w-3.5 h-3.5" />{saving ? "Saving..." : "Save Datesheet"}</button>
                 </div>
               </div>
-              <table className="w-full text-xs">
+              <div className="overflow-x-auto"><table className="w-full min-w-[640px] text-xs">
                 <thead className="border-b border-[#DDD1BE] bg-[#FAF8F5]">
                   <tr>
                     <th className="px-4 py-2.5 text-left font-bold text-[#0E3320] uppercase">Subject</th>
@@ -541,7 +542,7 @@ function DatesheetTab({
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </table></div>
             </div>
           )}
         </>
@@ -864,7 +865,7 @@ function RollNumbersTab({
 
             <div className="flex items-center gap-2">
               <a
-                href={`/super-admin/dashboard/admit-cards/bulk?exam_session_id=${selectedSession}`}
+                href={`/super-admin/dashboard/admit-cards/bulk?exam_session_id=${selectedSession}${selectedCourse ? `&course_name=${encodeURIComponent(selectedCourse.trim())}` : ""}&year=${targetYear}`}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#0E3320] hover:bg-[#15482D] text-white text-xs font-bold transition-colors"
@@ -1386,7 +1387,7 @@ function ResultsTab({
           ) : filteredStudents.length === 0 ? (
             <div className="text-center py-10 text-[#5C8261] text-sm">No students found.</div>
           ) : (
-            <table className="w-full text-xs">
+            <div className="overflow-x-auto"><table className="w-full min-w-[640px] text-xs">
               <thead className="border-b border-[#DDD1BE] bg-[#FAF8F5]">
                 <tr>
                   <th className="px-4 py-2.5 text-left font-bold text-[#0E3320] uppercase">Roll No.</th>
@@ -1430,7 +1431,7 @@ function ResultsTab({
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table></div>
           )}
         </div>
       )}

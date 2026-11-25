@@ -12,9 +12,14 @@ function BulkAdmitCardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const exam_session_id = searchParams.get("exam_session_id");
+  const course_param = (searchParams.get("course_name") || "").trim();
+  const year_param = searchParams.get("year") || "";
 
   const [sessions, setSessions]   = useState([]);
   const [selSession, setSelSession] = useState(exam_session_id || "");
+  const [selCourse, setSelCourse] = useState(course_param);
+  const [selYear, setSelYear]     = useState(year_param);
+  const [courses, setCourses]     = useState([]);
   const [loading, setLoading]     = useState(false);
   const [admitCards, setAdmitCards] = useState([]);
   const [skipped, setSkipped]     = useState([]);
@@ -23,6 +28,7 @@ function BulkAdmitCardContent() {
 
   useEffect(() => {
     fetch("/api/admin/exam-sessions").then(r => r.json()).then(j => setSessions(j.data || []));
+    fetch("/api/admin/courses").then(r => r.json()).then(j => setCourses((j.data || []).map(c => (c.course_name || "").trim()).filter(Boolean)));
   }, []);
 
   useEffect(() => {
@@ -33,7 +39,10 @@ function BulkAdmitCardContent() {
     if (!sessionId) return;
     setLoading(true); setError(""); setAdmitCards([]); setSkipped([]);
     try {
-      const res = await fetch(`/api/admin/admit-cards/bulk?exam_session_id=${sessionId}`);
+      const qs = new URLSearchParams({ exam_session_id: sessionId });
+      if (selCourse) qs.set("course_name", selCourse);
+      if (selYear) qs.set("year", selYear);
+      const res = await fetch(`/api/admin/admit-cards/bulk?${qs.toString()}`);
       const json = await res.json();
       if (!res.ok) setError(json.error || "Failed to load");
       else { setAdmitCards(json.admitCards || []); setSkipped(json.skipped || []); }
@@ -41,7 +50,7 @@ function BulkAdmitCardContent() {
     setLoading(false);
   };
 
-  useEffect(() => { if (selSession) load(selSession); }, [selSession]);
+  useEffect(() => { if (selSession) load(selSession); }, [selSession, selCourse, selYear]);
 
   const sessionLabel = sessions.find(s => s.id === selSession)?.session_label || sessions.find(s => s.id === selSession)?.session_name || selSession;
 
@@ -113,6 +122,25 @@ function BulkAdmitCardContent() {
             ))}
           </select>
         </div>
+        <div>
+          <label className="block text-[10px] font-bold text-[#5C8261] uppercase mb-1">Course</label>
+          <select value={selCourse} onChange={e => setSelCourse(e.target.value)}
+            className="px-3 py-2 rounded-xl border border-[#DDD1BE] bg-[#FAF8F5] text-sm text-[#0E3320] focus:outline-none focus:ring-2 focus:ring-[#C59B3F] min-w-[220px] max-w-full">
+            <option value="">All Courses</option>
+            {courses.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="block text-[10px] font-bold text-[#5C8261] uppercase mb-1">Year</label>
+          <select value={selYear} onChange={e => setSelYear(e.target.value)}
+            className="px-3 py-2 rounded-xl border border-[#DDD1BE] bg-[#FAF8F5] text-sm text-[#0E3320] focus:outline-none focus:ring-2 focus:ring-[#C59B3F]">
+            <option value="">All Years</option>
+            <option value="1">1st Year</option>
+            <option value="2">2nd Year</option>
+            <option value="3">3rd Year</option>
+            <option value="4">4th Year</option>
+          </select>
+        </div>
         <button onClick={() => load(selSession)} disabled={!selSession || loading}
           className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#F2EDE4] text-[#0E3320] text-sm font-bold hover:bg-[#DDD1BE] disabled:opacity-50">
           <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /> Refresh
@@ -159,7 +187,7 @@ function BulkAdmitCardContent() {
                   <Printer className="w-3.5 h-3.5" /> Print All
                 </button>
               </div>
-              <table className="w-full text-xs">
+              <div className="overflow-x-auto"><table className="w-full min-w-[560px] text-xs">
                 <thead className="border-b border-[#DDD1BE] bg-[#FAF8F5]">
                   <tr>
                     <th className="px-4 py-2.5 text-left font-bold text-[#0E3320] uppercase">Roll No.</th>
@@ -187,7 +215,7 @@ function BulkAdmitCardContent() {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </table></div>
             </div>
           )}
 
@@ -197,7 +225,7 @@ function BulkAdmitCardContent() {
               <div className="bg-red-50 px-4 py-2.5 border-b border-red-200">
                 <p className="text-xs font-bold text-red-700 uppercase">Skipped — {skipped.length} Students (Incomplete Setup)</p>
               </div>
-              <table className="w-full text-xs">
+              <div className="overflow-x-auto"><table className="w-full min-w-[560px] text-xs">
                 <thead className="border-b border-red-100 bg-red-50/50">
                   <tr>
                     <th className="px-4 py-2 text-left font-bold text-red-700 uppercase">Roll No.</th>
@@ -214,7 +242,7 @@ function BulkAdmitCardContent() {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </table></div>
             </div>
           )}
 
@@ -222,7 +250,7 @@ function BulkAdmitCardContent() {
             <div className="text-center py-16 bg-white rounded-2xl border border-[#DDD1BE]">
               <Hash className="w-10 h-10 mx-auto text-[#DDD1BE] mb-2" />
               <p className="font-semibold text-[#5C8261] text-sm">No eligible students found</p>
-              <p className="text-xs text-[#9B8265] mt-1">Approve students and allot roll numbers first.</p>
+              <p className="text-xs text-[#9B8265] mt-1 px-4">Is session{selCourse ? ` aur "${selCourse}"` : ""}{selYear ? ` (Year ${selYear})` : ""} ke liye koi student nahi mila. Check karo: student approved hai, uska roll number allot hua hai, aur roll number usi session ka hai.</p>
             </div>
           )}
         </>
